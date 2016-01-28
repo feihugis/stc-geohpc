@@ -166,12 +166,16 @@ public class MerraSDLocalTest {
             }
         });
 
+        //Merge Line 3
+
         sqrMeanSum.foreach(new VoidFunction<Tuple2<String, Tuple2<Integer, float[]>>>() {
             @Override
             public void call(Tuple2<String, Tuple2<Integer, float[]>> input) throws Exception {
                 LOG.info(input._1() + " : **************** " + input._2()._1());
             }
         });
+
+        //Merge Line 1
 
         //sqrMeanSum.saveAsTextFile("./result.txt");
 
@@ -180,5 +184,7 @@ public class MerraSDLocalTest {
         //System.out.println(bMeanList.getValue().get(0)._2()[1]);
 
         //Test for merge from branch to master
+
+        //Merge Line 2
     }
 }
