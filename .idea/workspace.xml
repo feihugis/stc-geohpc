@@ -50,23 +50,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
-              <folding>
-                <marker date="1453956748000" expanded="true" signature="9086:9196" placeholder="//..." />
-              </folding>
+            <state vertical-scroll-proportion="0.45335278">
+              <caret line="134" column="31" selection-start-line="134" selection-start-column="31" selection-end-line="134" selection-end-column="31" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="true">
+      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.51677245">
-              <caret line="606" column="53" selection-start-line="606" selection-start-column="53" selection-end-line="606" selection-end-column="53" />
+            <state vertical-scroll-proportion="-29.64">
+              <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
               <folding />
             </state>
           </provider>
@@ -175,8 +173,8 @@
         <option value="$PROJECT_DIR$/stc-hive/pom.xml" />
         <option value="$PROJECT_DIR$/stc-hive/src/main/java/edu/gmu/stc/App.java" />
         <option value="$PROJECT_DIR$/stc-spark/pom.xml" />
-        <option value="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
+        <option value="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" />
       </list>
     </option>
   </component>
@@ -233,11 +231,11 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="1440" />
-    <option name="y" value="-170" />
+    <option name="y" value="-147" />
     <option name="width" value="1920" />
-    <option name="height" value="1200" />
+    <option name="height" value="1173" />
   </component>
-  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
     <OptionsSetting value="true" id="Remove" />
     <OptionsSetting value="true" id="Checkout" />
@@ -301,7 +299,6 @@
     <property name="project.structure.side.proportion" value="0.2" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="FullScreen" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
@@ -980,7 +977,7 @@
       <option name="number" value="Default" />
       <updated>1453951862394</updated>
       <workItem from="1453951865999" duration="2396000" />
-      <workItem from="1453955257609" duration="1305000" />
+      <workItem from="1453955257609" duration="1980000" />
     </task>
     <task id="LOCAL-00001" summary="Nothing&#10;&#10;Nothing&#10;">
       <created>1453956452428</created>
@@ -992,10 +989,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3701000" />
+    <option name="totallyTimeSpent" value="4376000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1440" y="-170" width="1920" height="1200" extended-state="6" />
+    <frame x="1440" y="-147" width="1920" height="1173" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1003,7 +1000,7 @@
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32958478" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32958478" sideWeight="0.5021299" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.33766234" sideWeight="0.5021299" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32958478" sideWeight="0.4978701" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31487888" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -1064,9 +1061,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="155" column="0" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
-          <folding>
-            <marker date="1453956748000" expanded="true" signature="9086:9196" placeholder="//..." />
-          </folding>
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1227,20 +1222,18 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
-          <folding>
-            <marker date="1453956748000" expanded="true" signature="9086:9196" placeholder="//..." />
-          </folding>
+        <state vertical-scroll-proportion="-29.64">
+          <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
+          <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.51677245">
-          <caret line="606" column="53" selection-start-line="606" selection-start-column="53" selection-end-line="606" selection-end-column="53" />
+        <state vertical-scroll-proportion="0.45335278">
+          <caret line="134" column="31" selection-start-line="134" selection-start-column="31" selection-end-line="134" selection-end-column="31" />
           <folding />
         </state>
       </provider>
