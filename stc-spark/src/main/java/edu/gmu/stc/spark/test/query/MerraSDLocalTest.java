@@ -171,7 +171,7 @@ public class MerraSDLocalTest {
         sqrMeanSum.foreach(new VoidFunction<Tuple2<String, Tuple2<Integer, float[]>>>() {
             @Override
             public void call(Tuple2<String, Tuple2<Integer, float[]>> input) throws Exception {
-                LOG.info(input._1() + " : **************** " + input._2()._1());
+                LOG.info(input._1() + " : *******Database branch********* " + input._2()._1());
             }
         });
 
@@ -186,5 +186,7 @@ public class MerraSDLocalTest {
         //Test for merge from branch to master
 
         //Merge Line 2
+
+        //Database branch
     }
 }
