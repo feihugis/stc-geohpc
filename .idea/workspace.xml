@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="fbc62c18-1327-4cec-937c-d8dfe897f582" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="fbc62c18-1327-4cec-937c-d8dfe897f582" name="Default" comment="" />
     <ignored path="stc-geohpc.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />
@@ -53,8 +51,8 @@
       <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5913978">
-              <caret line="138" column="9" selection-start-line="138" selection-start-column="9" selection-end-line="138" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.31048387">
+              <caret line="121" column="40" selection-start-line="121" selection-start-column="40" selection-end-line="121" selection-end-column="40" />
               <folding />
             </state>
           </provider>
@@ -66,8 +64,10 @@
             <state vertical-scroll-proportion="0.0">
               <caret line="614" column="37" selection-start-line="614" selection-start-column="37" selection-end-line="614" selection-end-column="37" />
               <folding>
-                <marker date="1453960081000" expanded="true" signature="70616:70685" placeholder="..." />
-                <marker date="1453960081000" expanded="true" signature="70616:70700" placeholder="..." />
+                <marker date="1453960739000" expanded="true" signature="59:76363" placeholder="..." />
+                <marker date="1453960739000" expanded="true" signature="98:192" placeholder="..." />
+                <marker date="1453960739000" expanded="true" signature="71268:71337" placeholder="..." />
+                <marker date="1453960739000" expanded="true" signature="71268:71352" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -989,7 +989,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4844000" />
+    <option name="totallyTimeSpent" value="4882000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="-170" width="1920" height="1200" extended-state="0" />
@@ -999,9 +999,9 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31499556" sideWeight="0.5063898" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31499556" sideWeight="0.5085197" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31499556" sideWeight="0.49361023" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31499556" sideWeight="0.4914803" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1070,8 +1070,10 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="609" column="37" selection-start-line="609" selection-start-column="37" selection-end-line="609" selection-end-column="37" />
           <folding>
-            <marker date="1453960081000" expanded="true" signature="70616:70685" placeholder="..." />
-            <marker date="1453960081000" expanded="true" signature="70616:70700" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="59:76363" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71337" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71352" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -1156,8 +1158,10 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
           <folding>
-            <marker date="1453960081000" expanded="true" signature="70616:70685" placeholder="..." />
-            <marker date="1453960081000" expanded="true" signature="70616:70700" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="59:76363" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71337" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71352" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -1388,16 +1392,18 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="614" column="37" selection-start-line="614" selection-start-column="37" selection-end-line="614" selection-end-column="37" />
           <folding>
-            <marker date="1453960081000" expanded="true" signature="70616:70685" placeholder="..." />
-            <marker date="1453960081000" expanded="true" signature="70616:70700" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="59:76363" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71337" placeholder="..." />
+            <marker date="1453960739000" expanded="true" signature="71268:71352" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5913978">
-          <caret line="138" column="9" selection-start-line="138" selection-start-column="9" selection-end-line="138" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.31048387">
+          <caret line="121" column="40" selection-start-line="121" selection-start-column="40" selection-end-line="121" selection-end-column="40" />
           <folding />
         </state>
       </provider>
