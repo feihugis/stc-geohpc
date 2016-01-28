@@ -173,10 +173,12 @@ public class MerraSDLocalTest {
             }
         });
 
-        sqrMeanSum.saveAsTextFile("./result.txt");
+        //sqrMeanSum.saveAsTextFile("./result.txt");
+
+        //just for test for merge from different branches
 
         //System.out.println(bMeanList.getValue().get(0)._2()[1]);
 
-        //test
+        //test merge
     }
 }
