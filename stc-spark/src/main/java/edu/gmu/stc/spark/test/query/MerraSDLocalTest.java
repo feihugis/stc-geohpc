@@ -179,7 +179,11 @@ public class MerraSDLocalTest {
 
         //System.out.println(bMeanList.getValue().get(0)._2()[1]);
 
+<<<<<<< HEAD
         //target test test test
         //test
+=======
+        //test merge test test test
+>>>>>>> master
     }
 }

@@ -4,6 +4,11 @@ stc-spark/target/
 stc-mapreduce/target/
 stc-hive/target/
 .DS_Store
+<<<<<<< HEAD
 */.DS_Store
 .idea/workspace.xml
 .idea/
+=======
+*/.DS_Stor
+.idea/*
+>>>>>>> master
