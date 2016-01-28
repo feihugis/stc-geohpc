@@ -1,0 +1,7 @@
+target/
+stc-index/target/
+stc-spark/target/
+stc-mapreduce/target/
+stc-hive/target/
+.DS_Store
+*/.DS_Store
