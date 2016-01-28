@@ -34,9 +34,13 @@
         <entry file="file://$PROJECT_DIR$/stc-spark/pom.xml">
           <provider selected="true" editor-type-id="text-editor">
 <<<<<<< HEAD
+<<<<<<< HEAD
             <state vertical-scroll-proportion="0.0">
 =======
             <state vertical-scroll-proportion="-16.72">
+>>>>>>> master
+=======
+            <state vertical-scroll-proportion="0.0">
 >>>>>>> master
               <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
               <folding />
@@ -57,6 +61,7 @@
       <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
           <provider selected="true" editor-type-id="text-editor">
+<<<<<<< HEAD
 <<<<<<< HEAD
             <state vertical-scroll-proportion="2.0631278">
               <caret line="162" column="51" selection-start-line="162" selection-start-column="51" selection-end-line="162" selection-end-column="51" />
@@ -79,7 +84,26 @@
             <state vertical-scroll-proportion="-29.64">
               <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
 >>>>>>> master
+=======
+            <state vertical-scroll-proportion="0.6935484">
+              <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
+>>>>>>> master
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="workspace.xml" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0">
+              <caret line="614" column="37" selection-start-line="614" selection-start-column="37" selection-end-line="614" selection-end-column="37" />
+              <folding>
+                <marker date="1453960885000" expanded="true" signature="59:76355" placeholder="..." />
+                <marker date="1453960885000" expanded="true" signature="98:192" placeholder="..." />
+                <marker date="1453960885000" expanded="true" signature="71260:71329" placeholder="..." />
+                <marker date="1453960885000" expanded="true" signature="71260:71344" placeholder="..." />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -146,10 +170,13 @@
               <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
 <<<<<<< HEAD
               <folding />
+<<<<<<< HEAD
 =======
               <folding>
                 <element signature="imports" expanded="false" />
               </folding>
+>>>>>>> master
+=======
 >>>>>>> master
             </state>
           </provider>
@@ -161,7 +188,10 @@
     <option name="PREVIOUS_COMMIT_AUTHORS">
       <list>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <option value="Fei Hu &lt;hufei68@gmail.com&gt;" />
+=======
+>>>>>>> master
 =======
 >>>>>>> master
         <option value="Fei Hu" />
@@ -171,7 +201,11 @@
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <entry key="$PROJECT_DIR$" value="master" />
+=======
+        <entry key="$PROJECT_DIR$" value="database" />
+>>>>>>> master
 =======
         <entry key="$PROJECT_DIR$" value="database" />
 >>>>>>> master
@@ -319,7 +353,11 @@
     <property name="MemberChooser.sorted" value="false" />
     <property name="MemberChooser.showClasses" value="true" />
     <property name="MemberChooser.copyJavadoc" value="false" />
+<<<<<<< HEAD
     <property name="settings.editor.selected.configurable" value="settings.github" />
+=======
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+>>>>>>> master
     <property name="settings.editor.splitter.proportion" value="0.2" />
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
@@ -1006,9 +1044,13 @@
       <workItem from="1453951865999" duration="2396000" />
       <workItem from="1453955257609" duration="1980000" />
 <<<<<<< HEAD
+<<<<<<< HEAD
       <workItem from="1453957772816" duration="372000" />
       <workItem from="1453958979823" duration="28000" />
 =======
+>>>>>>> master
+=======
+      <workItem from="1453958738166" duration="207000" />
 >>>>>>> master
     </task>
     <task id="LOCAL-00001" summary="Nothing&#10;&#10;Nothing&#10;">
@@ -1016,6 +1058,7 @@
       <option name="number" value="00001" />
       <option name="project" value="LOCAL" />
       <updated>1453956452428</updated>
+<<<<<<< HEAD
     </task>
 <<<<<<< HEAD
     <task id="LOCAL-00002" summary="Test for Merge&#10;&#10;Test for Merge">
@@ -1033,19 +1076,30 @@
   <component name="ToolWindowManager">
     <frame x="1440" y="-147" width="1920" height="1173" extended-state="6" />
 =======
+=======
+    </task>
+>>>>>>> master
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
+<<<<<<< HEAD
     <option name="totallyTimeSpent" value="4376000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="-147" width="1920" height="1173" extended-state="0" />
 >>>>>>> master
+=======
+    <option name="totallyTimeSpent" value="5042000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="1440" y="-170" width="1920" height="1200" extended-state="0" />
+>>>>>>> master
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+<<<<<<< HEAD
 <<<<<<< HEAD
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -1061,6 +1115,13 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32958478" sideWeight="0.4978701" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31487888" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
 >>>>>>> master
+=======
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31499556" sideWeight="0.5085197" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32960597" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.31499556" sideWeight="0.4914803" order="7" side_tool="false" content_ui="tabs" />
+>>>>>>> master
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24973376" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -1068,6 +1129,7 @@
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+<<<<<<< HEAD
 <<<<<<< HEAD
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931355" sideWeight="0.4978701" order="7" side_tool="false" content_ui="tabs" />
@@ -1081,6 +1143,14 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+>>>>>>> master
+=======
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32931355" sideWeight="0.4978701" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31487888" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
 >>>>>>> master
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1102,8 +1172,12 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Nothing&#10;&#10;Nothing&#10;" />
 <<<<<<< HEAD
+<<<<<<< HEAD
     <MESSAGE value="Test for Merge&#10;&#10;Test for Merge" />
     <option name="LAST_COMMIT_MESSAGE" value="Test for Merge&#10;&#10;Test for Merge" />
+=======
+    <option name="LAST_COMMIT_MESSAGE" value="Nothing&#10;&#10;Nothing&#10;" />
+>>>>>>> master
 =======
     <option name="LAST_COMMIT_MESSAGE" value="Nothing&#10;&#10;Nothing&#10;" />
 >>>>>>> master
@@ -1115,6 +1189,8 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/stc-spark/pom.xml">
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
@@ -1131,39 +1207,50 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
+>>>>>>> master
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
+=======
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="609" column="37" selection-start-line="609" selection-start-column="37" selection-end-line="609" selection-end-column="37" />
+          <folding>
+            <marker date="1453960885000" expanded="true" signature="59:76355" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71329" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71344" placeholder="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+>>>>>>> master
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
 =======
 >>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="609" column="37" selection-start-line="609" selection-start-column="37" selection-end-line="609" selection-end-column="37" />
 =======
-    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
->>>>>>> master
-          <folding />
-        </state>
-      </provider>
-    </entry>
-<<<<<<< HEAD
-    <entry file="file://$PROJECT_DIR$/stc-mapreduce/pom.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/stc-hive/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1211,7 +1298,164 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+>>>>>>> master
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="609" column="37" selection-start-line="609" selection-start-column="37" selection-end-line="609" selection-end-column="37" />
 =======
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
+<<<<<<< HEAD
+>>>>>>> master
+=======
+>>>>>>> master
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-hive/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-hive/src/main/java/edu/gmu/stc/App.java">
+=======
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
+>>>>>>> master
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#118#119#0" expanded="false" />
+            <element signature="e#170#171#0" expanded="false" />
+=======
+    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
+          <folding>
+            <marker date="1453960885000" expanded="true" signature="59:76355" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71329" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71344" placeholder="..." />
+>>>>>>> master
+          </folding>
+        </state>
+      </provider>
+    </entry>
+<<<<<<< HEAD
+=======
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-hive/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-hive/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#118#119#0" expanded="false" />
+            <element signature="e#170#171#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+>>>>>>> master
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/mapreduce/map/AverageFloatSimpleMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-spark/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+<<<<<<< HEAD
+          <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
+=======
+=======
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+>>>>>>> master
     <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1225,12 +1469,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
 <<<<<<< HEAD
+<<<<<<< HEAD
           <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
+=======
+          <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+>>>>>>> master
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
+=======
+    <entry file="file://$PROJECT_DIR$/stc-hive/pom.xml">
+>>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -1238,32 +1490,62 @@
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
+=======
+    <entry file="file://$PROJECT_DIR$/stc-hive/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+>>>>>>> master
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/stc-mapreduce/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
 =======
 >>>>>>> master
           <caret line="8" column="13" selection-start-line="8" selection-start-column="13" selection-end-line="8" selection-end-column="13" />
+=======
+    <entry file="file://$PROJECT_DIR$/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+>>>>>>> master
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/stc-hive/pom.xml">
+=======
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/App.java">
+>>>>>>> master
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding>
+            <element signature="e#118#119#0" expanded="false" />
+            <element signature="e#170#171#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/mapreduce/map/AverageFloatSimpleMapper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="16" column="13" selection-start-line="16" selection-start-column="13" selection-end-line="16" selection-end-column="13" />
           <folding />
         </state>
       </provider>
     </entry>
+<<<<<<< HEAD
     <entry file="file://$PROJECT_DIR$/stc-hive/src/main/java/edu/gmu/stc/App.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1277,6 +1559,40 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+=======
+    <entry file="file://$PROJECT_DIR$/stc-index/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-index/pom.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-3.8">
+          <caret line="5" column="8" selection-start-line="5" selection-start-column="8" selection-end-line="7" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-index/src/main/java/edu/gmu/stc/App.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="6" column="13" selection-start-line="6" selection-start-column="13" selection-end-line="6" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="94" column="66" selection-start-line="94" selection-start-column="66" selection-end-line="94" selection-end-column="66" />
+>>>>>>> master
           <folding />
         </state>
       </provider>
@@ -1288,15 +1604,21 @@
           <folding>
             <element signature="e#118#119#0" expanded="false" />
             <element signature="e#170#171#0" expanded="false" />
+<<<<<<< HEAD
 =======
           <folding>
             <element signature="imports" expanded="false" />
+>>>>>>> master
+=======
 >>>>>>> master
           </folding>
         </state>
       </provider>
     </entry>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> master
     <entry file="file://$PROJECT_DIR$/stc-mapreduce/src/main/java/edu/gmu/stc/mapreduce/map/AverageFloatSimpleMapper.java">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -1359,6 +1681,7 @@
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+<<<<<<< HEAD
           <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
           <folding />
         </state>
@@ -1532,6 +1855,8 @@
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
+=======
+>>>>>>> master
           <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
           <folding />
         </state>
@@ -1540,9 +1865,13 @@
     <entry file="file://$PROJECT_DIR$/stc-spark/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <state vertical-scroll-proportion="0.0">
 =======
         <state vertical-scroll-proportion="-16.72">
+>>>>>>> master
+=======
+        <state vertical-scroll-proportion="0.0">
 >>>>>>> master
           <caret line="22" column="18" selection-start-line="22" selection-start-column="18" selection-end-line="22" selection-end-column="18" />
           <folding />
@@ -1552,6 +1881,7 @@
     <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
       <provider selected="true" editor-type-id="text-editor">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <state vertical-scroll-proportion="0.0">
           <caret line="609" column="37" selection-start-line="609" selection-start-column="37" selection-end-line="609" selection-end-column="37" />
 =======
@@ -1559,17 +1889,32 @@
           <caret line="615" column="37" selection-start-line="615" selection-start-column="37" selection-end-line="615" selection-end-column="37" />
 >>>>>>> master
           <folding />
+=======
+        <state vertical-scroll-proportion="0.0">
+          <caret line="614" column="37" selection-start-line="614" selection-start-column="37" selection-end-line="614" selection-end-column="37" />
+          <folding>
+            <marker date="1453960885000" expanded="true" signature="59:76355" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="98:192" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71329" placeholder="..." />
+            <marker date="1453960885000" expanded="true" signature="71260:71344" placeholder="..." />
+          </folding>
+>>>>>>> master
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
       <provider selected="true" editor-type-id="text-editor">
 <<<<<<< HEAD
+<<<<<<< HEAD
         <state vertical-scroll-proportion="2.0631278">
           <caret line="162" column="51" selection-start-line="162" selection-start-column="51" selection-end-line="162" selection-end-column="51" />
 =======
         <state vertical-scroll-proportion="0.45335278">
           <caret line="134" column="31" selection-start-line="134" selection-start-column="31" selection-end-line="134" selection-end-column="31" />
+>>>>>>> master
+=======
+        <state vertical-scroll-proportion="0.6935484">
+          <caret line="174" column="0" selection-start-line="174" selection-start-column="0" selection-end-line="174" selection-end-column="0" />
 >>>>>>> master
           <folding />
         </state>
