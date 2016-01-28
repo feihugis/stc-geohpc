@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="fbc62c18-1327-4cec-937c-d8dfe897f582" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" afterPath="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" />
     </list>
     <ignored path="stc-geohpc.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -14,6 +13,7 @@
     <ignored path="$PROJECT_DIR$/stc-spark/target/" />
     <ignored path="$PROJECT_DIR$/stc-mapreduce/target/" />
     <ignored path="$PROJECT_DIR$/stc-hive/target/" />
+    <ignored path=".idea/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -41,11 +41,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="MerraSDLocalTest.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0">
-              <caret line="155" column="0" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.77077746">
+              <caret line="181" column="25" selection-start-line="181" selection-start-column="25" selection-end-line="181" selection-end-column="25" />
               <folding>
                 <element signature="e#7442#8119#0" expanded="true" />
                 <element signature="e#8118#8119#0" expanded="true" />
@@ -60,8 +60,8 @@
             <state vertical-scroll-proportion="-0.0">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding>
-                <marker date="1453963914000" expanded="true" signature="68718:68753" placeholder="..." />
-                <marker date="1453963914000" expanded="true" signature="68718:68766" placeholder="..." />
+                <marker date="1453964205000" expanded="true" signature="69395:69430" placeholder="..." />
+                <marker date="1453964205000" expanded="true" signature="69395:69443" placeholder="..." />
               </folding>
             </state>
           </provider>
@@ -92,16 +92,18 @@
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0">
               <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+              <folding>
+                <element signature="imports" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.15281501">
-              <caret line="6" column="10" selection-start-line="6" selection-start-column="10" selection-end-line="6" selection-end-column="10" />
+            <state vertical-scroll-proportion="0.0">
+              <caret line="5" column="9" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
               <folding />
             </state>
           </provider>
@@ -155,9 +157,9 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" />
         <option value="$PROJECT_DIR$/.idea/workspace.xml" />
         <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java" />
       </list>
     </option>
   </component>
@@ -246,6 +248,9 @@
   <component name="PropertiesComponent">
     <property name="aspect.path.notification.shown" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/.idea" />
+    <property name="settings.editor.splitter.proportion" value="0.2" />
   </component>
   <component name="RunManager" selected="Application.MerraSDLocalTest">
     <configuration default="false" name="MerraSDLocalTest" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
@@ -884,12 +889,12 @@
       <created>1453963723872</created>
       <option name="number" value="Default" />
       <updated>1453963723872</updated>
-      <workItem from="1453963725328" duration="172000" />
+      <workItem from="1453963725328" duration="462000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="1635000" />
+    <option name="totallyTimeSpent" value="1925000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1440" y="-170" width="1920" height="1200" extended-state="0" />
@@ -953,8 +958,8 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1453963914000" expanded="true" signature="68718:68753" placeholder="..." />
-            <marker date="1453963914000" expanded="true" signature="68718:68766" placeholder="..." />
+            <marker date="1453964205000" expanded="true" signature="69395:69430" placeholder="..." />
+            <marker date="1453964205000" expanded="true" signature="69395:69443" placeholder="..." />
           </folding>
         </state>
       </provider>
@@ -979,7 +984,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1054,7 +1061,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1129,7 +1138,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1204,7 +1215,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1304,7 +1317,9 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
+          <folding>
+            <element signature="imports" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -1329,28 +1344,28 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding>
-            <marker date="1453963914000" expanded="true" signature="68718:68753" placeholder="..." />
-            <marker date="1453963914000" expanded="true" signature="68718:68766" placeholder="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="155" column="0" selection-start-line="155" selection-start-column="0" selection-end-line="155" selection-end-column="0" />
-          <folding>
-            <element signature="e#7442#8119#0" expanded="true" />
-            <element signature="e#8118#8119#0" expanded="true" />
+            <marker date="1453964205000" expanded="true" signature="69395:69430" placeholder="..." />
+            <marker date="1453964205000" expanded="true" signature="69395:69443" placeholder="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.15281501">
-          <caret line="6" column="10" selection-start-line="6" selection-start-column="10" selection-end-line="6" selection-end-column="10" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="5" column="9" selection-start-line="5" selection-start-column="9" selection-end-line="5" selection-end-column="9" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/stc-spark/src/main/java/edu/gmu/stc/spark/test/query/MerraSDLocalTest.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.77077746">
+          <caret line="181" column="25" selection-start-line="181" selection-start-column="25" selection-end-line="181" selection-end-column="25" />
+          <folding>
+            <element signature="e#7442#8119#0" expanded="true" />
+            <element signature="e#8118#8119#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
