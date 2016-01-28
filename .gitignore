@@ -5,3 +5,4 @@ stc-mapreduce/target/
 stc-hive/target/
 .DS_Store
 */.DS_Store
+.idea/
