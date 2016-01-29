@@ -90,7 +90,6 @@ public class MerraSDLocalTest {
                 for (int i=0; i<input._2().getSize(); i++) {
                     values[i] = input._2().getFloat(i);
                 }
-
                 return new Tuple2<VariableInfo, float[]>(input._1(), values);
             }
         });
