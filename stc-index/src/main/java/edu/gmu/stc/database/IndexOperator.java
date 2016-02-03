@@ -142,42 +142,42 @@ public class IndexOperator {
 			while(ritr.hasNext()) {
 				fileStatusList.add(ritr.next());
 			}
-			
+
 			//Filter the files that is not HDF format
 			ArrayList<FileStatus> unHDFs = new ArrayList<FileStatus>();
-		    for(FileStatus file: fileStatusList) {
-		    	String location = file.getPath().toString();
-		    	String[] paths = location.split("\\.");
-		    	String format = paths[paths.length-1];
-		    	if(!format.equalsIgnoreCase("hdf")) {
-		    		unHDFs.add(file);
-		    	}	
-		    }    
-		    
-		    fileStatusList.removeAll(unHDFs);
-			
+		        for ( FileStatus file : fileStatusList ) {
+		    		String location = file.getPath().toString();
+		    		String[] paths = location.split("\\.");
+		    		String format = paths[paths.length-1];
+		    		if(!format.equalsIgnoreCase("hdf")) {
+		    			unHDFs.add(file);
+		    	}
+		    }
+
+                        fileStatusList.removeAll(unHDFs);
+
 			for(FileStatus fileStatus : fileStatusList) {
 				String[] file = fileStatus.getPath().toString().split("\\.");
 				String date = file[file.length-2];
-				
+
 				int dd = Integer.parseInt(date);
 				if(sDate>dd || eDate<dd) {
 					continue;
 				}
-				
+
 				NcHdfsRaf raf = new NcHdfsRaf(fileStatus, conf);
 				NetcdfFile ncfile = NetcdfFile.open(raf, fileStatus.getPath().toString());
 				List<Variable> varList = new ArrayList<Variable>();
 				varList = ncfile.getVariables();
-				
-				
+
+
 				for(Variable var : varList) {
 					if(!var.getFullName().contains("EOSGRID/Data_Fields/") || var.isCoordinateVariable() && var.isMetadata() || var.getFullName().equals("Time")
 							|| var.getShortName().equals("XDim")|| var.getShortName().equals("YDim")
 							|| var.getShortName().equals("Height")|| var.getShortName().equals("Time")) {
 						continue;
 					}
-					
+
 					int hour = 0; //For daily data, "hour" means hour, but for monthly data, "hour" means day
 					String varInfo = var.getVarLocationInformation();
 					String[] unitsV = varInfo.split("; ");
@@ -203,7 +203,7 @@ public class IndexOperator {
 							blockHosts = hostString;
 							//blockHosts = blockString + hostString;
 						}
-						
+
 						//String time;
 						String dims_noSpace = date + getDimension(p1[0]);
 						/*if(hour<10) {
@@ -211,8 +211,8 @@ public class IndexOperator {
 						} else {
 							time = date + hour;
 						}*/
-						
-						
+
+
 						if(dd<1000000) {
 							dateType = "Monthly";
 						} else {
@@ -222,10 +222,10 @@ public class IndexOperator {
 						varInfoList.add(unitVInfo);
 						//dbOperator.addVarRecord(unitVInfo, dateType);
 						//hour++;
-					}	
-					
+					}
+
 					dbOperator.addVarRecordList(varInfoList, dateType);
-					
+
 				}
 			}
 		} catch (FileNotFoundException e) {

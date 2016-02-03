@@ -26,6 +26,11 @@
             <artifactId>stc-index</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>edu.gmu.stc</groupId>
+            <artifactId>stc-spark</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
