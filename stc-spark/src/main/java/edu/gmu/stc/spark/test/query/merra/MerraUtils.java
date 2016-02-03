@@ -1,4 +1,4 @@
-package edu.gmu.stc.spark.test.query;
+package edu.gmu.stc.spark.test.query.merra;
 
 import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;

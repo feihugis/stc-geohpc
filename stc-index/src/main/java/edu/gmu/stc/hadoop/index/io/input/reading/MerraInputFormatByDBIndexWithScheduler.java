@@ -42,7 +42,7 @@ public class MerraInputFormatByDBIndexWithScheduler extends FileInputFormat {
 		
 		List<String> varNamesList = getVariableQuearyList(job.getConfiguration().getStrings("variables"));
 		int startDate = Integer.parseInt(job.getConfiguration().get("startTime")); //For daily data, the format should be 20141001 (yyyymmdd)
-	    int endDate = Integer.parseInt(job.getConfiguration().get("endTime"));
+                int endDate = Integer.parseInt(job.getConfiguration().get("endTime"));
 	      
 		String inputBbox = job.getConfiguration().get("bbox");
 		HashMap<String, List<Integer[]>> bboxMap = Utils.parseBbox(inputBbox);
