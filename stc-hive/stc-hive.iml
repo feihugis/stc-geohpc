@@ -135,7 +135,6 @@
     <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro:1.7.4" level="project" />
     <orderEntry type="library" name="Maven: com.google.protobuf:protobuf-java:2.5.0" level="project" />
-    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.2.4" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-auth:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpclient:4.2.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.httpcomponents:httpcore:4.2.4" level="project" />
@@ -167,5 +166,7 @@
     <orderEntry type="library" name="Maven: com.sun.jersey:jersey-client:1.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-mapreduce-client-jobclient:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: gov.nasa.gsfc.cisto.cds.sia.netcdfAll:netcdfAll:4.3.23" level="project" />
+    <orderEntry type="library" name="Maven: com.vividsolutions:jts:1.13" level="project" />
+    <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.6.1" level="project" />
   </component>
 </module>

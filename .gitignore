@@ -3,6 +3,7 @@ stc-index/target/
 stc-spark/target/
 stc-mapreduce/target/
 stc-hive/target/
+*/*.iml
 .DS_Store
 <<<<<<< HEAD
 */.DS_Store
