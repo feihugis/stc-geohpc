@@ -17,48 +17,17 @@ import ucar.nc2.Variable;
  * Created by Fei Hu on 2/17/16.
  */
 public class H5Chunk extends DataChunk {
-  String varShortName;
-  String filePath;
+
+  public H5Chunk() {}
 
   public H5Chunk(String shortName, String path, int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
                  int filterMask, String[] hosts, String dataType) {
-    super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType);
-    varShortName = shortName;
-    filePath = path;
+    super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, path);
   }
 
   @Override
-  public void write(DataOutput out) throws IOException {
-    super.write(out);
-    Text.writeString(out, varShortName);
-    Text.writeString(out, filePath);
-  }
-
-  @Override
-  public void readFields(DataInput in) throws IOException {
-    super.readFields(in);
-    varShortName = Text.readString(in);
-    filePath = Text.readString(in);
-  }
-
-  public String getVarShortName() {
-    return varShortName;
-  }
-
-  public void setVarShortName(String varShortName) {
-    this.varShortName = varShortName;
-  }
-
-  public String getFilePath() {
-    return filePath;
-  }
-
-  public void setFilePath(String filePath) {
-    this.filePath = filePath;
-  }
-
   public String toString() {
-    String output = varShortName + " corner : ";
+    String output = this.getVarShortName() + " corner : ";
     for (int corner : getCorner()) {
       output = output + corner + " ";
     }

@@ -19,9 +19,15 @@ public abstract class DataChunk implements Writable{
   int filterMask = -1;         //compression type for HDF4; filter type for HDF5
   String[] hosts = null;       //the data nodes who host these data
   String dataType;             //the data type
+  String varShortName;
+  String filePath;
+
+  public DataChunk() {}
+
+
 
   public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
-                   int filterMask, String[] hosts, String dataType) {
+                   int filterMask, String[] hosts, String dataType, String varShortName, String filePath) {
     this.corner = corner;
     this.shape = shape;
     this.dimensions = dimensions;
@@ -30,6 +36,19 @@ public abstract class DataChunk implements Writable{
     this.filterMask = filterMask;
     this.hosts = hosts;
     this.dataType = dataType;
+    this.varShortName = varShortName;
+    this.filePath = filePath;
+  }
+
+
+  @Override
+  public String toString() {
+    String output = this.getVarShortName() + " corner : ";
+    for (int corner : getCorner()) {
+      output = output + corner + " ";
+    }
+    output += "start : " + getFilePos() + " end : " + (getFilePos() + getByteSize());
+    return output;
   }
 
   @Override
@@ -57,6 +76,8 @@ public abstract class DataChunk implements Writable{
     }
 
     Text.writeString(out, dataType);
+    Text.writeString(out, varShortName);
+    Text.writeString(out, filePath);
   }
 
   @Override
@@ -89,6 +110,8 @@ public abstract class DataChunk implements Writable{
     }
 
     dataType = Text.readString(in);
+    varShortName = Text.readString(in);
+    filePath = Text.readString(in);
   }
 
   public int[] getCorner() {
@@ -145,5 +168,29 @@ public abstract class DataChunk implements Writable{
 
   public void setHosts(String[] hosts) {
     this.hosts = hosts;
+  }
+
+  public String getDataType() {
+    return dataType;
+  }
+
+  public void setDataType(String dataType) {
+    this.dataType = dataType;
+  }
+
+  public String getVarShortName() {
+    return varShortName;
+  }
+
+  public void setVarShortName(String varShortName) {
+    this.varShortName = varShortName;
+  }
+
+  public String getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(String filePath) {
+    this.filePath = filePath;
   }
 }

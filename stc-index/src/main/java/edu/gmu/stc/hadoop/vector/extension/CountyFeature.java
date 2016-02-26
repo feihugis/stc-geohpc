@@ -14,7 +14,7 @@ import edu.gmu.stc.hadoop.vector.Polygon;
 /**
  * Created by Fei Hu on 2/21/16.
  */
-public class CountyFeature implements Writable{
+public class CountyFeature implements Feature, Writable{
   String type;
   String GEO_ID;
   String STATE;
@@ -152,5 +152,10 @@ public class CountyFeature implements Writable{
 
   public void setPolygonList(List<Polygon> polygonList) {
     this.polygonList = polygonList;
+  }
+
+  @Override
+  public List<Polygon> getFeature() {
+    return this.polygonList;
   }
 }
