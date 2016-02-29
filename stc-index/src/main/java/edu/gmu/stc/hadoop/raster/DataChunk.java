@@ -12,8 +12,8 @@ import java.io.IOException;
  */
 public abstract class DataChunk implements Writable{
   int[] corner = null;         //relative to the whole picture
-  int[] shape = null;          //chunk shape
-  String[] dimensions = null;  //dimension info for each dimension
+  int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
+  String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
   long filePos = 0;            //the start location in the file
   long byteSize = 0;           // byte size for this chunk
   int filterMask = -1;         //compression type for HDF4; filter type for HDF5
@@ -23,8 +23,6 @@ public abstract class DataChunk implements Writable{
   String filePath;
 
   public DataChunk() {}
-
-
 
   public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
                    int filterMask, String[] hosts, String dataType, String varShortName, String filePath) {

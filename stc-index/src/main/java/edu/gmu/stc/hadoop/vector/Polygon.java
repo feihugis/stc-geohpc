@@ -9,6 +9,8 @@
 package edu.gmu.stc.hadoop.vector;
 
 import org.apache.hadoop.io.Text;
+import org.postgis.LinearRing;
+import org.postgis.PGgeometry;
 
 
 import java.awt.*;
@@ -30,7 +32,6 @@ import edu.gmu.stc.hadoop.io.TextSerializerHelper;
 public class Polygon implements Shape {
 
   private static final long serialVersionUID = -117491486038680078L;
-
   double[] xpoints;
   double[] ypoints;
   int npoints;
@@ -134,5 +135,43 @@ public class Polygon implements Shape {
   @Override
   public void draw(Graphics g, double xscale, double yscale) {
     throw new RuntimeException("Not implemented yet");
+  }
+
+  public double[] getXpoints() {
+    return xpoints;
+  }
+
+  public void setXpoints(double[] xpoints) {
+    this.xpoints = xpoints;
+  }
+
+  public double[] getYpoints() {
+    return ypoints;
+  }
+
+  public void setYpoints(double[] ypoints) {
+    this.ypoints = ypoints;
+  }
+
+  public int getNpoints() {
+    return npoints;
+  }
+
+  public void setNpoints(int npoints) {
+    this.npoints = npoints;
+  }
+
+  public org.postgis.Polygon toPostGISPolygon() {
+    org.postgis.Point[] points = new org.postgis.Point[npoints+1];
+    for (int i=0; i<npoints; i++) {
+      points[i] = new org.postgis.Point(xpoints[i], ypoints[i]);
+    }
+    points[npoints] = new org.postgis.Point(xpoints[0], ypoints[0]);
+    org.postgis.LinearRing[] linearRing = new LinearRing[] {new LinearRing(points)};
+    return new org.postgis.Polygon(linearRing);
+  }
+
+  public org.postgis.PGgeometry toPostGISPGgeometry() {
+    return new PGgeometry(toPostGISPolygon());
   }
 }

@@ -45,7 +45,7 @@ public class Point implements Shape, Comparable<Point> {
 	  this.y = s.y;
   }
 
-  public void set(double x, double y) {
+        public void set(double x, double y) {
 		this.x = x;
 		this.y = y;
 	}
