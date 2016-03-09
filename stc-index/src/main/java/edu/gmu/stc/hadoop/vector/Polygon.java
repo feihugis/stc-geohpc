@@ -8,7 +8,10 @@
 *************************************************************************/
 package edu.gmu.stc.hadoop.vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.io.Text;
+import org.postgis.Geometry;
 import org.postgis.LinearRing;
 import org.postgis.PGgeometry;
 
@@ -30,7 +33,7 @@ import edu.gmu.stc.hadoop.io.TextSerializerHelper;
  *
  */
 public class Polygon implements Shape {
-
+  private static final Log LOG = LogFactory.getLog(Polygon.class);
   private static final long serialVersionUID = -117491486038680078L;
   double[] xpoints;
   double[] ypoints;
@@ -173,5 +176,28 @@ public class Polygon implements Shape {
 
   public org.postgis.PGgeometry toPostGISPGgeometry() {
     return new PGgeometry(toPostGISPolygon());
+  }
+
+  public static Polygon generatePolygonFromPGgeometry(PGgeometry plgn) {
+    if (plgn.getGeoType() == Geometry.POLYGON) {
+      org.postgis.Polygon polygon = (org.postgis.Polygon) plgn.getGeometry();
+      LinearRing ring = polygon.getRing(0);
+      org.postgis.Point[] points = ring.getPoints();
+      double[] xpoints = new double[points.length-1];
+      double[] ypoints = new double[points.length-1];
+      for (int i=0; i<points.length-1; i++) {
+        xpoints[i] = points[i].getX();
+        ypoints[i] = points[i].getY();
+      }
+      return new Polygon(xpoints, ypoints, points.length-1);
+    } else {
+      LOG.info("There is a bug in edu.gmu.stc.hadoop.vector.Polygon.generatePolygonFromPGgeometry" );
+    }
+    return null;
+  }
+
+  public static void main(String[] args) {
+    Polygon plgn = new Polygon(new double[]{0.0, 1.0, 1.0, 0.0}, new double[]{0.0, 0.0,1.0,1.0}, 4);
+    System.out.println(plgn.toPostGISPGgeometry().toString());
   }
 }

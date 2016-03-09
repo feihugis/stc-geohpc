@@ -1,23 +1,14 @@
-package edu.gmu.stc.hadoop.raster.index;
+package edu.gmu.stc.hadoop.raster.index.merra2;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.DBConnector;
-import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
 import edu.gmu.stc.hadoop.raster.ChunkFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
-import ucar.ma2.InvalidRangeException;
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.Variable;
 
 /**
  * Created by Fei Hu on 2/26/16.
@@ -74,7 +65,19 @@ public class Merr2IndexBuilder {
 
   public static void main(String[] args) {
     List<String> files = new ArrayList<String>();
-    files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.inst1_2d_int_Nx.19800101.nc4");
+    //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.inst1_2d_int_Nx.19800101.nc4");
+    //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.tavg1_2d_int_Nx.19800101.nc4");
+    //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.tavg1_2d_int_Nx.19800102.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150101.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150102.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150103.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150104.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150105.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150106.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150107.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150108.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150109.nc4");
+    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150110.nc4");
     try {
       Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
       merra2IndexBuilder.initMetaIndexTable();

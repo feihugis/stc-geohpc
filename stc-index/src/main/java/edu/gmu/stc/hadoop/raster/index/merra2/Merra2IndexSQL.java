@@ -1,16 +1,14 @@
-package edu.gmu.stc.hadoop.raster.index;
+package edu.gmu.stc.hadoop.raster.index.merra2;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.mapreduce.InputSplit;
-import org.postgis.Geometry;
 import org.postgis.PGgeometry;
-import org.postgresql.geometric.PGpoint;
-import org.postgresql.geometric.PGpolygon;
 
+import java.io.IOException;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -23,7 +21,10 @@ import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
 import edu.gmu.stc.hadoop.raster.hdf5.Merra2Chunk;
+import edu.gmu.stc.hadoop.raster.index.MetaData;
 import edu.gmu.stc.hadoop.vector.Polygon;
+import ucar.nc2.NetcdfFile;
+import ucar.nc2.Variable;
 
 /**
  * Created by Fei Hu on 2/25/16.
@@ -250,21 +251,97 @@ public class Merra2IndexSQL {
       e.printStackTrace();
       e.getNextException().printStackTrace();
     }
+  }
 
+  public List<DataChunk> queryDataChunk(String tableName, List<String> varList, Polygon polygon) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+                  + "WHERE merra.geometry = spaceindex.geometry\n"
+                  + "AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
+                  + "'::geometry)\n";
+    String varSQL = "AND (";
+    for (int i = 0; i < varList.size() - 1; i++) {
+      varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' \n OR ";
+    }
+
+    varSQL = varSQL + "merra.varshortname = '" + varList.get(varList.size() - 1) + "') ORDER BY merra.corner;";
+
+    sql = sql + varSQL;
+    System.out.println(sql);
+
+    ResultSet rs;
+    try {
+      rs = this.statement.executeQuery(sql);
+      chunkList = generateDataChunk(rs);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+    return chunkList;
+  }
+
+  public List<DataChunk> generateDataChunk(ResultSet rs) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    try {
+      rs.last();
+      if (rs.getRow() == 0) {
+        System.out.println(this.getClass().getName() + ".generateDataChunk: ResultSet is empty");
+        rs.close();
+      } else {
+        rs.first();
+        do {
+          Integer[] corner = (Integer[]) rs.getArray("corner").getArray();
+          Integer[] shape = (Integer[]) rs.getArray("shape").getArray();
+          String[] dimensions = (String[]) rs.getArray("dimensions").getArray();
+          Long filepos = rs.getLong("filepos");
+          Long bytesize = rs.getLong("bytesize");
+          int filtermask = rs.getInt("filtermask");
+          String[] hosts = (String[]) rs.getArray("hosts").getArray();
+          String datatype = rs.getString("datatype");
+          String varshortname = rs.getString("varshortname");
+          String filepath = rs.getString("filepath");
+
+          Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
+                                                    dimensions, filepos, bytesize, filtermask,
+                                                    hosts,datatype);
+          chunkList.add(merra2Chunk);
+          rs.next();
+        } while (!rs.isAfterLast());
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return chunkList;
   }
 
   public static void main(String[] args) {
     Merra2IndexSQL hdf5IdxBuilder = new Merra2IndexSQL(new DBConnector().GetConnStatement());
+    List<String> varList = new ArrayList<String>();
+    varList.add("UFLXKE");
+    varList.add("AUTCNVRN");
+    varList.add("BKGERR");
+    Polygon plgn = new Polygon(new double[]{0.0, 1.0, 1.0, 0.0}, new double[]{0.0, 0.0,1.0,1.0}, 4);
+    hdf5IdxBuilder.queryDataChunk("merra2_100_tavg1_2d_int_nx_19800101_nc4", varList, plgn);
     //hdf5IdxBuilder.createPostGISExtension();
     //hdf5IdxBuilder.createMerra2SpaceIndexTable();
     //hdf5IdxBuilder.createFileIndexTable("MERRA2_100_inst1_2d_int_Nx_222129800107_Nc4");
-    List<String> names = new ArrayList<String>();
+    /*List<String> names = new ArrayList<String>();
     for (int i=0; i< 5; i++) {
       names.add("test"+i);
-    }
+    }*/
     //hdf5IdxBuilder.createBtreeOperatorClass();
     //hdf5IdxBuilder.addBtreeIndex2Table("lai", "geometry");
     //hdf5IdxBuilder.addBtreeIndex2Table("merra2spaceindex", "geometry");
     //hdf5IdxBuilder.addForeignKey("lai");
+
+/*    try {
+      NetcdfFile nc = NetcdfFile.open("/Users/feihu/Desktop/MOP01-20000319-L1V3.42.0.he5");
+      List<Variable> variableList = nc.getVariables();
+      for (Variable var : variableList) {
+        System.out.println(var.read().toString());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }*/
   }
 }

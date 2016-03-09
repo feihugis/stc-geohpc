@@ -1,8 +1,6 @@
 package edu.gmu.stc.hadoop.raster.index;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import edu.gmu.stc.hadoop.vector.Polygon;
 
@@ -20,6 +18,9 @@ public class MetaData {
     public static double lonUnit = 0.625;
     public static int latShape = 361;
     public static int lonShape = 576;
+    public static float fillValue = 9.9999999E14f;
+    public static float vmax = 9.9999999E14f;
+    public static float vmin = 9.9999999E14f;
 
     public static HashMap<int[],Polygon> getChunkBoundaries() {
       HashMap<int[], Polygon> chunkBoundaries = new HashMap<int[], Polygon>();

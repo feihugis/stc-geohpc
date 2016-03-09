@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import ucar.ma2.InvalidRangeException;
@@ -25,7 +26,7 @@ public class ChunkFactory {
   private FSDataInputStream fsInput = null;
   private static Configuration conf = new Configuration();
   static {
-    //conf.set("fs.defaultFS", MyProperty.nameNode);
+    conf.set("fs.defaultFS", MyProperty.nameNode);
     conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
     conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
     conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
