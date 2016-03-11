@@ -350,7 +350,7 @@ public class MerraInputFormatByDBIndexWithScheduler extends FileInputFormat {
 	@Override
 	protected List<FileStatus> listStatus(JobContext jobC) throws IOException {
 
-		int startTime = Integer.parseInt(jobC.getConfiguration().get("startTime"));
+            int startTime = Integer.parseInt(jobC.getConfiguration().get("startTime"));
 	    int endTime = Integer.parseInt(jobC.getConfiguration().get("endTime"));	
 	   
 	    List<FileStatus> files = super.listStatus(jobC);

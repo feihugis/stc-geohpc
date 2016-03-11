@@ -58,17 +58,6 @@ public class Merra2Chunk extends H5Chunk{
     boundary = new Polygon(lons,lats, 4);
   }
 
-  @Override
-  public void write(DataOutput out) throws IOException {
-    super.write(out);
-    boundary.write(out);
-  }
-
-  @Override
-  public void readFields(DataInput in) throws IOException {
-    super.readFields(in);
-    boundary.readFields(in);
-  }
 
   public Polygon getBoundary() {
     return boundary;

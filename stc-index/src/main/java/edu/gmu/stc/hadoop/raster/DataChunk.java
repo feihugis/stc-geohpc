@@ -2,6 +2,7 @@ package edu.gmu.stc.hadoop.raster;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+import org.apache.hadoop.mapreduce.InputSplit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -21,6 +22,7 @@ public abstract class DataChunk implements Writable{
   String dataType;             //the data type
   String varShortName;
   String filePath;
+  boolean isContain = true;
 
   public DataChunk() {}
 
@@ -37,6 +39,7 @@ public abstract class DataChunk implements Writable{
     this.varShortName = varShortName;
     this.filePath = filePath;
   }
+
 
 
   @Override
@@ -76,6 +79,8 @@ public abstract class DataChunk implements Writable{
     Text.writeString(out, dataType);
     Text.writeString(out, varShortName);
     Text.writeString(out, filePath);
+
+    out.writeBoolean(isContain);
   }
 
   @Override
@@ -110,6 +115,15 @@ public abstract class DataChunk implements Writable{
     dataType = Text.readString(in);
     varShortName = Text.readString(in);
     filePath = Text.readString(in);
+    isContain = in.readBoolean();
+  }
+
+  public boolean isContain() {
+    return isContain;
+  }
+
+  public void setContain(boolean contain) {
+    isContain = contain;
   }
 
   public int[] getCorner() {

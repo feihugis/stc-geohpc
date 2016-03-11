@@ -20,6 +20,7 @@ public class H5Chunk extends DataChunk {
 
   public H5Chunk() {}
 
+
   public H5Chunk(String shortName, String path, int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
                  int filterMask, String[] hosts, String dataType) {
     super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, path);

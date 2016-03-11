@@ -1,5 +1,6 @@
 package edu.gmu.stc.hadoop.raster.index.merra2;
 
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.Path;
 
 import java.io.IOException;
@@ -9,6 +10,9 @@ import java.util.List;
 import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.ChunkFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
+import edu.gmu.stc.hadoop.raster.RasterUtils;
+import edu.gmu.stc.hadoop.raster.hdf5.H5ChunkInputSplit;
+import edu.gmu.stc.hadoop.vector.Polygon;
 
 /**
  * Created by Fei Hu on 2/26/16.
@@ -30,14 +34,7 @@ public class Merr2IndexBuilder {
    */
   public void createFileIndexTablesInBatch(List<String> files) {
     List<String> tableNames = new ArrayList<String>();
-    for (int i=0; i<files.size(); i++) {
-      String[] tmps = files.get(i).split("/");
-      String tableName = tmps[tmps.length-1].toLowerCase();
-      while (tableName.contains(".")) {
-        tableName = tableName.replace(".", "_");
-      }
-      tableNames.add(tableName);
-    }
+    tableNames = RasterUtils.fileNamesToTableNames(files);
     this.sqlOptor.createFileIndexTablesInBatch(tableNames);
   }
 
@@ -62,6 +59,27 @@ public class Merr2IndexBuilder {
   public void insertdataChunks(String tableName, List<DataChunk> chunks) {
     this.sqlOptor.insertDataChunks(tableName, chunks);
   }
+
+
+
+  /**
+   *
+   * @param pathTableName   it can be the input file paths or table names
+   * @param varList
+   * @param polygon
+   * @return
+   */
+  public List<H5ChunkInputSplit> queryDataChunksByfilePathOrTablename(List<String> pathTableName, List<String> varList, Polygon polygon) {
+    List<String> tableNameList = RasterUtils.fileNamesToTableNames(pathTableName);
+    return this.sqlOptor.queryDataChunks(tableNameList, varList, polygon);
+  }
+
+  public List<H5ChunkInputSplit> queryDataChunksByinputFileStatus(List<FileStatus> fileStatusList, List<String> varList, Polygon polygon) {
+    List<String> tableNameList = RasterUtils.fileStatusToTableNames(fileStatusList);
+    return this.sqlOptor.queryDataChunks(tableNameList, varList, polygon);
+  }
+
+
 
   public static void main(String[] args) {
     List<String> files = new ArrayList<String>();

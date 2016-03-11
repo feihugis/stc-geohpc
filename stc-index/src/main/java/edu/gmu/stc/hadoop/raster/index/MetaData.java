@@ -3,6 +3,7 @@ package edu.gmu.stc.hadoop.raster.index;
 import java.util.HashMap;
 
 import edu.gmu.stc.hadoop.vector.Polygon;
+import ucar.nc2.iosp.hdf5.H5header;
 
 /**
  * Created by Fei Hu on 2/25/16.

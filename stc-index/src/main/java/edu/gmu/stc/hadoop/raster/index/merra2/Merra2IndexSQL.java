@@ -20,11 +20,10 @@ import java.util.Map;
 import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
+import edu.gmu.stc.hadoop.raster.hdf5.H5ChunkInputSplit;
 import edu.gmu.stc.hadoop.raster.hdf5.Merra2Chunk;
 import edu.gmu.stc.hadoop.raster.index.MetaData;
 import edu.gmu.stc.hadoop.vector.Polygon;
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.Variable;
 
 /**
  * Created by Fei Hu on 2/25/16.
@@ -34,6 +33,7 @@ public class Merra2IndexSQL {
   private Statement statement = null;
   private String merra2SpaceIndex = "merra2spaceindex";
   private String optorClass = "merraindex";
+  private boolean debug = true;
 
   public Merra2IndexSQL(Statement statement) {
     this.statement = statement;
@@ -253,7 +253,24 @@ public class Merra2IndexSQL {
     }
   }
 
-  public List<DataChunk> queryDataChunk(String tableName, List<String> varList, Polygon polygon) {
+  public List<H5ChunkInputSplit> queryDataChunks(List<String> tableNameList, List<String> varList, Polygon polygon) {
+    List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
+    for (String tableName : tableNameList) {
+      inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon));
+      inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    }
+
+    return inputSplits;
+  }
+
+  public List<H5ChunkInputSplit> queryDataChunks(String tableName, List<String> varList, Polygon polygon) {
+    List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
+    inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon));
+    inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    return inputSplits;
+  }
+
+  public List<H5ChunkInputSplit> queryIntersectedDataChunk(String tableName, List<String> varList, Polygon polygon) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
                   + "WHERE merra.geometry = spaceindex.geometry\n"
@@ -264,22 +281,70 @@ public class Merra2IndexSQL {
       varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' \n OR ";
     }
 
-    varSQL = varSQL + "merra.varshortname = '" + varList.get(varList.size() - 1) + "') ORDER BY merra.corner;";
+    varSQL = varSQL + "merra.varshortname = '" + varList.get(varList.size() - 1) + "') ORDER BY merra.filepos,merra.corner;";
 
     sql = sql + varSQL;
-    System.out.println(sql);
+
+    if (debug) {
+      LOG.info(sql);
+      System.out.println(sql);
+    }
 
     ResultSet rs;
     try {
       rs = this.statement.executeQuery(sql);
-      chunkList = generateDataChunk(rs);
+      chunkList = generateDataChunk(rs, false); //PostGIS query is ST_Intersects, so the datachunk is not contained in the bbox
     } catch (SQLException e) {
       e.printStackTrace();
     }
-    return chunkList;
+
+    return generateInputSplitByHosts(chunkList);
   }
 
-  public List<DataChunk> generateDataChunk(ResultSet rs) {
+  public List<H5ChunkInputSplit> queryContainedDataChunk(String tableName, List<String> varList, Polygon polygon) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+                 + "WHERE merra.geometry = spaceindex.geometry\n"
+                 + "AND ST_Contains('" + polygon.toPostGISPGgeometry().toString() + "'::geometry" + ", spaceindex.geometry )\n";
+    String varSQL = "AND (";
+    for (int i = 0; i < varList.size() - 1; i++) {
+      varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' \n OR ";
+    }
+
+    varSQL = varSQL + "merra.varshortname = '" + varList.get(varList.size() - 1) + "') ORDER BY merra.filepos,merra.corner;";
+
+    sql = sql + varSQL;
+
+    if (debug) LOG.info(sql);
+
+    ResultSet rs;
+    try {
+      rs = this.statement.executeQuery(sql);
+      chunkList = generateDataChunk(rs, true);  //PostGIS query is ST_Contains, so the datachunk is contained in the bbox
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return generateInputSplitByHosts(chunkList);
+  }
+
+  public List<H5ChunkInputSplit> generateInputSplitByHosts(List<DataChunk> inputChunkList) {
+    List<H5ChunkInputSplit> inputSplitList = new ArrayList<H5ChunkInputSplit>();
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    inputChunkList.add(null);
+    for(int i=0; i<inputChunkList.size()-1; i++) {
+      chunkList.add(inputChunkList.get(i));
+      if (RasterUtils.isShareHosts(inputChunkList.get(i), inputChunkList.get(i+1))) {
+        continue;
+      } else {
+        inputSplitList.add(new H5ChunkInputSplit(chunkList));
+        chunkList = new ArrayList<DataChunk>();
+      }
+    }
+    return inputSplitList;
+  }
+
+  public List<DataChunk> generateDataChunk(ResultSet rs, boolean isContain) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     try {
       rs.last();
@@ -303,6 +368,7 @@ public class Merra2IndexSQL {
           Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
                                                     dimensions, filepos, bytesize, filtermask,
                                                     hosts,datatype);
+          merra2Chunk.setContain(isContain);
           chunkList.add(merra2Chunk);
           rs.next();
         } while (!rs.isAfterLast());
@@ -320,8 +386,19 @@ public class Merra2IndexSQL {
     varList.add("UFLXKE");
     varList.add("AUTCNVRN");
     varList.add("BKGERR");
+    List<String> files = new ArrayList<String>();
+    files.add("merra2_400_tavg1_2d_int_nx_20150101_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150102_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150103_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150104_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150105_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150106_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150107_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150108_nc4");
+    files.add("merra2_400_tavg1_2d_int_nx_20150109_nc4");
     Polygon plgn = new Polygon(new double[]{0.0, 1.0, 1.0, 0.0}, new double[]{0.0, 0.0,1.0,1.0}, 4);
-    hdf5IdxBuilder.queryDataChunk("merra2_100_tavg1_2d_int_nx_19800101_nc4", varList, plgn);
+    //hdf5IdxBuilder.queryDataChunks("merra2_100_tavg1_2d_int_nx_19800101_nc4", varList, plgn);
+    hdf5IdxBuilder.queryDataChunks(files, varList, plgn);
     //hdf5IdxBuilder.createPostGISExtension();
     //hdf5IdxBuilder.createMerra2SpaceIndexTable();
     //hdf5IdxBuilder.createFileIndexTable("MERRA2_100_inst1_2d_int_Nx_222129800107_Nc4");
