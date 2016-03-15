@@ -46,7 +46,7 @@ public class H5FileInputFormat extends FileInputFormat {
     List<FileStatus> fileStatusList = listStatus(job);
 
     Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
-    Polygon plgn = new Polygon(new double[]{0.0, 1.0, 1.0, 0.0}, new double[]{0.0, 0.0, 1.0, 1.0}, 4);
+    Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
     inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, plgn));
     return inputSplits;
   }

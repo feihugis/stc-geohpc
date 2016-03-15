@@ -6,10 +6,12 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import edu.gmu.stc.hadoop.vector.Polygon;
+import edu.gmu.stc.hadoop.vector.Rectangle;
 
 /**
  * Created by Fei Hu on 2/21/16.
@@ -157,5 +159,21 @@ public class CountyFeature implements Feature, Writable{
   @Override
   public List<Polygon> getFeature() {
     return this.polygonList;
+  }
+
+  public Rectangle getMBR() {
+    double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
+    for (Polygon polygon : polygonList) {
+      long npoints = polygon.getNpoints();
+      double[] xpoints = polygon.getXpoints(), ypoints = polygon.getYpoints();
+      for (int i = 0; i < npoints; i++) {
+        if (xpoints[i] > x_max) x_max = xpoints[i];
+        if (xpoints[i] < x_min) x_min = xpoints[i];
+        if (ypoints[i] > y_max) y_max = ypoints[i];
+        if (ypoints[i] < y_min) y_min = ypoints[i];
+      }
+    }
+    Rectangle rectangle = new Rectangle(x_min, y_min, x_max, y_max);
+    return rectangle;
   }
 }

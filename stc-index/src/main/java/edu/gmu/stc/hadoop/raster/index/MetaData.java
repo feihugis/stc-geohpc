@@ -22,6 +22,8 @@ public class MetaData {
     public static float fillValue = 9.9999999E14f;
     public static float vmax = 9.9999999E14f;
     public static float vmin = 9.9999999E14f;
+    public static float lon_orig = -180.0f;
+    public static float lat_orig = -90.0f;
 
     public static HashMap<int[],Polygon> getChunkBoundaries() {
       HashMap<int[], Polygon> chunkBoundaries = new HashMap<int[], Polygon>();

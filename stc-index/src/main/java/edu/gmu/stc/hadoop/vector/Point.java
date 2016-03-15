@@ -166,4 +166,24 @@ public class Point implements Shape, Comparable<Point> {
     g.fillRect(imgx, imgy, 1, 1);
   }
 
+  public double getX() {
+    return x;
+  }
+
+  public void setX(double x) {
+    this.x = x;
+  }
+
+  public double getY() {
+    return y;
+  }
+
+  public void setY(double y) {
+    this.y = y;
+  }
+
+  public void changeResolution(double xResolution, double yResolution) {
+      x = x/xResolution;
+      y = y/yResolution;
+  }
 }

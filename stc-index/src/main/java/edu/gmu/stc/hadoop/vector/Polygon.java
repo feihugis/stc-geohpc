@@ -21,6 +21,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -112,7 +113,14 @@ public class Polygon implements Shape {
 
   @Override
   public Rectangle getMBR() {
-    throw new RuntimeException("Not implemented yet");
+    double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
+    for (int i = 0; i < npoints; i++) {
+      if (xpoints[i] > x_max) x_max = xpoints[i];
+      if (xpoints[i] < x_min) x_min = xpoints[i];
+      if (ypoints[i] > y_max) y_max = ypoints[i];
+      if (ypoints[i] < y_min) y_min = ypoints[i];
+    }
+    return new Rectangle(x_min, y_min, x_max, y_max);
   }
 
   @Override
@@ -164,6 +172,10 @@ public class Polygon implements Shape {
     this.npoints = npoints;
   }
 
+  public Point getPoint(int index) {
+    return new Point(xpoints[index], ypoints[index]);
+  }
+
   public org.postgis.Polygon toPostGISPolygon() {
     org.postgis.Point[] points = new org.postgis.Point[npoints+1];
     for (int i=0; i<npoints; i++) {
@@ -194,6 +206,80 @@ public class Polygon implements Shape {
       LOG.info("There is a bug in edu.gmu.stc.hadoop.vector.Polygon.generatePolygonFromPGgeometry" );
     }
     return null;
+  }
+
+  public Polygon toLogicView(double xResolution, double yResolution, double x_orig, double y_orig) {
+    double[] xs = new double[npoints];
+    double[] ys= new double[npoints];
+    for (int i = 0; i < npoints; i++) {
+      xs[i] = (xpoints[i] - x_orig) / xResolution;
+      ys[i] = (ypoints[i] - y_orig) / yResolution;
+    }
+
+    return new Polygon(xs, ys, npoints);
+  }
+
+  public boolean contains(double x, double y) {
+    if (npoints <= 2 || !getMBR().contains(x, y)) {
+      return false;
+    }
+    int hits = 0;
+
+    double lastx = xpoints[npoints - 1];
+    double lasty = ypoints[npoints - 1];
+    double curx, cury;
+
+    // Walk the edges of the polygon
+    for (int i = 0; i < npoints; lastx = curx, lasty = cury, i++) {
+      curx = xpoints[i];
+      cury = ypoints[i];
+
+      if (cury == lasty) {
+        continue;
+      }
+
+      double leftx;
+      if (curx < lastx) {
+        if (x >= lastx) {
+          continue;
+        }
+        leftx = curx;
+      } else {
+        if (x >= curx) {
+          continue;
+        }
+        leftx = lastx;
+      }
+
+      double test1, test2;
+      if (cury < lasty) {
+        if (y < cury || y >= lasty) {
+          continue;
+        }
+        if (x < leftx) {
+          hits++;
+          continue;
+        }
+        test1 = x - curx;
+        test2 = y - cury;
+      } else {
+        if (y < lasty || y >= cury) {
+          continue;
+        }
+        if (x < leftx) {
+          hits++;
+          continue;
+        }
+        test1 = x - lastx;
+        test2 = y - lasty;
+      }
+
+      if (test1 < (test2 / (lasty - cury) * (lastx - curx))) {
+        hits++;
+      }
+    }
+
+    return ((hits & 1) != 0);
   }
 
   public static void main(String[] args) {

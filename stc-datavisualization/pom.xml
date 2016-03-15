@@ -9,10 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>stc-spark</artifactId>
+    <artifactId>stc-datavisualization</artifactId>
     <packaging>jar</packaging>
 
-    <name>stc-spark</name>
+    <name>stc-datavisualization</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -26,11 +26,8 @@
             <artifactId>stc-index</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>edu.gmu.stc</groupId>
-            <artifactId>stc-datavisualization</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
     </dependencies>
+
+
 
 </project>

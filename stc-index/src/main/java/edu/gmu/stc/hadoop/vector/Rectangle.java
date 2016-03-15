@@ -343,4 +343,32 @@ public class Rectangle implements Shape, WritableComparable<Rectangle> {
     return String.format("POLYGON((%g %g, %g %g, %g %g, %g %g, %g %g))",
         x1, y1,   x1, y2,   x2, y2,   x2, y1,   x1, y1);
   }
+
+  public Rectangle toLogicView(double xResolution, double yResolution, double x_orig, double y_orig) {
+    double x_1, x_2, y_1, y_2;
+    x_1 = (x1 - x_orig)/xResolution;
+    y_1 = (y1 - y_orig)/yResolution;
+    x_2 = (x2 - x_orig)/xResolution;
+    y_2 = (y2 - y_orig)/yResolution;
+
+    return new Rectangle(x_1,y_1,x_2,y_2);
+
+  }
+
+  public double getMinX() {
+    return Math.min(x1, x2);
+  }
+
+  public double getMinY() {
+    return Math.min(y1, y2);
+  }
+
+  public double getMaxX() {
+    return Math.max(x1, x2);
+  }
+
+  public double getMaxY() {
+    return Math.max(y1, y2);
+  }
+
 }
