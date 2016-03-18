@@ -192,7 +192,7 @@ public class Rectangle implements Shape, WritableComparable<Rectangle> {
   }
 
   public boolean contains(double x, double y) {
-    return x >= x1 && x < x2 && y >= y1 && y < y2;
+    return x >= x1 && x <= x2 && y >= y1 && y <= y2;
   }
 
   public boolean contains(Rectangle r) {

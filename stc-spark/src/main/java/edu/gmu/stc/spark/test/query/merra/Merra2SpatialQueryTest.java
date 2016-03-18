@@ -12,8 +12,10 @@ import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
+import org.apache.spark.broadcast.Broadcast;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.gmu.stc.datavisualization.netcdf.PngFactory;
@@ -29,9 +31,11 @@ import edu.gmu.stc.hadoop.vector.Rectangle;
 import edu.gmu.stc.hadoop.vector.extension.CountyFeature;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyMultiPolygonJSON;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyPolygonJSON;
+import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 import scala.Tuple2;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
+import ucar.ma2.ArrayInt;
 import ucar.ma2.Index;
 import ucar.ma2.Index2D;
 import ucar.ma2.Index3D;
@@ -42,13 +46,12 @@ import ucar.ma2.Index3D;
 public class Merra2SpatialQueryTest {
 
   public static void main(String[] args) throws ClassNotFoundException {
-    final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster("local[4]").registerKryoClasses(new Class<?>[]{
-        Class.forName("org.apache.hadoop.io.Writable"),
-        Class.forName("edu.gmu.stc.hadoop.vector.Polygon"),
-        Class.forName("org.apache.hadoop.io.LongWritable"),
-        Class.forName("edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer"),
-        Class.forName("edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer")
-    });
+
+    final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster("local[4]");
+
+    sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
+    sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
+
     JavaSparkContext sc = new JavaSparkContext(sconf);
     Configuration hconf = new Configuration();
     String vars = "LWTNET";;//"UFLXKE,AUTCNVRN,BKGERR";
@@ -72,7 +75,7 @@ public class Merra2SpatialQueryTest {
     final double y_orig = 90.0; //MetaData.MERRA2.lat_orig;
     final int[] picShape = new int[] {height,width};
 
-    final ArrayIntSerializer mask = new ArrayIntSerializer(picShape, new int[picShape[0] * picShape[1]]);
+    ArrayIntSerializer maskLocal = new ArrayIntSerializer(picShape, new int[picShape[0] * picShape[1]]);
 
     JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(
         new Function<String, Boolean>() {
@@ -169,8 +172,7 @@ public class Merra2SpatialQueryTest {
             }
 
             for (int c=0; c<feature.getFeature().size(); c++) {
-              Polygon
-                  polygon = feature.getFeature().get(c).toLogicView(xResolution, yResolution, x_orig, y_orig);
+              Polygon polygon = feature.getFeature().get(c).toLogicView(xResolution, yResolution, x_orig, y_orig);
               for (int i = 0; i < polygon.getNpoints(); i++) {
                 int py = (int) polygon.getYpoints()[i];
                 int px = (int) polygon.getXpoints()[i];
@@ -183,7 +185,6 @@ public class Merra2SpatialQueryTest {
                 Point point = new Point(x, y);
                 for (int c=0; c<feature.getFeature().size(); c++) {
                   Polygon polygon = feature.getFeature().get(c).toLogicView(xResolution, yResolution, x_orig, y_orig);
-                  Rectangle rectangle = polygon.getMBR();
                   if (polygon.contains(point.x, point.y)) {
                     array[(((int) y) - corners[0])*shape[1] + (((int) x) - corners[1])] = 1;
                   } else {
@@ -198,6 +199,7 @@ public class Merra2SpatialQueryTest {
         });
 
     List<Tuple2<H5Chunk, ArrayIntSerializer>> maskList = stateMask.collect();
+
     Index2D maskIndex = new Index2D(new int[]{height, width});
     for (Tuple2<H5Chunk, ArrayIntSerializer> tuple : maskList) {
       int[] corner = tuple._1().getCorner();
@@ -207,17 +209,21 @@ public class Merra2SpatialQueryTest {
         for (int x = corner[1]; x < corner[1] + shape[1]; x++) {
 
           maskIndex.set(y,x);
-          if (mask.getArray().get(maskIndex) > 0) {
+          if (maskLocal.getArray().get(maskIndex) > 0) {
             continue;
           } else {
             polygonIndex.set(y-corner[0], x-corner[1]);
-            mask.getArray().set(maskIndex, tuple._2().getArray().get(polygonIndex));
+            maskLocal.getArray().set(maskIndex, tuple._2().getArray().get(polygonIndex));
           }
         }
       }
     }
 
-    //sc.broadcast(mask);
+
+
+    final Broadcast<ArrayIntSerializer> mask = sc.broadcast(maskLocal);
+
+    PngFactory.drawPNG(mask.value().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f);
 
     JavaPairRDD<DataChunk, ArrayFloatSerializer> records = sc.newAPIHadoopRDD(hconf,
                                                                               H5FileInputFormat.class,
@@ -225,14 +231,17 @@ public class Merra2SpatialQueryTest {
                                                                               ArrayFloatSerializer.class);
 
     //the upside of y are change to downside, and filtered by the mask
-    JavaPairRDD<DataChunk, ArrayFloatSerializer> recordsWithCoordinateChanging = records.mapValues(
-        new Function<ArrayFloatSerializer, ArrayFloatSerializer>() {
+    JavaPairRDD<DataChunk, ArrayFloatSerializer> recordsWithCoordinateChanging = records.mapToPair(
+        new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, DataChunk, ArrayFloatSerializer>() {
           @Override
-          public ArrayFloatSerializer call(ArrayFloatSerializer v1) throws Exception {
+          public Tuple2<DataChunk, ArrayFloatSerializer> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
+            ArrayFloatSerializer v1 = tuple2._2();
             ArrayFloat result = (ArrayFloat) Array.factory(float.class, v1.getArray().getShape());
             Index index = Index.factory(result.getShape());
             Index rawIndex = Index.factory(result.getShape());
-            //Index maskIndex = Index.factory(mask.getArray().getShape());
+            Index maskIndex = Index.factory(mask.value().getArray().getShape());
+            int[] corner = tuple2._1().getCorner();
+
             switch (index.getRank()) {
               case 3:
                 int ysize = result.getShape()[1];
@@ -240,58 +249,79 @@ public class Merra2SpatialQueryTest {
                   for (int y=0; y<index.getShape(1); y++) {
                     for (int x=0; x<index.getShape(2); x++) {
                       index.set(t,y,x);
-                      //if (mask.getArray().get(maskIndex.set(y,x))>0) {
+                      if (mask.value().getArray().get(maskIndex.set(y+corner[1],x+corner[2]))>0) {
                         if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>1000) {
                           result.set(index,-1.0f);
                         }
-                        result.set(index,v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x)));
-                      //} else {
-                      //  result.set(index,0.0f);
-                      //}
+                        result.set(index,v1.getArray().get(rawIndex.set(t, /*rawIndex.getShape(1)-y-1*/y, x)));
+                      } else {
+                        //result.set(index,v1.getArray().get(rawIndex.set(t, /*rawIndex.getShape(1)-y-1*/y, x)));
+                        result.set(index,0.0f);
+                      }
                     }
                   }
                 }
                 break;
             }
-
-            return new ArrayFloatSerializer(new int[]{result.getShape()[1],result.getShape()[2]}, (float[]) result.getStorage());
+            return new Tuple2<DataChunk, ArrayFloatSerializer>(tuple2._1(), new ArrayFloatSerializer(result.getShape(), (float[]) result.getStorage()));
           }
         });
 
-    List<Tuple2<DataChunk, ArrayFloatSerializer>> merra2List = recordsWithCoordinateChanging.collect();
-    ArrayFloat[] combinedMerra = new ArrayFloat[24];
-    float[] defaultValues = new float[height*width];
-    for (int i=0; i<height; i++) {
-      for (int j=0; j<width; j++) {
-        defaultValues[i*width+j] = -1.0f;
-      }
-    }
 
-    for (int i = 0; i<24; i++) {
-      combinedMerra[i] = (ArrayFloat) Array.factory(float.class, new int[]{height, width}, defaultValues);
-    }
-
-    for (Tuple2<DataChunk, ArrayFloatSerializer> tuple : merra2List) {
-      int[] corner = tuple._1().getCorner();
-      int[] shape = tuple._1().getShape();
-      Index3D chunkIndex = new Index3D(shape);
-      for (int y = corner[1]; y< corner[1] + shape[1]; y++) {
-        for (int x = corner[2]; x < corner[2] + shape[2]; x++) {
-          maskIndex.set(y,x);
-          if (mask.getArray().get(maskIndex) > 0) {
-            combinedMerra[corner[0]].set(maskIndex,tuple._2().getArray().get(chunkIndex.set(0, y-corner[1], x-corner[2])));
+    JavaPairRDD<String, Tuple2<DataChunk, ArrayFloatSerializer>> rddCombinedByVarAndTime = recordsWithCoordinateChanging.mapToPair(
+        new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, Tuple2<DataChunk, ArrayFloatSerializer>>() {
+          @Override
+          public Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>> call(
+              Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
+            String key = tuple2._1.getVarShortName() + tuple2._1().getCorner()[0] + "_" + tuple2._1().getFilePath().split("\\.")[2];
+            return new Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>>(key, tuple2);
           }
-        }
+        });
+
+    JavaPairRDD<String, ArrayFloatSerializer> combinedChunks = rddCombinedByVarAndTime.groupByKey().mapToPair(
+        new PairFunction<Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>>, String, ArrayFloatSerializer>() {
+          @Override
+          public Tuple2<String, ArrayFloatSerializer> call(
+              Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>> stringIterableTuple2)
+              throws Exception {
+            float[] defaultValues = new float[height*width];
+            for (int i=0; i<height; i++) {
+              for (int j=0; j<width; j++) {
+                defaultValues[i*width+j] = 0.0f;
+              }
+            }
+            ArrayFloat combinedArray = (ArrayFloat) Array.factory(float.class, new int[]{height, width}, defaultValues);
+            Index2D maskIndex = new Index2D(new int[]{height, width});
+
+            Iterator<Tuple2<DataChunk, ArrayFloatSerializer>> itor = stringIterableTuple2._2().iterator();
+            while (itor.hasNext()) {
+              Tuple2<DataChunk, ArrayFloatSerializer> tuple = itor.next();
+              int[] corner = tuple._1().getCorner();
+              int[] shape = tuple._1().getShape();
+              Index3D chunkIndex = new Index3D(shape);
+              for (int y = corner[1]; y< corner[1] + shape[1]; y++) {
+                for (int x = corner[2]; x < corner[2] + shape[2]; x++) {
+                  maskIndex.set(y,x);
+                  combinedArray.set(maskIndex,tuple._2().getArray().get(chunkIndex.set(0, y-corner[1], x-corner[2])));
+                }
+              }
+            }
+
+            return new Tuple2<String, ArrayFloatSerializer>(stringIterableTuple2._1(),
+                                                            new ArrayFloatSerializer(combinedArray.getShape(),
+                                                                                     (float[]) combinedArray.getStorage()));
+          }
+        });
+
+    combinedChunks.foreach(new VoidFunction<Tuple2<String, ArrayFloatSerializer>>() {
+      @Override
+      public void call(Tuple2<String, ArrayFloatSerializer> tuple) throws Exception {
+        //NetCDFManager manager = new NetCDFManager();
+        //ArrayFloat.D2 d2 = (ArrayFloat.D2) tuple._2().getArray();
+        //ArrayFloat.D2 input = manager.interpolateArray(d2, 2, 2.0f);
+        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f);
       }
-    }
-
-    for (int i = 0; i<24; i++) {
-      NetCDFManager netcdfMng = new NetCDFManager();
-      ArrayFloat.D2 dd = (ArrayFloat.D2) Array.factory(float.class, combinedMerra[i].getShape(), combinedMerra[i].getStorage());
-
-      ArrayFloat.D2 ds =   netcdfMng.interpolateArray(dd, 2, 2f);
-      PngFactory.drawPNG(ds, "/Users/feihu/Desktop/test/"+ i + ".png", 107.2249f, 319.2336f);
-    }
+    });
 
   }
 

@@ -1,5 +1,10 @@
 package edu.gmu.stc.hadoop.raster;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.mapreduce.InputSplit;
@@ -7,11 +12,15 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.Serializable;
+
+import ucar.ma2.Array;
+import ucar.ma2.ArrayInt;
 
 /**
  * Created by Fei Hu on 2/17/16.
  */
-public abstract class DataChunk implements Writable{
+public abstract class DataChunk implements Writable {
   int[] corner = null;         //relative to the whole picture
   int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
   String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
@@ -117,6 +126,76 @@ public abstract class DataChunk implements Writable{
     filePath = Text.readString(in);
     isContain = in.readBoolean();
   }
+
+
+/*  @Override
+  public void write(Kryo kryo, Output out) {
+    kryo.writeObjectOrNull(out, this, this.getClass());
+    *//*out.writeInt(corner.length);
+    for (int i=0; i<corner.length; i++) {
+      out.writeInt(corner[i]);
+    }
+
+    for (int i=0; i<shape.length; i++) {
+      out.writeInt(shape[i]);
+    }
+
+    for (int i=0; i<dimensions.length; i++) {
+      out.writeString(dimensions[i]);
+    }
+
+    out.writeLong(filePos);
+    out.writeLong(byteSize);
+    out.writeInt(filterMask);
+
+    out.writeInt(hosts.length);
+    for (int i=0; i<hosts.length; i++) {
+      out.writeString(hosts[i]);
+    }
+
+    out.writeString(dataType);
+    out.writeString(varShortName);
+    out.writeString(filePath);
+
+    out.writeBoolean(isContain);
+*//*
+  }*/
+/*
+  @Override
+  public void read(Kryo kryo, Input in) {
+     kryo.readObjectOrNull(in, this.getClass());
+    *//*int num = in.readInt();
+    corner = new int[num];
+    shape = new int[num];
+    dimensions = new String[num];
+
+    for (int i=0; i<num; i++) {
+      corner[i] = in.readInt();
+    }
+
+    for (int i=0; i<num; i++) {
+      shape[i] = in.readInt();
+    }
+
+    for (int i=0; i<num; i++) {
+      dimensions[i] = in.readString();
+    }
+
+    filePos = in.readLong();
+    byteSize = in.readLong();
+    filterMask = in.readInt();
+
+    num = in.readInt();
+    hosts = new String[num];
+    for (int i =0; i<num; i++) {
+      hosts[i] = in.readString();
+    }
+
+    dataType = in.readString();
+    varShortName = in.readString();
+    filePath = in.readString();
+    isContain = in.readBoolean();*//*
+  }*/
 
   public boolean isContain() {
     return isContain;
