@@ -30,7 +30,7 @@ public class PngWriter {
         }
     };
     private static int[][] rgb;
-    private static Font mFont = new Font("Tahoma", Font.PLAIN, 13);
+    private static Font mFont = new Font("Tahoma", Font.PLAIN, 10);
     private File outFile = null;
     private File fi = null;
     private BufferedImage bi = null;
@@ -285,8 +285,12 @@ public class PngWriter {
         int Width = FM.stringWidth(para);
         int wCenter = (irgb.length - Width) / 2;
 
+        if (units == null) {
+          g.drawString(para, wCenter, irgb.length/4);        //title
+        } else {
+          g.drawString(para + " (" + units + ")", wCenter, 15);        //title
+        }
 
-        g.drawString(para + " (" + units + ")", wCenter, 15);        //title
         int spacing = (irgb.length - 20) / legend.length;
         for (int k = 0; k < legend.length; k++) {
             g.drawString(legend[k], 10 + spacing * k, 2 * irgb[0].length / 3 + 15);
@@ -344,11 +348,15 @@ public class PngWriter {
         int Width = FM.stringWidth(para);
         int wCenter = (irgb.length - Width) / 2;
 
+        if (units == null) {
+          g.drawString(para, wCenter, 15);        //title
+        } else {
+          g.drawString(para + " (" + units + ")", wCenter, 15);        //title
+        }
 
-        g.drawString(para + " (" + units + ")", wCenter, 15);        //title
 
         for (int k = 0; k < legend.length; k++) {
-            g.drawString(legend[k], marks[k] - margin / 2, 2 * irgb[0].length / 3 + 15);
+            g.drawString(legend[k], marks[k] - margin / 2, 2 * irgb[0].length / 3 + 10);
         }
 
 

@@ -7,8 +7,10 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
+import org.postgis.PGgeometry;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -42,12 +44,20 @@ public class H5FileInputFormat extends FileInputFormat {
     //HashMap<String, List<Integer[]>> bboxMap = Utils.parseBbox(inputBbox);
     //List<Integer[]> startList = new ArrayList<Integer[]>(bboxMap.get("start"));
     //List<Integer[]> endList = new ArrayList<Integer[]>(bboxMap.get("end"));
+    String geoBBox = job.getConfiguration().get("geoBBox");
+
+    Polygon geoPolygon = null;
+    try {
+      geoPolygon = Polygon.generatePolygonFromPGgeometry(geoBBox);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
 
     List<FileStatus> fileStatusList = listStatus(job);
 
     Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
-    Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
-    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, plgn));
+    //Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
+    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon));
     return inputSplits;
   }
 

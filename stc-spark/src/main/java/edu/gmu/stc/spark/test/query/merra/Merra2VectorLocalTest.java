@@ -190,7 +190,7 @@ public class Merra2VectorLocalTest {
        }
       }
 
-    PngFactory.drawPNG(mask.getArray(),"/Users/feihu/Desktop/test.png", 0.0f, 1.0f);
+    PngFactory.drawPNG(mask.getArray(),"/Users/feihu/Desktop/test.png", 0.0f, 1.0f, null, 1);
 
 
 

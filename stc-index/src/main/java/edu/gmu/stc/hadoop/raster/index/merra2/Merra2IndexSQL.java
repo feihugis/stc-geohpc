@@ -257,7 +257,7 @@ public class Merra2IndexSQL {
     List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
     for (String tableName : tableNameList) {
       inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon));
-      inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+      //inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
     }
 
     return inputSplits;
@@ -266,7 +266,7 @@ public class Merra2IndexSQL {
   public List<H5ChunkInputSplit> queryDataChunks(String tableName, List<String> varList, Polygon polygon) {
     List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
     inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon));
-    inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    //inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
     return inputSplits;
   }
 

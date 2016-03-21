@@ -10,10 +10,15 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
+import org.apache.spark.broadcast.Broadcast;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 
+import edu.gmu.stc.datavisualization.netcdf.test.NetCDFManager;
+import edu.gmu.stc.hadoop.raster.DataChunk;
+import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.vector.Point;
@@ -23,7 +28,10 @@ import edu.gmu.stc.hadoop.vector.extension.CountyFeature;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyMultiPolygonJSON;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyPolygonJSON;
 import scala.Tuple2;
+import ucar.ma2.Array;
+import ucar.ma2.ArrayFloat;
 import ucar.ma2.Index2D;
+import ucar.ma2.Index3D;
 
 /**
  * Created by Fei Hu on 3/17/16.
@@ -178,5 +186,147 @@ public class GeoExtracting {
     chunk.setShape(shapeMask);
     Tuple2<H5Chunk, ArrayIntSerializer> mask = new Tuple2<H5Chunk, ArrayIntSerializer>(chunk, maskArray);
     return mask;
+  }
+
+
+  public static class ChunkExtractingByMask implements PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, DataChunk, ArrayFloatSerializer> {
+    Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask;
+
+    public ChunkExtractingByMask(Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask) {
+      this.mask = mask;
+    }
+
+    @Override
+    public Tuple2<DataChunk, ArrayFloatSerializer> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
+        int[] maskCorner = mask.value()._1().getCorner();
+        int[] maskShape = mask.value()._1().getShape();
+        Rectangle maskBBox = new Rectangle(maskCorner[1], maskCorner[0], maskCorner[1]+maskShape[1]-1, maskCorner[0]+maskShape[0]-1);
+
+        ArrayFloatSerializer v1 = tuple2._2();
+        int[] shape = tuple2._1().getShape().clone();
+        int[] corner = tuple2._1().getCorner().clone();
+        Rectangle chunkBBox = new Rectangle(corner[corner.length-1], corner[corner.length-2], corner[corner.length-1]+shape[corner.length-1]-1, corner[corner.length-2]+shape[corner.length-2]-1);
+
+        if (chunkBBox.isIntersected(maskBBox)) {
+          Rectangle intectedRec = chunkBBox.getIntersection(maskBBox);
+          shape[shape.length-2] = (int) (intectedRec.getHeight())+1;
+          shape[shape.length-1] = (int) (intectedRec.getWidth())+1;
+          corner[corner.length-2] = (int) intectedRec.getMinY();
+          corner[corner.length-1] = (int) intectedRec.getMinX();
+
+          ArrayFloat result = (ArrayFloat) Array.factory(float.class, shape);
+          ucar.ma2.Index index = ucar.ma2.Index.factory(shape);
+          ucar.ma2.Index rawIndex = ucar.ma2.Index.factory(tuple2._2().getArray().getShape());
+          int[] rawCorner = tuple2._1().getCorner();
+          ucar.ma2.Index maskIndex = ucar.ma2.Index.factory(mask.value()._2().getArray().getShape());
+
+          switch (index.getRank()) {
+            case 3:
+              for (int t=0; t<shape[0]; t++) {
+                for (int y=0; y<shape[1]; y++) {
+                  for (int x=0; x<shape[2]; x++) {
+                    index.set(t,y,x);
+                    if (maskBBox.contains(corner[2] + x, corner[1] + y)) {
+
+                      if (mask.value()._2.getArray().get(maskIndex.set(corner[1] + y - maskCorner[0], corner[2] + x - maskCorner[1]))>0) {
+                        if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>1000) {
+                          result.set(index,-1.0f);
+                          //continue;
+                        }
+                        result.set(index,v1.getArray().get(rawIndex.set(t, /*rawIndex.getShape(1)-y-1*/y+corner[1]-rawCorner[1], x+corner[2]-rawCorner[2])));
+                      }
+                    } else {
+                      result.set(index,0.0f);
+                    }
+                  }
+                }
+              }
+              break;
+          }
+
+          tuple2._1().setCorner(corner);
+          tuple2._1().setShape(shape);
+          return new Tuple2<DataChunk, ArrayFloatSerializer>(tuple2._1(), new ArrayFloatSerializer(result.getShape(), (float[]) result.getStorage()));
+        } else {
+          return null;
+        }
+      }
+    }
+
+  public static class InterpolateArrayByIDW implements PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, DataChunk, ArrayFloatSerializer> {
+    int zoomScale = 1;
+
+    public InterpolateArrayByIDW(int zoomScale) {
+      this.zoomScale = zoomScale;
+    }
+
+    @Override
+    public Tuple2<DataChunk, ArrayFloatSerializer> call( Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
+      String key = tuple2._1.getVarShortName() + tuple2._1().getCorner()[0] + "_" + tuple2._1().getFilePath().split("\\.")[2];
+      int[] shape = tuple2._1().getShape();
+      int[] corner = tuple2._1().getCorner();
+
+      if (zoomScale == 1) {
+        return tuple2;
+      }
+
+      NetCDFManager manager = new NetCDFManager();
+      ArrayFloat.D2 d2 = (ArrayFloat.D2) tuple2._2().getArray().reduce(0);
+      ArrayFloat.D2 input = manager.interpolateArray(d2, zoomScale, 2.0f);
+
+      shape[shape.length-2] = shape[shape.length-2]*zoomScale;
+      shape[shape.length-1] = shape[shape.length-1]*zoomScale;
+      corner[corner.length-2] = corner[corner.length-2]*zoomScale;
+      corner[corner.length-1] = corner[corner.length-1]*zoomScale;
+      tuple2._1().setCorner(corner);
+      tuple2._1().setShape(shape);
+      return new Tuple2<DataChunk, ArrayFloatSerializer>(tuple2._1(), new ArrayFloatSerializer(shape, (float[]) input.getStorage()));
+    }
+  }
+
+  public static class CombineChunks implements PairFunction<Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>>, String, ArrayFloatSerializer> {
+    Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask;
+    int zoomScale;
+
+    public CombineChunks( Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask, int zoomScale) {
+      this.mask = mask;
+      this.zoomScale = zoomScale;
+    }
+
+    @Override
+    public Tuple2<String, ArrayFloatSerializer> call( Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>> stringIterableTuple2) throws Exception {
+      int height = mask.value()._1().getShape()[0]*zoomScale;
+      int width = mask.value()._1().getShape()[1]*zoomScale;
+      int[] cornerMask = mask.value()._1().getCorner().clone();
+      cornerMask[0] = cornerMask[0]*zoomScale;
+      cornerMask[1] = cornerMask[1]*zoomScale;
+      float[] defaultValues = new float[height*width];
+      for (int i=0; i<height; i++) {
+        for (int j=0; j<width; j++) {
+          defaultValues[i*width + j] = 100.0f;
+        }
+      }
+      ArrayFloat combinedArray = (ArrayFloat) Array.factory(float.class, new int[]{height, width}, defaultValues);
+      Index2D maskIndex = new Index2D(new int[]{height, width});
+
+      Iterator<Tuple2<DataChunk, ArrayFloatSerializer>> itor = stringIterableTuple2._2().iterator();
+
+      while (itor.hasNext()) {
+        Tuple2<DataChunk, ArrayFloatSerializer> tuple = itor.next();
+        int[] corner = tuple._1().getCorner();
+        int[] shape = tuple._1().getShape();
+        Index3D chunkIndex = new Index3D(shape);
+        for (int y = corner[1]; y< corner[1] + shape[1]; y++) {
+          for (int x = corner[2]; x < corner[2] + shape[2]; x++) {
+            maskIndex.set(y-cornerMask[0], x-cornerMask[1]);
+            combinedArray.set(maskIndex,tuple._2().getArray().get(chunkIndex.set(0, y-corner[1], x-corner[2])));
+          }
+        }
+      }
+
+      return new Tuple2<String, ArrayFloatSerializer>(stringIterableTuple2._1(),
+                                                      new ArrayFloatSerializer(combinedArray.getShape(),
+                                                                               (float[]) combinedArray.getStorage()));
+    }
   }
 }

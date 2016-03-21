@@ -223,7 +223,7 @@ public class Merra2SpatialQueryTest {
 
     final Broadcast<ArrayIntSerializer> mask = sc.broadcast(maskLocal);
 
-    PngFactory.drawPNG(mask.value().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f);
+    PngFactory.drawPNG(mask.value().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, 1);
 
     JavaPairRDD<DataChunk, ArrayFloatSerializer> records = sc.newAPIHadoopRDD(hconf,
                                                                               H5FileInputFormat.class,
@@ -273,7 +273,7 @@ public class Merra2SpatialQueryTest {
           @Override
           public Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>> call(
               Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
-            String key = tuple2._1.getVarShortName() + tuple2._1().getCorner()[0] + "_" + tuple2._1().getFilePath().split("\\.")[2];
+            String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2] + "_" + tuple2._1().getCorner()[0];
             return new Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>>(key, tuple2);
           }
         });
@@ -319,7 +319,7 @@ public class Merra2SpatialQueryTest {
         //NetCDFManager manager = new NetCDFManager();
         //ArrayFloat.D2 d2 = (ArrayFloat.D2) tuple._2().getArray();
         //ArrayFloat.D2 input = manager.interpolateArray(d2, 2, 2.0f);
-        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f);
+        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f, tuple._1(), 1);
       }
     });
 

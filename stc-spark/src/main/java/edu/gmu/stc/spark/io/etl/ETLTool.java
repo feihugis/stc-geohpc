@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.io.BooleanWritable;
 import org.apache.hadoop.yarn.util.SystemClock;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -15,6 +16,9 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,6 +37,7 @@ import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyMultiPolygonJSON;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyPolygonJSON;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 import scala.Tuple2;
+import scala.Tuple3;
 import scala.math.Ordering;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
@@ -74,12 +79,13 @@ public class ETLTool {
 
     final int width = 576, height = 364;
     final double xResolution = 360.0 / width; //MetaData.MERRA2.lonUnit;
-    final double yResolution = -180.0 / height; //MetaData.MERRA2.latUnit;
+    final double yResolution = 180.0 / height; //MetaData.MERRA2.latUnit;
     final double x_orig = -180.0; //MetaData.MERRA2.lon_orig;
-    final double y_orig = 90.0; //MetaData.MERRA2.lat_orig;
-    final int zoomScale = 6;
+    final double y_orig = -90.0; //MetaData.MERRA2.lat_orig;
+    final int interplateScale = 1;
+    final int pngScale = 4;
 
-    final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"};
+    final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
     final boolean isObject = false;
 
     JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
@@ -104,13 +110,45 @@ public class ETLTool {
           }
         });
 
+    JavaRDD<Rectangle> stateBoundaries = states.map(new Function<CountyFeature, Rectangle>() {
+      @Override
+      public Rectangle call(CountyFeature v1) throws Exception {
+        return v1.getMBR();
+      }
+    });
+
+    List<Rectangle> statesBList = stateBoundaries.collect();
+    double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
+    for (Rectangle rectangle : statesBList) {
+      x_min = Math.min(x_min, rectangle.getMinX());
+      x_max = Math.max(x_max, rectangle.getMaxX());
+      y_min = Math.min(y_min, rectangle.getMinY());
+      y_max = Math.max(y_max, rectangle.getMaxY());
+    }
+
+    Rectangle queryBBox = new Rectangle(x_min,y_min,x_max,y_max);
+    hconf.set("geoBBox", queryBBox.toWKT());
+
+
     JavaPairRDD<H5Chunk, ArrayIntSerializer> stateMask = states.mapToPair( new GeoExtracting.ChunkMaskFactory(xResolution, yResolution, x_orig, y_orig));
 
     List<Tuple2<H5Chunk, ArrayIntSerializer>> maskList = stateMask.collect();
 
     Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = GeoExtracting.combineChunkMasks(maskList);
 
-    PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f);
+    /*queryBBox = new Rectangle(-185,-95,185,95);
+    hconf.set("geoBBox", queryBBox.toWKT());
+    int[] globalmask = new int[height*width];
+    for (int i= 0; i<height; i++) {
+      for (int j=0; j<width; j++) {
+        globalmask[i*width+j] = 1;
+      }
+    }
+    maskLocal._1().setShape(new int[]{height, width});
+    maskLocal._1().setCorner(new int[]{0, 0});
+    maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(maskLocal._1(), new ArrayIntSerializer(new int[]{height, width}, globalmask));*/
+
+    PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
     final Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask = sc.broadcast(maskLocal);
 
@@ -118,64 +156,9 @@ public class ETLTool {
                                                                                      DataChunk.class,
                                                                                      ArrayFloatSerializer.class);
 
-    //the upside of y are change to downside, and filtered by the mask
-    JavaPairRDD<DataChunk, ArrayFloatSerializer> recordsWithCoordinateChanging = records.mapToPair(
-        new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, DataChunk, ArrayFloatSerializer>() {
-          @Override
-          public Tuple2<DataChunk, ArrayFloatSerializer> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
-            int[] maskCorner = mask.value()._1().getCorner();
-            int[] maskShape = mask.value()._1().getShape();
-            Rectangle maskBBox = new Rectangle(maskCorner[1], maskCorner[0], maskCorner[1]+maskShape[1]-1, maskCorner[0]+maskShape[0]-1);
-
-            ArrayFloatSerializer v1 = tuple2._2();
-            int[] shape = tuple2._1().getShape().clone();
-            int[] corner = tuple2._1().getCorner().clone();
-            Rectangle chunkBBox = new Rectangle(corner[corner.length-1], corner[corner.length-2], corner[corner.length-1]+shape[corner.length-1]-1, corner[corner.length-2]+shape[corner.length-2]-1);
-
-            if (chunkBBox.isIntersected(maskBBox)) {
-              Rectangle intectedRec = chunkBBox.getIntersection(maskBBox);
-              shape[shape.length-2] = (int) (intectedRec.getHeight())+1;
-              shape[shape.length-1] = (int) (intectedRec.getWidth())+1;
-              corner[corner.length-2] = (int) intectedRec.getMinY();
-              corner[corner.length-1] = (int) intectedRec.getMinX();
-
-              ArrayFloat result = (ArrayFloat) Array.factory(float.class, shape);
-              Index index = Index.factory(shape);
-              Index rawIndex = Index.factory(tuple2._2().getArray().getShape());
-              int[] rawCorner = tuple2._1().getCorner();
-              Index maskIndex = Index.factory(mask.value()._2().getArray().getShape());
-
-              switch (index.getRank()) {
-                case 3:
-                  for (int t=0; t<shape[0]; t++) {
-                    for (int y=0; y<shape[1]; y++) {
-                      for (int x=0; x<shape[2]; x++) {
-                        index.set(t,y,x);
-                        if (maskBBox.contains(corner[2] + x, corner[1] + y)) {
-                          if (mask.value()._2.getArray().get(maskIndex.set(corner[1] + y - maskCorner[0], corner[2] + x - maskCorner[1]))>0) {
-                            if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>1000) {
-                              result.set(index,-1.0f);
-                              continue;
-                            }
-                            result.set(index,v1.getArray().get(rawIndex.set(t, /*rawIndex.getShape(1)-y-1*/y+corner[1]-rawCorner[1], x+corner[2]-rawCorner[2])));
-                          }
-                        } else {
-                          result.set(index,0.0f);
-                        }
-                      }
-                    }
-                  }
-                  break;
-              }
-
-              tuple2._1().setCorner(corner);
-              tuple2._1().setShape(shape);
-              return new Tuple2<DataChunk, ArrayFloatSerializer>(tuple2._1(), new ArrayFloatSerializer(result.getShape(), (float[]) result.getStorage()));
-            } else {
-              return null;
-            }
-          }
-        }).filter(new Function<Tuple2<DataChunk, ArrayFloatSerializer>, Boolean>() {
+    //filter out the data by the mask
+    JavaPairRDD<DataChunk, ArrayFloatSerializer> recordsWithCoordinateChanging = records.mapToPair(new GeoExtracting.ChunkExtractingByMask(mask))
+        .filter(new Function<Tuple2<DataChunk, ArrayFloatSerializer>, Boolean>() {
             @Override
             public Boolean call(Tuple2<DataChunk, ArrayFloatSerializer> v1) throws Exception {
               if (v1 == null) {
@@ -186,74 +169,57 @@ public class ETLTool {
             }
     });
 
-    JavaPairRDD<String, Tuple2<DataChunk, ArrayFloatSerializer>> rddCombinedByVarAndTime = recordsWithCoordinateChanging.mapToPair(
-        new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, Tuple2<DataChunk, ArrayFloatSerializer>>() {
+    JavaPairRDD<String, Tuple2<DataChunk, ArrayFloatSerializer>> rddCombinedByVarAndTime =
+        recordsWithCoordinateChanging.mapToPair(new GeoExtracting.InterpolateArrayByIDW(interplateScale))
+            .mapToPair(new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, Tuple2<DataChunk, ArrayFloatSerializer>>() {
+              @Override
+              public Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>> call(
+                  Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
+                String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2] + "_" + tuple2._1().getCorner()[0];
+                return new Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>>(key, tuple2);
+              }
+            });
+
+    JavaPairRDD<String, ArrayFloatSerializer> combinedChunks = rddCombinedByVarAndTime.groupByKey().mapToPair( new GeoExtracting.CombineChunks(mask, interplateScale));
+
+
+    JavaPairRDD<String, Tuple2<String, ArrayFloatSerializer>> timeChunks = combinedChunks.mapToPair(
+        new PairFunction<Tuple2<String, ArrayFloatSerializer>, String, Tuple2<String, ArrayFloatSerializer>>() {
           @Override
-          public Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>> call(
-              Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
-            String key = tuple2._1.getVarShortName() + tuple2._1().getCorner()[0] + "_" + tuple2._1().getFilePath().split("\\.")[2];
-            int[] shape = tuple2._1().getShape();
-            int[] corner = tuple2._1().getCorner();
-
-            NetCDFManager manager = new NetCDFManager();
-
-            ArrayFloat.D2 d2 = (ArrayFloat.D2) tuple2._2().getArray().reduce(0);
-            ArrayFloat.D2 input = manager.interpolateArray(d2, zoomScale, 2.0f);
-
-            shape[shape.length-2] = shape[shape.length-2]*zoomScale;
-            shape[shape.length-1] = shape[shape.length-1]*zoomScale;
-            corner[corner.length-2] = corner[corner.length-2]*zoomScale;
-            corner[corner.length-1] = corner[corner.length-1]*zoomScale;
-            tuple2._1().setCorner(corner);
-            tuple2._1().setShape(shape);
-            return new Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>>(key, new Tuple2<DataChunk, ArrayFloatSerializer>(tuple2._1(),
-                                                                                                                                new ArrayFloatSerializer(shape, (float[]) input.getStorage())));
+          public Tuple2<String, Tuple2<String, ArrayFloatSerializer>> call(
+              Tuple2<String, ArrayFloatSerializer> tuple2) throws Exception {
+            String[] tmps = tuple2._1().split("_");
+            String hour = String.format("%02d", Integer.parseInt(tmps[2]));
+            return new Tuple2<String, Tuple2<String, ArrayFloatSerializer>>(tmps[0]+tmps[1], new Tuple2<String, ArrayFloatSerializer>(tmps[0]+"_"+tmps[1]+"_"+hour, tuple2._2()));
           }
         });
 
-    JavaPairRDD<String, ArrayFloatSerializer> combinedChunks = rddCombinedByVarAndTime.groupByKey().mapToPair(
-        new PairFunction<Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>>, String, ArrayFloatSerializer>() {
+    timeChunks.groupByKey().foreach(
+        new VoidFunction<Tuple2<String, Iterable<Tuple2<String, ArrayFloatSerializer>>>>() {
           @Override
-          public Tuple2<String, ArrayFloatSerializer> call(
-              Tuple2<String, Iterable<Tuple2<DataChunk, ArrayFloatSerializer>>> stringIterableTuple2)
-              throws Exception {
-            int height = mask.value()._1().getShape()[0]*zoomScale;
-            int width = mask.value()._1().getShape()[1]*zoomScale;
-            int[] cornerMask = mask.value()._1().getCorner().clone();
-            cornerMask[0] = cornerMask[0]*zoomScale;
-            cornerMask[1] = cornerMask[1]*zoomScale;
-            float[] defaultValues = new float[height*width];
-            ArrayFloat combinedArray = (ArrayFloat) Array.factory(float.class, new int[]{height, width}, defaultValues);
-            Index2D maskIndex = new Index2D(new int[]{height, width});
-
-            Iterator<Tuple2<DataChunk, ArrayFloatSerializer>> itor = stringIterableTuple2._2().iterator();
-            while (itor.hasNext()) {
-              Tuple2<DataChunk, ArrayFloatSerializer> tuple = itor.next();
-              int[] corner = tuple._1().getCorner();
-              int[] shape = tuple._1().getShape();
-              Index3D chunkIndex = new Index3D(shape);
-              for (int y = corner[1]; y< corner[1] + shape[1]; y++) {
-                for (int x = corner[2]; x < corner[2] + shape[2]; x++) {
-                  //System.out.println(y + " __ " + cornerMask[0]);
-                  maskIndex.set(y-cornerMask[0], x-cornerMask[1]);
-                  combinedArray.set(maskIndex,tuple._2().getArray().get(chunkIndex.set(0, y-corner[1], x-corner[2])));
-                }
-              }
+          public void call(Tuple2<String, Iterable<Tuple2<String, ArrayFloatSerializer>>> tuple2) throws Exception {
+            ArrayList<Image> images = new ArrayList<Image>();
+            for (int i=0; i<24; i++) {
+              images.add(new BufferedImage(1,1,1));
             }
 
-            return new Tuple2<String, ArrayFloatSerializer>(stringIterableTuple2._1(),
-                                                            new ArrayFloatSerializer(combinedArray.getShape(),
-                                                                                     (float[]) combinedArray.getStorage()));
+            Iterator<Tuple2<String, ArrayFloatSerializer>> itor = tuple2._2().iterator();
+
+            while (itor.hasNext()) {
+              Tuple2<String, ArrayFloatSerializer> tuple = itor.next();
+              Image image = PngFactory.getImage(tuple._2().getArray(), 107.2249f, 319.2336f, tuple._1(), pngScale);
+              int index = Integer.parseInt(tuple._1().split("_")[2]);
+              images.set(index, image);
+            }
+            PngFactory.geneGIFBilinear(images, "/Users/feihu/Desktop/test/" + tuple2._1(), 1, 500);
           }
         });
 
-    combinedChunks.foreach(new VoidFunction<Tuple2<String, ArrayFloatSerializer>>() {
+    timeChunks.foreach(new VoidFunction<Tuple2<String, Tuple2<String, ArrayFloatSerializer>>>() {
       @Override
-      public void call(Tuple2<String, ArrayFloatSerializer> tuple) throws Exception {
-       // NetCDFManager manager = new NetCDFManager();
-        //ArrayFloat.D2 d2 = (ArrayFloat.D2) tuple._2().getArray();
-        //ArrayFloat.D2 input = manager.interpolateArray(d2, 2, 2.0f);
-        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f);
+      public void call(Tuple2<String, Tuple2<String, ArrayFloatSerializer>> tuple2) throws Exception {
+        Tuple2<String, ArrayFloatSerializer> tuple = tuple2._2();
+        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f, tuple._1(), pngScale);
       }
     });
   }

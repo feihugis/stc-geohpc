@@ -68,6 +68,10 @@ public class PngColor {
         float normal = (data - this.min) / (max - min);
         int rgb = Color.HSBtoRGB((1f - normal) / 1.5f, 0.94f, 0.5f + normal * 0.33f);
 
+        /*if (data < min/2) {
+          rgb = 0xff000000 | (255 << 16) | (255 << 8) | (255 << 0);
+        }*/
+
         return rgb;
     }
 	
@@ -152,16 +156,16 @@ public class PngColor {
 
         File legend = new File(outputName + ".png");
         PngWriter pg = new PngWriter();
-        String[] lengNum = new String[7];
+        String[] lengNum = new String[5];
         //System.out.println(""+this.max+" "+this.min+" "+(this.max-this.min));
         for (int k = 0; k < lengNum.length; k++) {
-            float inLegend = this.min + (this.max - this.min) / 6f * k;
+            float inLegend = this.min + (this.max - this.min) / 4f * k;
             DecimalFormat myformat = null;
             if (Math.abs(inLegend) > 100000)
-                myformat = new DecimalFormat("0.00E0");    //correcting the format of excessively large numbers
+                myformat = new DecimalFormat("0.0E0");    //correcting the format of excessively large numbers
 
             else
-                myformat = new DecimalFormat("0.000");
+                myformat = new DecimalFormat("0.0");
 
             lengNum[k] = (myformat.format(inLegend));
         }
@@ -171,8 +175,8 @@ public class PngColor {
 
     public BufferedImage getLegendImage(int width, int height, int margin, String title, String units) {
         legendMap = new int[width][height];
-        int[] marks = new int[legendMap.length / 50];
-        double spacing = (((double) (legendMap.length - margin * 2)) / ((double) marks.length - 1.0));
+        int[] marks = new int[width / 50];
+        double spacing = (((double) (width - margin * 2)) / ((double) marks.length - 1.0));
         for (int i = 0; i < marks.length; i++) {
             marks[i] = margin + (int) Math.round(spacing * i);
         }
@@ -206,10 +210,10 @@ public class PngColor {
             float inLegend = this.min + (this.max - this.min) / ((float) (lengNum.length - 1)) * k;
             DecimalFormat myformat = null;
             if (Math.abs(inLegend) > 100000)
-                myformat = new DecimalFormat("0.00E0");    //correcting the format of excessively large numbers
+                myformat = new DecimalFormat("0.0E0");    //correcting the format of excessively large numbers
 
             else
-                myformat = new DecimalFormat("0.000");
+                myformat = new DecimalFormat("0.0");
 
             lengNum[k] = (myformat.format(inLegend));
         }

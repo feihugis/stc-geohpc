@@ -49,7 +49,7 @@ public class MyProperty {
     public static String mysql_user = "feihu"; //"root";
     public static String mysql_password = "feihu";
     public static String mysql_catalog = "merra2";
-    public static String nameNode = "localhost";
+    public static String nameNode = "file:////";
 
 	public MyProperty() {
 		// TODO Auto-generated constructor stub

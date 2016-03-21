@@ -22,6 +22,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -191,6 +192,25 @@ public class Polygon implements Shape {
   }
 
   public static Polygon generatePolygonFromPGgeometry(PGgeometry plgn) {
+    if (plgn.getGeoType() == Geometry.POLYGON) {
+      org.postgis.Polygon polygon = (org.postgis.Polygon) plgn.getGeometry();
+      LinearRing ring = polygon.getRing(0);
+      org.postgis.Point[] points = ring.getPoints();
+      double[] xpoints = new double[points.length-1];
+      double[] ypoints = new double[points.length-1];
+      for (int i=0; i<points.length-1; i++) {
+        xpoints[i] = points[i].getX();
+        ypoints[i] = points[i].getY();
+      }
+      return new Polygon(xpoints, ypoints, points.length-1);
+    } else {
+      LOG.info("There is a bug in edu.gmu.stc.hadoop.vector.Polygon.generatePolygonFromPGgeometry" );
+    }
+    return null;
+  }
+
+  public static Polygon generatePolygonFromPGgeometry(String plgnString) throws SQLException {
+    PGgeometry plgn = new PGgeometry(plgnString);
     if (plgn.getGeoType() == Geometry.POLYGON) {
       org.postgis.Polygon polygon = (org.postgis.Polygon) plgn.getGeometry();
       LinearRing ring = polygon.getRing(0);
