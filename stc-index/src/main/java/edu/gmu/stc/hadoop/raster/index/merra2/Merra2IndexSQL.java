@@ -49,6 +49,10 @@ public class Merra2IndexSQL {
     this.addBtreeIndex2Table(this.merra2SpaceIndex, "geometry");
   }
 
+  public void closeDBConection() throws SQLException {
+    this.statement.close();
+  }
+
   /**
    * Create tables for the file index
    * @param tablenames  the table name should be same with the file name

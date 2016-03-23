@@ -1,12 +1,20 @@
 package edu.gmu.stc.hadoop.raster.index.merra2;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.ChunkFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
@@ -22,6 +30,10 @@ public class Merr2IndexBuilder {
 
   public Merr2IndexBuilder() throws IOException {
     sqlOptor = new Merra2IndexSQL(new DBConnector().GetConnStatement());
+  }
+
+  public void closeDBConnnection() throws SQLException {
+    sqlOptor.closeDBConection();
   }
 
   public void initMetaIndexTable() {
@@ -84,32 +96,44 @@ public class Merr2IndexBuilder {
   public static void main(String[] args) {
     List<String> files = new ArrayList<String>();
     //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.inst1_2d_int_Nx.19800101.nc4");
-    //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.tavg1_2d_int_Nx.19800101.nc4");
-    //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.tavg1_2d_int_Nx.19800102.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150101.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150102.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150103.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150104.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150105.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150106.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150107.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150108.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150109.nc4");
-    files.add("/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150110.nc4");
+    // "/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150110.nc4");*/
+
+    Path path = new Path("/Users/feihu/Documents/Data/Merra2/");
+    FileSystem fs = null;
+    Configuration conf = new Configuration();
+    conf.set("fs.defaultFS", MyProperty.nameNode);
+    conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+    conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+    conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
     try {
+      fs = FileSystem.get(conf);
+      List<FileStatus> fileStatusList = new ArrayList<FileStatus>();
+      RemoteIterator<LocatedFileStatus> ritr = fs.listFiles(path, true);
+      while (ritr.hasNext()) {
+        FileStatus file = ritr.next();
+        String location = file.getPath().toString();
+        String[] paths = location.split("\\.");
+        String format = paths[paths.length - 1];
+        if (format.equalsIgnoreCase("hdf")||format.equalsIgnoreCase("nc4")) {
+          fileStatusList.add(file);
+          files.add(file.getPath().toString());
+        } else {
+          continue;
+        }
+      }
+
       Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
       merra2IndexBuilder.initMetaIndexTable();
       merra2IndexBuilder.insertMerra2SpaceIndex();
       merra2IndexBuilder.createFileIndexTablesInBatch(files);
       merra2IndexBuilder.insertdataChunks(files);
+
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
     } catch (IOException e) {
       e.printStackTrace();
     }
-
   }
 
 
-
-
-
-}
+  }
