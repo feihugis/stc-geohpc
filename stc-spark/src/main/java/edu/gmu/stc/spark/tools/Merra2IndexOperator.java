@@ -93,8 +93,9 @@ public class Merra2IndexOperator {
   public static void main(String[] args) throws ClassNotFoundException, IOException, SQLException {
     String configFile = args[0];
     String inputDir = args[1]; //"/Users/feihu/Documents/Data/Merra2/";
-    if (args.length != 2) {
-      System.out.println("Please input <configFilePath> <inputDir>");
+    boolean isInitMetaIndex = Boolean.parseBoolean(args[2]);
+    if (args.length != 3) {
+      System.out.println("Please input <configFilePath> <inputDir><isInitMetaIndex>");
       return;
     }
 
@@ -104,8 +105,11 @@ public class Merra2IndexOperator {
 
     Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
 
-    merra2IndexBuilder.initMetaIndexTable();
-    merra2IndexBuilder.insertMerra2SpaceIndex();
+    if (isInitMetaIndex) {
+      merra2IndexBuilder.initMetaIndexTable();
+      merra2IndexBuilder.insertMerra2SpaceIndex();
+    }
+
     //merra2IndexBuilder.closeDBConnnection();
 
     final SparkConf sconf = new SparkConf().setAppName("SparkTest");//.setMaster("local[6]");
