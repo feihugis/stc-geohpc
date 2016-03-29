@@ -267,6 +267,20 @@ public class Merra2IndexSQL {
     return inputSplits;
   }
 
+  public List<H5ChunkInputSplit> queryDataChunks(List<String> tableNameList,
+                                                 List<String> varList,
+                                                 Polygon polygon,
+                                                 List<Integer[]> starConer,
+                                                 List<Integer[]> endCorner) {
+    List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
+    for (String tableName : tableNameList) {
+      inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon, starConer, endCorner));
+      //inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    }
+
+    return inputSplits;
+  }
+
   public List<H5ChunkInputSplit> queryDataChunks(String tableName, List<String> varList, Polygon polygon) {
     List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
     inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon));
@@ -288,6 +302,73 @@ public class Merra2IndexSQL {
     varSQL = varSQL + "merra.varshortname = '" + varList.get(varList.size() - 1) + "') ORDER BY merra.filepos,merra.corner;";
 
     sql = sql + varSQL;
+
+    if (debug) {
+      LOG.info(sql);
+      System.out.println(sql);
+    }
+
+    ResultSet rs;
+    try {
+      rs = this.statement.executeQuery(sql);
+      chunkList = generateDataChunk(rs, false); //PostGIS query is ST_Intersects, so the datachunk is not contained in the bbox
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return generateInputSplitByHosts(chunkList);
+  }
+
+  public List<H5ChunkInputSplit> queryIntersectedDataChunk(String tableName,
+                                                           List<String> varList,
+                                                           Polygon polygon,
+                                                           List<Integer[]> starConer,
+                                                           List<Integer[]> endCorner) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+                 + "WHERE merra.geometry = spaceindex.geometry\n"
+                 + "AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
+                 + "'::geometry)\n";
+
+    String varSQL = "AND (";
+    for (int i = 0; i < varList.size(); i++) {
+      varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' ";
+      if (i < varList.size()-1) {
+        varSQL = varSQL + " OR ";
+      }
+    }
+
+    varSQL = varSQL + ") \n";
+
+    String cornerSQL = " AND (";
+
+    for (int i = 0; i < starConer.size(); i++ ) {
+      Integer[] subStart = starConer.get(i);
+      Integer[] subEnd = endCorner.get(i);
+      String subCornerSQL = "(";
+      for (int j = 0; j < subStart.length; j++) {
+        subCornerSQL = subCornerSQL + " ( merra.corner["+(j+1)+"] >=" + subStart[j] + " AND merra.corner["+(j+1)+"] <=" + subEnd[j] + ")";
+        if (j < subStart.length-1) {
+          subCornerSQL = subCornerSQL + "AND ";
+        }
+      }
+      subCornerSQL = subCornerSQL + " )";
+      cornerSQL = cornerSQL + subCornerSQL;
+      if (i<starConer.size()-1) {
+        cornerSQL = cornerSQL + " OR ";
+      }
+    }
+
+    cornerSQL = cornerSQL + " )\n";
+
+
+
+
+    String orderSQL = "ORDER BY merra.filepos,merra.corner;";
+
+
+
+    sql = sql + varSQL + cornerSQL + orderSQL;
 
     if (debug) {
       LOG.info(sql);

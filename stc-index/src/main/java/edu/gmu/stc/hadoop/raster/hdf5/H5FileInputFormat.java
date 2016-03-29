@@ -18,6 +18,7 @@ import java.util.List;
 
 import edu.gmu.stc.database.IndexOperator;
 import edu.gmu.stc.hadoop.index.tools.Utils;
+import edu.gmu.stc.hadoop.raster.RasterUtils;
 import edu.gmu.stc.hadoop.raster.index.merra2.Merr2IndexBuilder;
 import edu.gmu.stc.hadoop.vector.Polygon;
 
@@ -34,18 +35,36 @@ public class H5FileInputFormat extends FileInputFormat {
     int numDims = 0;
 
     List<InputSplit> inputSplits = new ArrayList<InputSplit>();
-    IndexOperator indexOptr = new IndexOperator();
 
     List<String> varNamesList = Arrays.asList(job.getConfiguration().getStrings("variables"));
     int startDate = Integer.parseInt(job.getConfiguration().get("startTime")); //For daily data, the format should be 20141001 (yyyymmdd)
     int endDate = Integer.parseInt(job.getConfiguration().get("endTime"));
+    List<FileStatus> fileStatusList = listStatus(job);
+    fileStatusList = RasterUtils.filterMerraInputFilesByTime(fileStatusList, startDate, endDate);
 
-    //String inputBbox = job.getConfiguration().get("bbox");
-    //HashMap<String, List<Integer[]>> bboxMap = Utils.parseBbox(inputBbox);
-    //List<Integer[]> startList = new ArrayList<Integer[]>(bboxMap.get("start"));
-    //List<Integer[]> endList = new ArrayList<Integer[]>(bboxMap.get("end"));
+    String inputBbox = job.getConfiguration().get("bbox");
+    HashMap<String, List<Integer[]>> bboxMap = Utils.parseBbox(inputBbox);
+    List<Integer[]> startCorners = new ArrayList<Integer[]>(bboxMap.get("start"));
+    List<Integer[]> endCorners = new ArrayList<Integer[]>(bboxMap.get("end"));
+
+    /*List<Integer[]> subStartCorners = new ArrayList<Integer[]>();
+    List<Integer[]> subEndCorners = new ArrayList<Integer[]>();
+
+    //subset the dims except the lat and lon dimension. Here assume the lat and lon dims are the last two dimensions.
+    for (int i=0; i<startCorners.size(); i++) {
+      Integer[] start = startCorners.get(i);
+      Integer[] end = endCorners.get(i);
+      Integer[] subStart = new Integer[start.length-2];
+      Integer[] subEnd = new Integer[end.length-2];
+      for (int j=0; j<subStart.length; j++) {
+        subStart[j] = start[j];
+        subEnd[j] = end[j];
+      }
+      subStartCorners.add(subStart);
+      subEndCorners.add(subEnd);
+    }*/
+
     String geoBBox = job.getConfiguration().get("geoBBox");
-
     Polygon geoPolygon = null;
     try {
       geoPolygon = Polygon.generatePolygonFromPGgeometry(geoBBox);
@@ -53,18 +72,15 @@ public class H5FileInputFormat extends FileInputFormat {
       e.printStackTrace();
     }
 
-    List<FileStatus> fileStatusList = listStatus(job);
-
     Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
     //Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
-    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon));
+    //inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon));
+    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon, startCorners, endCorners));
     return inputSplits;
   }
 
   @Override
   protected List<FileStatus> listStatus(JobContext jobC) throws IOException {
-    int startTime = Integer.parseInt(jobC.getConfiguration().get("startTime"));
-    int endTime = Integer.parseInt(jobC.getConfiguration().get("endTime"));
 
     List<FileStatus> files = super.listStatus(jobC);
 
@@ -81,18 +97,6 @@ public class H5FileInputFormat extends FileInputFormat {
 
     files.removeAll(unNetCDFs);
 
-    ArrayList<FileStatus> nfiles = new ArrayList<FileStatus>();
-    for (FileStatus file: files) {
-      String path = file.getPath().toString();
-      String[] paths = path.split("\\.");
-      String time = paths[paths.length - 2];
-      int timeValue = Integer.parseInt(time);
-      if(timeValue<startTime || timeValue>endTime) {
-        System.out.println(file.getPath().toString());
-        nfiles.add(file);
-      }
-    }
-    files.removeAll(nfiles);
     return files;
   }
 

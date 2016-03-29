@@ -31,14 +31,14 @@ import scala.Tuple2;
 /**
  * Created by Fei Hu on 3/17/16.
  */
-public class ETLTool {
+public class ETLToolTestCluster {
 
   /**
    *
    * @param args
    * @throws ClassNotFoundException
    */
-  public static void main(final String[] args) throws ClassNotFoundException {
+  public static void main(String[] args) throws ClassNotFoundException {
 
     final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster("local[6]");
 
@@ -60,9 +60,9 @@ public class ETLTool {
     hconf.setStrings("endTime", "20151201");
 
     //Did not use the following setting
-    /*hconf.setStrings("datanodeNum", "14");
+    hconf.setStrings("datanodeNum", "14");
     hconf.setStrings("slotNum", "10");
-    hconf.setStrings("threadNumPerNode", "10");*/
+    hconf.setStrings("threadNumPerNode", "10");
 
     final int width = 576, height = 364;
     final double xResolution = 360.0 / width; //MetaData.MERRA2.lonUnit;
@@ -74,12 +74,12 @@ public class ETLTool {
 
     final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
     final boolean isObject = false;
-    JavaRDD<String> geoJson = sc.textFile(args[1]).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+    //JavaRDD<String> geoJson = sc.textFile(args[1]).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
     //JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
 
-    JavaPairRDD<String, CountyFeature> countyRDD = geoJson.mapToPair(new GeoExtracting.GeoFeatureFactory());
+    //JavaPairRDD<String, CountyFeature> countyRDD = geoJson.mapToPair(new GeoExtracting.GeoFeatureFactory());
 
-    JavaRDD<CountyFeature> states = countyRDD.reduceByKey(
+    /*JavaRDD<CountyFeature> states = countyRDD.reduceByKey(
         new Function2<CountyFeature, CountyFeature, CountyFeature>() {
           @Override
           public CountyFeature call(CountyFeature v1, CountyFeature v2) throws Exception {
@@ -102,27 +102,27 @@ public class ETLTool {
       public Rectangle call(CountyFeature v1) throws Exception {
         return v1.getMBR();
       }
-    });
+    });*/
 
-    List<Rectangle> statesBList = stateBoundaries.collect();
+    //List<Rectangle> statesBList = stateBoundaries.collect();
     double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
-    for (Rectangle rectangle : statesBList) {
+    /*for (Rectangle rectangle : statesBList) {
       x_min = Math.min(x_min, rectangle.getMinX());
       x_max = Math.max(x_max, rectangle.getMaxX());
       y_min = Math.min(y_min, rectangle.getMinY());
       y_max = Math.max(y_max, rectangle.getMaxY());
-    }
+    }*/
 
     Rectangle queryBBox = new Rectangle(x_min,y_min,x_max,y_max);
     hconf.set("geoBBox", queryBBox.toWKT());
 
-    JavaPairRDD<H5Chunk, ArrayIntSerializer> stateMask = states.mapToPair( new GeoExtracting.ChunkMaskFactory(xResolution, yResolution, x_orig, y_orig));
+    //JavaPairRDD<H5Chunk, ArrayIntSerializer> stateMask = states.mapToPair( new GeoExtracting.ChunkMaskFactory(xResolution, yResolution, x_orig, y_orig));
 
-    List<Tuple2<H5Chunk, ArrayIntSerializer>> maskList = stateMask.collect();
+    //List<Tuple2<H5Chunk, ArrayIntSerializer>> maskList = stateMask.collect();
 
-    Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = GeoExtracting.combineChunkMasks(maskList);
+    //Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = GeoExtracting.combineChunkMasks(maskList);
 
-    /*queryBBox = new Rectangle(-185,-95,185,95);
+    queryBBox = new Rectangle(-185,-95,185,95);
     hconf.set("geoBBox", queryBBox.toWKT());
     int[] globalmask = new int[height*width];
     for (int i= 0; i<height; i++) {
@@ -130,12 +130,13 @@ public class ETLTool {
         globalmask[i*width+j] = 1;
       }
     }
-    maskLocal._1().setShape(new int[]{height, width});
-    maskLocal._1().setCorner(new int[]{0, 0});
-    maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(maskLocal._1(), new ArrayIntSerializer(new int[]{height, width}, globalmask));*/
 
-    //PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
-    PngFactory.drawPNG(maskLocal._2().getArray(), args[2] + "/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
+    H5Chunk chunk = new H5Chunk();
+    chunk.setShape(new int[]{height, width});
+    chunk.setCorner(new int[]{0, 0});
+    Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(chunk, new ArrayIntSerializer(new int[]{height, width}, globalmask));
+
+    PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
     final Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask = sc.broadcast(maskLocal);
 
@@ -198,18 +199,17 @@ public class ETLTool {
               int index = Integer.parseInt(tuple._1().split("_")[2]);
               images.set(index, image);
             }
-            //PngFactory.geneGIFBilinear(images, "/Users/feihu/Desktop/test/" + tuple2._1(), 1, 500);
-            PngFactory.geneGIFBilinear(images, args[2] + tuple2._1(), 1, 500);
+            PngFactory.geneGIFBilinear(images, "/Users/feihu/Desktop/test/" + tuple2._1(), 1, 500);
           }
         });
 
-    /*timeChunks.foreach(new VoidFunction<Tuple2<String, Tuple2<String, ArrayFloatSerializer>>>() {
+    timeChunks.foreach(new VoidFunction<Tuple2<String, Tuple2<String, ArrayFloatSerializer>>>() {
       @Override
       public void call(Tuple2<String, Tuple2<String, ArrayFloatSerializer>> tuple2) throws Exception {
         Tuple2<String, ArrayFloatSerializer> tuple = tuple2._2();
         PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f, tuple._1(), pngScale);
       }
-    });*/
+    });
   }
 
 }

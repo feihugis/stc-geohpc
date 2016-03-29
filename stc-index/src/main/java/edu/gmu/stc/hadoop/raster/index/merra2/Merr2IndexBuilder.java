@@ -91,6 +91,16 @@ public class Merr2IndexBuilder {
     return this.sqlOptor.queryDataChunks(tableNameList, varList, polygon);
   }
 
+  public List<H5ChunkInputSplit> queryDataChunksByinputFileStatus(List<FileStatus> fileStatusList,
+                                                                  List<String> varList,
+                                                                  Polygon polygon,
+                                                                  List<Integer[]> starConer,
+                                                                  List<Integer[]> endCorner
+                                                                  ) {
+    List<String> tableNameList = RasterUtils.fileStatusToTableNames(fileStatusList);
+    return this.sqlOptor.queryDataChunks(tableNameList, varList, polygon, starConer, endCorner);
+  }
+
 
 
   public static void main(String[] args) {

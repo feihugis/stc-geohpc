@@ -93,6 +93,22 @@ public class RasterUtils {
     return false;
   }
 
+ public static List<FileStatus> filterMerraInputFilesByTime(List<FileStatus> files, int startTime, int endTime ) {
+   ArrayList<FileStatus> nfiles = new ArrayList<FileStatus>();
+   for (FileStatus file: files) {
+     String path = file.getPath().toString();
+     String[] paths = path.split("\\.");
+     String time = paths[paths.length - 2];
+     int timeValue = Integer.parseInt(time);
+     if(timeValue<startTime || timeValue>endTime) {
+       System.out.println(file.getPath().toString());
+       nfiles.add(file);
+     }
+   }
+   files.removeAll(nfiles);
+   return files;
+ }
+
 
   public static void main(String[] args) {
     Float[] input = new Float[] {1.2f, 3.2f, 4.3f};

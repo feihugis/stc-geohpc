@@ -51,8 +51,8 @@ public class MyProperty {
 	public static String mysql_catalog = "merra2datacontainer";
 	public static String nameNode = "hdfs://svr-A3-A-U2:8020";
 
-    /*//For localhost
-    public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+    //For localhost
+    /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
     public static String mysql_user = "feihu"; //"root";
     public static String mysql_password = "feihu";
     public static String mysql_catalog = "merra2test";
