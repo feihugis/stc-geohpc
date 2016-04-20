@@ -1,0 +1,53 @@
+.popup {
+    text-align:center;
+}
+.popup .slideshow .image        { display:none; }
+.popup .slideshow .image.active { display:block; }
+.popup .slideshow img {
+    width:100%;
+}
+.popup .slideshow .caption {
+    background:#eee;
+    padding:10px;
+}
+.popup .cycle {
+    padding:10px 0 20px;
+}
+.popup .cycle a.prev { float:left; }
+.popup .cycle a.next { float:right; }
+
+#infobg {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    width: 190px;
+    height: 150px;
+    text-align:center;
+    background: rgba(0,0,0,0.5);
+    opacity: 0.4;
+    z-index: 20;
+    color:#fff;
+    border-radius:3px;
+}
+
+#info {
+    position: absolute;
+    top: 15px;
+    right: 0px;
+    opacity: 1 !important;
+    width: 190px;
+    height: 125px;
+    color:#fff;
+    z-index: 30;
+}
+
+#number, #min_lat, #min_lon, #max_lat, #max_lon {
+    position: relative;
+    height: 23px;
+    margin-left: 30px;
+    font-size: 14px;
+}
+
+.myControl {
+    width: 190px;
+}
