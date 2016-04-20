@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
+
 /**
  * Created by Fei Hu on 3/8/16.
  */
-public abstract class DataChunkInputSplit extends InputSplit implements Writable {
+public class DataChunkInputSplit extends InputSplit implements Writable {
   protected List<DataChunk> chunkList = new ArrayList<DataChunk>();  //Each data chunk should be located on the same hosts
 
   public List<DataChunk> getChunkList() {
@@ -31,7 +33,6 @@ public abstract class DataChunkInputSplit extends InputSplit implements Writable
   public DataChunkInputSplit() {
 
   }
-
 
   @Override
   public long getLength() throws IOException, InterruptedException {
@@ -53,6 +54,13 @@ public abstract class DataChunkInputSplit extends InputSplit implements Writable
 
   @Override
   public void readFields(DataInput in) throws IOException {
-
+    chunkList = new ArrayList<DataChunk>();
+    int n = in.readInt();
+    while (n>0) {
+      DataChunk chunk = new DataChunk();
+      chunk.readFields(in);
+      chunkList.add(chunk);
+      n = n -1;
+    }
   }
 }

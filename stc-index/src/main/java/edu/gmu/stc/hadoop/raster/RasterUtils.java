@@ -101,7 +101,7 @@ public class RasterUtils {
      String time = paths[paths.length - 2];
      int timeValue = Integer.parseInt(time);
      if(timeValue<startTime || timeValue>endTime) {
-       System.out.println(file.getPath().toString());
+       //System.out.println(file.getPath().toString());
        nfiles.add(file);
      }
    }

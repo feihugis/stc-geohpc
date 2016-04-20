@@ -23,15 +23,17 @@ import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
+import edu.gmu.stc.hadoop.raster.index.MetaData;
 import edu.gmu.stc.hadoop.vector.Rectangle;
 import edu.gmu.stc.hadoop.vector.extension.CountyFeature;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 import scala.Tuple2;
+import ucar.ma2.ArrayFloat;
 
 /**
  * Created by Fei Hu on 3/17/16.
  */
-public class ETLTool {
+public class ETLMeanClusterTest {
 
   /**
    *
@@ -40,24 +42,32 @@ public class ETLTool {
    */
   public static void main(final String[] args) throws ClassNotFoundException {
 
-    final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster("local[6]");
+    if (args.length != 9) {
+      System.out.println("Please input 9 input parameters, <vars> <inputdir> <bbox> <startTime> <endTime> <jsonPath> <resultPath> <states> <isQueryorExcludedstates>");
+      return;
+    }
+    final SparkConf sconf = new SparkConf().setAppName("SparkTest");//.setMaster("local[6]");
 
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
     JavaSparkContext sc = new JavaSparkContext(sconf);
     Configuration hconf = new Configuration();
-    String vars = "LWTNET,UFLXKE";//"UFLXKE,AUTCNVRN,BKGERR";
-    //hconf.set("mapreduce.input.fileinputformat.inputdir", args[0]);
-    hconf.set("mapreduce.input.fileinputformat.inputdir", "/Users/feihu/Documents/Data/Merra2/");
+
+    hconf.setStrings("variables", args[0]); //"LWTNET,UFLXKE";//"UFLXKE,AUTCNVRN,BKGERR";
+    hconf.set("mapreduce.input.fileinputformat.inputdir", args[1]);
+    hconf.setStrings("bbox", args[2]); //"[0-1,0-361,0-576],[5-6,0-361,0-576]"
+    hconf.setStrings("startTime", args[3]);  //"19800101"
+    hconf.setStrings("endTime", args[4]); //"20151201"
+    String jsonPath = args[5];
+    final String resultPath = args[6];
+    final String[] stateNames = args[7].split(","); //new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
+    final boolean isObject = Boolean.parseBoolean(args[8]); //false;
+
+    //hconf.set("mapreduce.input.fileinputformat.inputdir", "/Users/feihu/Documents/Data/Merra2/");
     hconf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
     hconf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-
-    hconf.setStrings("variables", vars);
-    //hconf.setStrings("variables", args[0]);
-    hconf.setStrings("bbox", "[0-1,0-361,0-576],[5-6,0-361,0-576]");
-    hconf.setStrings("startTime", "19800101");
-    hconf.setStrings("endTime", "20151201");
+    hconf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
 
     //Did not use the following setting
     /*hconf.setStrings("datanodeNum", "14");
@@ -72,10 +82,10 @@ public class ETLTool {
     final int interplateScale = 1;
     final int pngScale = 4;
 
-    final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
-    final boolean isObject = false;
-    //JavaRDD<String> geoJson = sc.textFile(args[1]).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
-    JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+
+
+    JavaRDD<String> geoJson = sc.textFile(jsonPath).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+    //JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
 
     JavaPairRDD<String, CountyFeature> countyRDD = geoJson.mapToPair(new GeoExtracting.GeoFeatureFactory());
 
@@ -134,8 +144,8 @@ public class ETLTool {
     maskLocal._1().setCorner(new int[]{0, 0});
     maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(maskLocal._1(), new ArrayIntSerializer(new int[]{height, width}, globalmask));*/
 
-    PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
-    //PngFactory.drawPNG(maskLocal._2().getArray(), args[2] + "/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
+    //PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
+    //PngFactory.drawPNG(maskLocal._2().getArray(), gifPath + "/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
     final Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask = sc.broadcast(maskLocal);
 
@@ -157,8 +167,7 @@ public class ETLTool {
     });
 
     JavaPairRDD<String, Tuple2<DataChunk, ArrayFloatSerializer>> rddCombinedByVarAndTime =
-        recordsWithCoordinateChanging.mapToPair(new GeoExtracting.InterpolateArrayByIDW(interplateScale))
-            .mapToPair(new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, Tuple2<DataChunk, ArrayFloatSerializer>>() {
+        recordsWithCoordinateChanging.mapToPair(new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, Tuple2<DataChunk, ArrayFloatSerializer>>() {
               @Override
               public Tuple2<String, Tuple2<DataChunk, ArrayFloatSerializer>> call(
                   Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
@@ -169,47 +178,23 @@ public class ETLTool {
 
     JavaPairRDD<String, ArrayFloatSerializer> combinedChunks = rddCombinedByVarAndTime.groupByKey().mapToPair( new GeoExtracting.CombineChunks(mask, interplateScale));
 
-
-    JavaPairRDD<String, Tuple2<String, ArrayFloatSerializer>> timeChunks = combinedChunks.mapToPair(
-        new PairFunction<Tuple2<String, ArrayFloatSerializer>, String, Tuple2<String, ArrayFloatSerializer>>() {
+    JavaPairRDD<String, Float> meanRDDS = combinedChunks.mapValues(
+        new Function<ArrayFloatSerializer, Float>() {
           @Override
-          public Tuple2<String, Tuple2<String, ArrayFloatSerializer>> call(
-              Tuple2<String, ArrayFloatSerializer> tuple2) throws Exception {
-            String[] tmps = tuple2._1().split("_");
-            String hour = String.format("%02d", Integer.parseInt(tmps[2]));
-            return new Tuple2<String, Tuple2<String, ArrayFloatSerializer>>(tmps[0]+tmps[1], new Tuple2<String, ArrayFloatSerializer>(tmps[0]+"_"+tmps[1]+"_"+hour, tuple2._2()));
+          public Float call(ArrayFloatSerializer v1) throws Exception {
+            ArrayFloat array = v1.getArray();
+            float sum = 0.0f;
+            int count = 0;
+            for (int i=0; i<array.getSize(); i++) {
+              float value = array.getFloat(i);
+              if (value != MetaData.MERRA2.fillValue && value != -1.0f) {
+                sum = sum + value;
+                count++;
+              }
+            }
+            return sum/count;
           }
         });
-
-    timeChunks.groupByKey().foreach(
-        new VoidFunction<Tuple2<String, Iterable<Tuple2<String, ArrayFloatSerializer>>>>() {
-          @Override
-          public void call(Tuple2<String, Iterable<Tuple2<String, ArrayFloatSerializer>>> tuple2) throws Exception {
-            ArrayList<Image> images = new ArrayList<Image>();
-            for (int i=0; i<24; i++) {
-              images.add(new BufferedImage(1,1,1));
-            }
-
-            Iterator<Tuple2<String, ArrayFloatSerializer>> itor = tuple2._2().iterator();
-
-            while (itor.hasNext()) {
-              Tuple2<String, ArrayFloatSerializer> tuple = itor.next();
-              Image image = PngFactory.getImage(tuple._2().getArray(), 107.2249f, 319.2336f, tuple._1(), pngScale);
-              int index = Integer.parseInt(tuple._1().split("_")[2]);
-              images.set(index, image);
-            }
-            PngFactory.geneGIFBilinear(images, "/Users/feihu/Desktop/test/" + tuple2._1(), 1, 500);
-            //PngFactory.geneGIFBilinear(images, args[2] + tuple2._1(), 1, 500);
-          }
-        });
-
-    /*timeChunks.foreach(new VoidFunction<Tuple2<String, Tuple2<String, ArrayFloatSerializer>>>() {
-      @Override
-      public void call(Tuple2<String, Tuple2<String, ArrayFloatSerializer>> tuple2) throws Exception {
-        Tuple2<String, ArrayFloatSerializer> tuple = tuple2._2();
-        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/"+ tuple._1() + ".png", 107.2249f, 319.2336f, tuple._1(), pngScale);
-      }
-    });*/
   }
 
 }

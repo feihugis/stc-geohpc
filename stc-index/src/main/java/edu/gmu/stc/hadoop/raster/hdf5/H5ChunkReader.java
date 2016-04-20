@@ -9,6 +9,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
+import org.apache.hadoop.yarn.util.SystemClock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -87,6 +88,8 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     bb.order(byteOrder);
     FloatBuffer fltBuffer = bb.asFloatBuffer();
     float[] data = new float[fltBuffer.capacity()];
+
+    DataChunk chunk = h5ChunkInputSplit.getChunkList().get(currentKeyMark);
     for(int i=0; i<data.length; i++) {
       data[i] = fltBuffer.get(i);
     }

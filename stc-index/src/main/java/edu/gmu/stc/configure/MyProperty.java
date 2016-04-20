@@ -45,18 +45,18 @@ public class MyProperty {
 	public static String nameNode = "hdfs://SERVER-A8-C-U26:8020";*/
       //data container
       //Index for Merra2
-	public static String mysql_connString = "jdbc:postgresql://192.168.8.84:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+	/*public static String mysql_connString = "jdbc:postgresql://192.168.8.84:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
 	public static String mysql_user = "postgres"; //"root";
 	public static String mysql_password = "cisc255b";
 	public static String mysql_catalog = "merra2datacontainer";
-	public static String nameNode = "hdfs://svr-A3-A-U2:8020";
+	public static String nameNode = "hdfs://svr-A3-A-U2:8020";*/
 
     //For localhost
-    /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+    public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
     public static String mysql_user = "feihu"; //"root";
     public static String mysql_password = "feihu";
     public static String mysql_catalog = "merra2test";
-    public static String nameNode = "file:////";*/
+    public static String nameNode = "file:////";
 
 	public MyProperty() {
 		// TODO Auto-generated constructor stub

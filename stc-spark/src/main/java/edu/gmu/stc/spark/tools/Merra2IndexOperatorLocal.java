@@ -24,10 +24,9 @@ import edu.gmu.stc.hadoop.raster.index.merra2.Merr2IndexBuilder;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 
 /**
- * Created by Fei Hu on 3/22/16.
+ * Created by Fei Hu on 4/18/16.
  */
-public class Merra2IndexOperator {
-
+public class Merra2IndexOperatorLocal {
   public void initializeConfiguration(String configFile) throws IOException {
     BufferedReader br = new BufferedReader(new FileReader(configFile));
     String line = null;
@@ -100,8 +99,7 @@ public class Merra2IndexOperator {
     String inputDir = args[1]; //"/Users/feihu/Documents/Data/Merra2/";
     boolean isInitMetaIndex = Boolean.parseBoolean(args[2]);
 
-
-    Merra2IndexOperator merra2IndexOperator = new Merra2IndexOperator();
+    Merra2IndexOperatorLocal merra2IndexOperator = new Merra2IndexOperatorLocal();
     //merra2IndexOperator.initializeConfiguration(configFile);
     List<String> inputFiles = merra2IndexOperator.getInputPaths(inputDir);
 
@@ -114,7 +112,7 @@ public class Merra2IndexOperator {
 
     //merra2IndexBuilder.closeDBConnnection();
 
-    final SparkConf sconf = new SparkConf().setAppName("SparkTest");//.setMaster("local[6]");
+    final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster("local[6]");
 
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());

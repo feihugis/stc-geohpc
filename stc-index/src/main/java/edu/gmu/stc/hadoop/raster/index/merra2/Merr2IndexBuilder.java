@@ -108,7 +108,7 @@ public class Merr2IndexBuilder {
     //files.add("/Users/feihu/Documents/Data/Merra2/MERRA2_100.inst1_2d_int_Nx.19800101.nc4");
     // "/Merra/MERRA2/Daily/M2I1NXINT/MERRA2_400.tavg1_2d_int_Nx.20150110.nc4");*/
 
-    Path path = new Path("/Users/feihu/Documents/Data/Merra2/");
+    Path path = new Path("/Users/feihu/Documents/Data/Merra2/monthly/");
     FileSystem fs = null;
     Configuration conf = new Configuration();
     conf.set("fs.defaultFS", MyProperty.nameNode);

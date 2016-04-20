@@ -1,26 +1,16 @@
 package edu.gmu.stc.hadoop.raster;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.KryoSerializable;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapreduce.InputSplit;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.io.Serializable;
-
-import ucar.ma2.Array;
-import ucar.ma2.ArrayInt;
 
 /**
  * Created by Fei Hu on 2/17/16.
  */
-public abstract class DataChunk implements Writable {
+public class DataChunk implements Writable {
   int[] corner = null;         //relative to the whole picture
   int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
   String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
