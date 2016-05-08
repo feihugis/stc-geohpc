@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>edu.gmu.stc</groupId>
 	<artifactId>stc-website</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>stc-website</name>
 	<description>STC HPC website project for Spring Boot</description>
@@ -15,7 +15,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>1.3.3.RELEASE</version>
-		<relativePath/> &lt;!&ndash; lookup parent from repository &ndash;&gt;
+		<relativePath/>
 	</parent>-->
 
     <parent>
@@ -29,6 +29,7 @@
     <properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
+        <start-class>edu.gmu.stc.website.StcWebsiteApplication</start-class>
 	</properties>
 
 	<dependencies>
@@ -52,11 +53,11 @@
 			<scope>test</scope>
 		</dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>edu.gmu.stc</groupId>
             <artifactId>stc-spark</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
 	</dependencies>
 	
 	<build>

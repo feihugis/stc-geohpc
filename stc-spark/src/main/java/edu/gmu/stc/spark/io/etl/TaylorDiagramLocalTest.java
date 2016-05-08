@@ -208,6 +208,7 @@ public class TaylorDiagramLocalTest {
     JavaPairRDD<DataChunk, ArrayFloatSerializer> merra2Records = sc.newAPIHadoopRDD(hconf, H5FileInputFormat.class,
                                                                                     DataChunk.class,
                                                                                     ArrayFloatSerializer.class);
+
     JavaPairRDD<String, Tuple2<Float, Long>> merra2SumCountRDD = merra2Records.mapValues(
         new Function<ArrayFloatSerializer, Tuple2<Float, Long>>() {
           @Override
@@ -222,7 +223,6 @@ public class TaylorDiagramLocalTest {
                count++;
              }
             }
-
             return new Tuple2<Float, Long>(sum, count);
           }
         }).mapToPair(
@@ -345,6 +345,7 @@ public class TaylorDiagramLocalTest {
           @Override
           public Tuple2<String, Tuple2<Float, Long>> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
             ArrayFloat arrayFloat = tuple2._2().getArray();
+
             Float sum = 0.0f;
             Long count = 0L;
             for (int i=0; i<arrayFloat.getSize(); i++) {

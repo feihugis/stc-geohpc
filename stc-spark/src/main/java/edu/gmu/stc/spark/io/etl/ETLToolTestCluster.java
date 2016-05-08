@@ -47,15 +47,15 @@ public class ETLToolTestCluster {
 
     JavaSparkContext sc = new JavaSparkContext(sconf);
     Configuration hconf = new Configuration();
-    String vars = "LWTNET,UFLXKE";//"UFLXKE,AUTCNVRN,BKGERR";
-    hconf.set("mapreduce.input.fileinputformat.inputdir", args[0]);
-    //hconf.set("mapreduce.input.fileinputformat.inputdir", "/Users/feihu/Documents/Data/Merra2/");
+    String vars = "LWTNET";//"UFLXKE,AUTCNVRN,BKGERR";
+    //hconf.set("mapreduce.input.fileinputformat.inputdir", args[0]);
+    hconf.set("mapreduce.input.fileinputformat.inputdir", "/Users/feihu/Documents/Data/Merra2/");
     hconf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
     hconf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
 
     hconf.setStrings("variables", vars);
     //hconf.setStrings("variables", args[0]);
-    hconf.setStrings("bbox", "[0-1,0-361,0-576],[5-6,0-361,0-576]");
+    hconf.setStrings("bbox", "[0-1,0-361,0-576],[1-24,0-361,0-576]");
     hconf.setStrings("startTime", "19800101");
     hconf.setStrings("endTime", "20151201");
 
@@ -74,6 +74,68 @@ public class ETLToolTestCluster {
 
     final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
     final boolean isObject = false;
+
+    boolean isGlobal = true;
+    if (isGlobal) {
+      double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
+      Rectangle queryBBox = new Rectangle(x_min,y_min,x_max,y_max);
+      hconf.set("geoBBox", queryBBox.toWKT());
+      queryBBox = new Rectangle(-185,-95,185,95);
+      hconf.set("geoBBox", queryBBox.toWKT());
+      int[] globalmask = new int[height*width];
+      for (int i= 0; i<height; i++) {
+        for (int j=0; j<width; j++) {
+          globalmask[i*width+j] = 1;
+        }
+      }
+      H5Chunk chunk = new H5Chunk();
+      chunk.setShape(new int[]{height, width});
+      chunk.setCorner(new int[]{0, 0});
+      Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(chunk, new ArrayIntSerializer(new int[]{height, width}, globalmask));
+    } else {
+      //JavaRDD<String> geoJson = sc.textFile(args[1]).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+      JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+      JavaPairRDD<String, CountyFeature> countyRDD = geoJson.mapToPair(new GeoExtracting.GeoFeatureFactory());
+
+      JavaRDD<CountyFeature> states = countyRDD.reduceByKey(
+          new Function2<CountyFeature, CountyFeature, CountyFeature>() {
+            @Override
+            public CountyFeature call(CountyFeature v1, CountyFeature v2) throws Exception {
+              CountyFeature feature = new CountyFeature(v1.getType(),v1.getGEO_ID(),v1.getSTATE(),
+                                                        v1.getCOUNTY(),v1.getNAME(),v1.getLSAD(),v1.getCENSUSAREA(),
+                                                        v1.getPolygonList());
+              feature.getFeature().addAll(v2.getFeature());
+              return feature;
+            }
+          }).map(
+          new Function<Tuple2<String, CountyFeature>, CountyFeature>() {
+            @Override
+            public CountyFeature call(Tuple2<String, CountyFeature> v1) throws Exception {
+              return v1._2();
+            }
+          });
+
+      JavaRDD<Rectangle> stateBoundaries = states.map(new Function<CountyFeature, Rectangle>() {
+        @Override
+        public Rectangle call(CountyFeature v1) throws Exception {
+          return v1.getMBR();
+        }
+      });
+      List<Rectangle> statesBList = stateBoundaries.collect();
+      double x_min = Double.MAX_VALUE, x_max = -1*Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1*Double.MAX_VALUE;
+      for (Rectangle rectangle : statesBList) {
+        x_min = Math.min(x_min, rectangle.getMinX());
+        x_max = Math.max(x_max, rectangle.getMaxX());
+        y_min = Math.min(y_min, rectangle.getMinY());
+        y_max = Math.max(y_max, rectangle.getMaxY());
+      }
+      Rectangle queryBBox = new Rectangle(x_min,y_min,x_max,y_max);
+      hconf.set("geoBBox", queryBBox.toWKT());
+
+      JavaPairRDD<H5Chunk, ArrayIntSerializer> stateMask = states.mapToPair( new GeoExtracting.ChunkMaskFactory(xResolution, yResolution, x_orig, y_orig));
+      List<Tuple2<H5Chunk, ArrayIntSerializer>> maskList = stateMask.collect();
+      Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = GeoExtracting.combineChunkMasks(maskList);
+    }
     //JavaRDD<String> geoJson = sc.textFile(args[1]).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
     //JavaRDD<String> geoJson = sc.textFile("/Users/feihu/Desktop/gz_2010_us_040_00_500k.json").filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
 

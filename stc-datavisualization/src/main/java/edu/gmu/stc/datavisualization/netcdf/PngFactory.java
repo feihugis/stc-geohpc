@@ -51,8 +51,7 @@ public class PngFactory {
     }
   }
 
-
-  private static final Font font = new Font("", Font.BOLD, 10);
+  private static final Font font = new Font("", Font.BOLD, 20);
 
   public static void drawPNG(Array value, String outputFile, float minValue, float maxValue, String lable, int scale) {
     try {
@@ -102,11 +101,11 @@ public class PngFactory {
       for (int i = 0; i < row; i++) {   //y
         for (int j = 0; j < col; j++) { //x
           val = value.getFloat(index.set(row - 1 - i, j));
-          if (val <minValue) {
-            rgb[i][j] = -1;
-          } else {
+          //if (val <minValue) {
+          //  rgb[i][j] = 0;
+          //} else {
             rgb[i][j] = color.getColorRGB(val);
-          }
+          //}
         }
       }
 
@@ -122,7 +121,7 @@ public class PngFactory {
         DateFormat format = new SimpleDateFormat("yyyyMMdd HH:mm", Locale.ENGLISH);
         Date date = format.parse(time);
 
-        mi.drawString(date.toString(), 15, 5, font, Color.DARK_GRAY);
+        mi.drawString(date.toString(), 15, 15, font, Color.DARK_GRAY);
         mi.combineImagesVertical(mi.getImage(),color.getLegendImage(col*scale, 40, 22, lables[0], null));
       }
 
@@ -140,7 +139,8 @@ public class PngFactory {
       BufferedImage firstImage = (BufferedImage) images.get(0);
 
       // create a new BufferedOutputStream with the last argument
-      ImageOutputStream output = new FileImageOutputStream(new File(outputName + ".gif"));
+      String tmpFile = outputName + "_tmp";
+      ImageOutputStream output = new FileImageOutputStream(new File(tmpFile + ".gif"));
 
 
       // create a gif sequence with the type of the first image, 1 second
@@ -176,7 +176,7 @@ public class PngFactory {
       writer.close();
       output.close();
 
-      fs.copyFromLocalFile(true, true, new Path(outputName+".gif"), new Path(outputName+"1.gif"));
+      fs.copyFromLocalFile(true, true, new Path(tmpFile+".gif"), new Path(outputName+".gif"));
     } catch (Exception e) {
       e.printStackTrace();
     }

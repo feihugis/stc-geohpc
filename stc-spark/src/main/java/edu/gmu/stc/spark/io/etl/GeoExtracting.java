@@ -37,6 +37,8 @@ import ucar.ma2.Index3D;
  * Created by Fei Hu on 3/17/16.
  */
 public class GeoExtracting {
+  //TODO fix the max_value, it should be varied for different variables
+  final static float max_value = 10000000.0f;
   public static class GeoJSONFilter implements Function<String, Boolean> {
     String[] stateNames = null;
     boolean isObject = false;
@@ -121,6 +123,7 @@ public class GeoExtracting {
       stateInfo.setShape(shape);
       int[] array = new int[shape[0] * shape[1]];
 
+      //fill the boundary into array mask
       for (int c=0; c<feature.getFeature().size(); c++) {
         Polygon polygon = feature.getFeature().get(c).toLogicView(xResolution, yResolution, x_orig, y_orig);
         for (int i = 0; i < polygon.getNpoints(); i++) {
@@ -130,6 +133,7 @@ public class GeoExtracting {
         }
       }
 
+      // fill the points in the boundary into the array mask
       for (double y = ((int) bbox.getMinY())+0.0; y < bbox.getMaxY(); y++) {
         for(double x = ((int) bbox.getMinX())+0.0; x < bbox.getMaxX(); x++) {
           Point point = new Point(x, y);
@@ -229,7 +233,7 @@ public class GeoExtracting {
                     if (maskBBox.contains(corner[2] + x, corner[1] + y)) {
 
                       if (mask.value()._2.getArray().get(maskIndex.set(corner[1] + y - maskCorner[0], corner[2] + x - maskCorner[1]))>0) {
-                        if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>1000) {
+                        if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>max_value) {
                           result.set(index,-1.0f);
                           //continue;
                         }

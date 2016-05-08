@@ -38,6 +38,7 @@ public class TaylorDiagramUnit {
     }
     this.std = (float) stats.getStandardDeviation();
     this.correlation = (float) new PearsonsCorrelation().correlation(xArray, yArray);
+    //this.correlation = Math.abs(this.correlation);
   }
 
   public String getLegendName() {
