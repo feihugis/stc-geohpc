@@ -53,11 +53,17 @@
 			<scope>test</scope>
 		</dependency>
 
-        <!--<dependency>
+        <dependency>
             <groupId>edu.gmu.stc</groupId>
             <artifactId>stc-spark</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>-->
+        </dependency>
+        <dependency>
+            <groupId>edu.gmu.stc</groupId>
+            <artifactId>stc-datavisualization</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
 	</dependencies>
 	
 	<build>

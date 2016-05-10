@@ -21,16 +21,20 @@ public class MvcConfig extends WebMvcConfigurerAdapter {
 
   @Override
   public void addViewControllers(ViewControllerRegistry registry) {
-    registry.addViewController("/index").setViewName("index");
-    registry.addViewController("/index.html").setViewName("index");
+    registry.addViewController("/index").setViewName("taylordiagram");
+    registry.addViewController("/index.html").setViewName("taylordiagram");
     registry.addViewController("/").setViewName("index");
     registry.addViewController("/query").setViewName("query");
+    registry.addViewController("/taylordiagram").setViewName("taylordiagram");
   }
 
   @Override
   public void addResourceHandlers(ResourceHandlerRegistry registry) {
+    WebProperties.initilizeProperties();
     String gifLocation = "file:" + WebProperties.GIF_PATH;   //"file:/Applications/apache-tomcat-8.0.14/webapps/gif/"
+    String resultLocation = "file:" + WebProperties.RESULT_PATH;
     registry.addResourceHandler("/gif/**").addResourceLocations(gifLocation);// + WebProperties.GIF_PATH);
+    registry.addResourceHandler(WebProperties.RESULT_URI+"**").addResourceLocations(resultLocation);
     super.addResourceHandlers(registry);
   }
 

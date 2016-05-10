@@ -13,3 +13,4 @@ stc-hive/target/
 */.DS_Stor
 .idea/*
 >>>>>>> master
+out/*

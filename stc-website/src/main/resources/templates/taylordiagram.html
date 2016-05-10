@@ -21,7 +21,7 @@
     <link href="/css/plugins/morris.css" rel="stylesheet"/>
 
     <!-- Custom Fonts -->
-    <link href="f/ont-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+    <link href="/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -156,11 +156,13 @@
                     <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                 </li>
                 <li class="active">
+                    <a href="taylordiagram"><i class="fa fa-fw fa-bar-chart-o"></i> Taylor Diagram</a>
+                </li>
+
+                <li >
                     <a href="query"><i class="fa fa-fw fa-bar-chart-o"></i> Query</a>
                 </li>
-                <li>
-                    <a href="taylordiagram.html"><i class="fa fa-fw fa-bar-chart-o"></i> Taylor Diagram</a>
-                </li>
+
                 <li>
                     <a href="tables.html"><i class="fa fa-fw fa-table"></i> Tables</a>
                 </li>
@@ -202,41 +204,113 @@
             <!-- Page Heading -->
             <div class="row">
                 <div class="col-lg-12">
-                    <h1 class="page-header"> Geospatial and temporal query </h1>
+                    <h1 class="page-header"> Taylor Diagram for Model Comparison </h1>
                 </div>
             </div>
             <!-- /.row -->
 
-            <div class="row">
+            <div class="row" align="middle">
                 <div class="form-group">
                     <div class="col-xs-2">
-                        <label for="startDate">Start Date</label>
-                        <input class="form-control" id="startDate" type="text"/>
+                        <label>Temporal Date</label>
                     </div>
-                    <div class="col-xs-2">
-                        <label for="endDate">End Date</label>
-                        <input class="form-control" id="endDate" type="text"/>
+                    <div class="col-xs-4">
+                        <label >Spatial Range</label>
                     </div>
-                    <div class="col-xs-2">
-                        <label for="varName">Variable Name</label>
-                        <input class="form-control" id="varName" type="text"/>
-                    </div>
-                    <div class="col-xs-2">
-                        <button type="button" class="btn btn-primary" onclick="queryMerra2()">Submit</button>
-                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-xs-1">
+                    <input type="text"  id="start_time" class="form-control" placeholder="start time" value="198001"/>
+                </div>
+                <div class="col-xs-1">
+                    <input type="text" id="end_time" class="form-control" placeholder="end time" value="198012"/>
+                </div>
+                <div class="col-xs-1">
+                    <input type="text" id="min_lat" class="form-control" placeholder="min lat" value="-90.00"/>
+                </div>
+                <div class="col-xs-1">
+                    <input type="text" id="min_lon" class="form-control" placeholder="min lon" value="-180.00"/>
+                </div>
+                <div class="col-xs-1">
+                    <input type="text" id="max_lat" class="form-control" placeholder="max lat" value="90.00"/>
+                </div>
+                <div class="col-xs-1">
+                    <input type="text" id="max_lon" class="form-control" placeholder="max lon" value="180.00"/>
+                </div>
+                <div class="col-xs-4">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isCMAP" value="true"/> CMAP
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isGPCP" value="true"/> GPCP
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="iSMERRA2" value="true"/> MERRA-2
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isMERRA1" value="true"/> MERRA-1
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isCFSR" value="true"/> CFSR
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="isERAINTRIM" value="false"/> ERA-INTRIM
+                    </label>
+                </div>
+                <div class="col-xs-1">
+                    <button type="button" class="btn btn-primary" onclick="getTaylordiagram()">Submit</button>
                 </div>
             </div>
 
             <br></br>
 
             <!-- /.row -->
-            <div class="row">
-                <div class="col-lg-8">
+            <div class="row" id="taylordiagram-panel">
+                <div class="col-lg-9">
                     <div class="panel panel-primary">
                         <div class="panel-body">
-                            <img class="img-responsive" id="merra2gif"  src="/img/gif/EVAP198001011.gif" alt=""/>
+                            <img class="img-responsive" id="taylordiagram"  src="/result/taylordiagram/taylordiagram.png" alt=""/>
                         </div>
                     </div>
+                </div>
+                <div class="col-lg-2 center-block">
+                    <table class="table table-hover table-bordered center-block">
+                        <thead>
+                            <tr>
+                                <th class="text-center warning">Time Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" id="time_range">198001 - 198012</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <th class="text-center warning">Space Range</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" id="space_range">(-90.00,-180.00) - (90.00,180.00)</td>
+                            </tr>
+                        </tbody>
+                        <thead>
+                            <tr>
+                                <th class="text-center warning">Models</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center" id="model_list">CMAP, GPCP, MERRA-2, MERRA-1, ERA-INTRIM</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-lg-1 center-block">
+                    <button type="button" class="btn btn-warning center-block" id="delete_div" onclick="deleteDiv.call(this)">Delete</button>
                 </div>
             </div>
             <!-- /.row -->
@@ -270,7 +344,7 @@
 <script src="/js/plugins/flot/jquery.flot.pie.js"></script>
 <script src="/js/plugins/flot/flot-data.js"></script>
 
-<script src="/js/geospatialquery/merra2query.js"></script>
+<script src="/js/services/taylordiagram.js"></script>
 </body>
 
 </html>

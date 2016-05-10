@@ -21,6 +21,17 @@ public class WebProperties {
   public static String SPARK_JAR_PATH = "";
   public static String SPARK_MASTER = "";
   public static String SPARK_GEOEXTRA_MERRA2_CLASS = "";
+  public static String SPARK_TAYLORDIAGRAM_CLASS = "";
+  public static String CFSR_PATH = "";
+  public static String CMAP_PATH = "";
+  public static String GPCP_PATH = "";
+  public static String TAYLORDIAGRAM_JSON_OUTPUT = "";
+  public static String TAYLORDIAGRAM_PYTHON_SCRIPT = "";
+  public static String TAYLORDIAGRAM_RESULT_PATH = "";
+  public static String RESULT_URI = "";
+  public static String RESULT_PATH = "";
+  public static String MERRA2_TAYLORDIAGRAM_INPUT = "";
+
 
   public static void initilizeProperties() {
     Log log = LogFactory.getLog(WebProperties.class);
@@ -35,12 +46,23 @@ public class WebProperties {
         log.warn("Unable to access file <" + filename + ">.");
       }
     }
+
     GIF_PATH = (String) getOption(properties, "gif_path", "/test");
     MERRA2_DAILY_INPUTPATH = (String) getOption(properties, "merra2_daily_inputpath", "/test");
     SPARK_HOME = (String) getOption(properties, "spark_home", "/test");
     SPARK_JAR_PATH = (String) getOption(properties, "spark_jar_path", "/test");
     SPARK_MASTER = (String) getOption(properties, "spark_master", "/test");
     SPARK_GEOEXTRA_MERRA2_CLASS = (String) getOption(properties, "spark_geoextra_merra2_class", "/test");
+    SPARK_TAYLORDIAGRAM_CLASS = (String) getOption(properties, "spark_taylordiagram_class", "/test");
+    CFSR_PATH = (String) getOption(properties, "cfsr_path", "/test");
+    CMAP_PATH = (String) getOption(properties, "cmap_path", "/test");
+    GPCP_PATH = (String) getOption(properties, "gpcp_path", "/test");
+    TAYLORDIAGRAM_JSON_OUTPUT = (String) getOption(properties, "taylordiagram_json_output", "/test");
+    TAYLORDIAGRAM_PYTHON_SCRIPT = (String) getOption(properties, "taylordiagram_python_script", "/test");
+    TAYLORDIAGRAM_RESULT_PATH = (String) getOption(properties, "taylordiagram_result_path", "/test");
+    RESULT_URI = (String) getOption(properties, "result_uri", "/test");
+    RESULT_PATH = (String) getOption(properties, "result_path", "/test");
+    MERRA2_TAYLORDIAGRAM_INPUT = (String) getOption(properties, "merra2_taylordiagram_input", "/test");
   }
 
  /* static {

@@ -1,6 +1,7 @@
 package edu.gmu.stc.spark.io.etl;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.yarn.util.SystemClock;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -116,8 +117,7 @@ public class GeoSpatialExtraction {
       chunk.setCorner(new int[]{0, 0});
       maskLocal = new Tuple2<H5Chunk, ArrayIntSerializer>(chunk, new ArrayIntSerializer(new int[]{height, width}, globalmask));
     } else {
-      JavaRDD<String> geoJson = sc.textFile(geoJSONPath)
-                                  .filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
+      JavaRDD<String> geoJson = sc.textFile(geoJSONPath).filter(new GeoExtracting.GeoJSONFilter(stateNames, isObject));
       JavaPairRDD<String, CountyFeature> countyRDD = geoJson.mapToPair(new GeoExtracting.GeoFeatureFactory());
       JavaRDD<CountyFeature> states = countyRDD.reduceByKey(new Function2<CountyFeature, CountyFeature, CountyFeature>() {
             @Override
@@ -152,6 +152,7 @@ public class GeoSpatialExtraction {
         y_min = Math.min(y_min, rectangle.getMinY());
         y_max = Math.max(y_max, rectangle.getMaxY());
       }
+
       Rectangle queryBBox = new Rectangle(x_min, y_min, x_max, y_max);
       hconf.set("geoBBox", queryBBox.toWKT());
 
@@ -236,7 +237,7 @@ public class GeoSpatialExtraction {
                   ArrayFloat values = tuple._2().getArray();
                   for (int i=0; i<values.getSize(); i++) {
                     float v = values.getFloat(i);
-                    if (v < MetaData.MERRA2.fillValue) {
+                    if (v < MetaData.MERRA2.fillValue && v != GeoExtracting.image_fill_value) {
                       if (max<v) {
                         max = v;
                       }
@@ -244,17 +245,21 @@ public class GeoSpatialExtraction {
                         min = v;
                       }
                     }
+                    else {
+                      System.out.println("---- v " + v);
+                    }
                   }
                   mark = false;
                 }
 
               //TODO the max and min value should be consisted for the same variable in the different time slice.
-              min = -0.00000455116f;
-              max = 0.00018684742f;
+              //min = -0.00000455116f;
+              //max = 0.00018684742f;
               Image image = PngFactory.getImage(tuple._2().getArray(), min, max, tuple._1(), pngScale); //107.2249f, 319.2336f
               int index = Integer.parseInt(tuple._1().split("_")[2]);
               images.set(index, image);
             }
+
             PngFactory.geneGIFBilinear(images, outputPath + tuple2._1(), 1, 500);
           }
         });

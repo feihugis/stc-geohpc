@@ -39,6 +39,7 @@ import ucar.ma2.Index3D;
 public class GeoExtracting {
   //TODO fix the max_value, it should be varied for different variables
   final static float max_value = 10000000.0f;
+  final static float image_fill_value = -9999.0f;
   public static class GeoJSONFilter implements Function<String, Boolean> {
     String[] stateNames = null;
     boolean isObject = false;
@@ -231,16 +232,18 @@ public class GeoExtracting {
                   for (int x=0; x<shape[2]; x++) {
                     index.set(t,y,x);
                     if (maskBBox.contains(corner[2] + x, corner[1] + y)) {
-
-                      if (mask.value()._2.getArray().get(maskIndex.set(corner[1] + y - maskCorner[0], corner[2] + x - maskCorner[1]))>0) {
+                      float isContain = mask.value()._2.getArray().get(maskIndex.set(corner[1] + y - maskCorner[0], corner[2] + x - maskCorner[1]));
+                      if (isContain>0) {
                         if (v1.getArray().get(rawIndex.set(t, rawIndex.getShape(1)-y-1, x))>max_value) {
-                          result.set(index,-1.0f);
+                          result.set(index, GeoExtracting.image_fill_value);
                           //continue;
                         }
                         result.set(index,v1.getArray().get(rawIndex.set(t, /*rawIndex.getShape(1)-y-1*/y+corner[1]-rawCorner[1], x+corner[2]-rawCorner[2])));
+                      } else {
+                        result.set(index, GeoExtracting.image_fill_value);
                       }
                     } else {
-                      result.set(index,0.0f);
+                      result.set(index, GeoExtracting.image_fill_value);
                     }
                   }
                 }
