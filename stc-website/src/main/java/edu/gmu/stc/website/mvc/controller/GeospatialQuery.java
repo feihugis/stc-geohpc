@@ -33,22 +33,24 @@ public class GeospatialQuery {
     String statenames = requestParams.get("statename");
     String isObject = requestParams.get("isObject");
     String isGlobal = requestParams.get("isGlobal");
-    String outputFile_prefix = WebProperties.GIF_PATH + statenames; //add statenames to path to differ different spatial query for variables
-
-    List<String> results = getImgLinkPaths(WebProperties.GIF_PATH, statenames+vars);
+    String outputFile_prefix = WebProperties.GIF_PATH + statenames + "-" + isObject + "-" + isGlobal; //add statenames to path to differ different spatial query for variables
+    String fileName_prefix = statenames + "-" + isObject + "-" + isGlobal;
+    List<String> results = getImgLinkPaths(WebProperties.GIF_PATH, fileName_prefix);
 
     if (results != null && !results.isEmpty()) {
       //return results;
     }
 
     String shellscript = "sh " + WebProperties.SPARK_HOME +" "
+                         + "--master yarn --deploy-mode client --num-executors 20 --driver-memory 3g --executor-memory 18g --executor-cores 12 "
                          + "--class " + WebProperties.SPARK_GEOEXTRA_MERRA2_CLASS + " "
                          + WebProperties.SPARK_JAR_PATH+" "
                          + WebProperties.SPARK_MASTER + " "
                          + vars + " "
                          + inputPath + " "
                          + startTime + " "
-                         + endTime + " "
+                         + 19800102 + " "
+                         /*+ endTime + " "*/
                          + statenames + " "
                          + isObject + " "
                          + isGlobal + " "
@@ -59,7 +61,7 @@ public class GeospatialQuery {
     Process ps = Runtime.getRuntime().exec(shellscript);
     int shellState = ps.waitFor();
     System.out.println("*** shell " + shellState );
-    results = getImgLinkPaths(WebProperties.GIF_PATH, statenames+vars);
+    results = getImgLinkPaths(WebProperties.GIF_PATH + "/gif/", fileName_prefix);
     return  results;
   }
 
@@ -76,7 +78,7 @@ public class GeospatialQuery {
     for (int i=0; i< fileList.length; i++) {
       String localPath = fileList[i].getName();
       if (localPath.contains(key)) {
-        results.add("/gif/" + localPath);
+        results.add("/gif/gif/" + localPath);
       }
     }
 

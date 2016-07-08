@@ -10,6 +10,8 @@ __version__ = "Time-stamp: <2012-02-17 20:59:35 ycopin>"
 __author__ = "Yannick Copin <yannick.copin@laposte.net>"
 
 import numpy as NP
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as PLT
 import json
 import sys

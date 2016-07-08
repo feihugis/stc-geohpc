@@ -3,6 +3,7 @@
  */
 
 var startTime, endTime, minLat, minLon, maxLat, maxLon, isCMAP, isGPCP, isMerra2, isMerra1, isCFSR, isERAINTRIM;
+var referenceModel = "CMAP";
 
 function getTaylordiagram() {
     //var varName = $('#varName').val();
@@ -31,7 +32,8 @@ function getTaylordiagram() {
         isMERRA2: isMerra2,
         isMERRA1: isMerra1,
         isCFSR: isCFSR,
-        isERAINTRIM: isERAINTRIM
+        isERAINTRIM: isERAINTRIM,
+        referenceModel: referenceModel
     }
 
     $.get("query/taylordiagram", urlParams, function(data, status) {
@@ -63,3 +65,11 @@ function addTaylorDiagramDiv(taylordiagram_uri, time_range, space_range, model_l
     tmp.find("#model_list").html(model_list);
     $(".container-fluid").append("<div class='row' id='taylordiagram-panel'>" + tmp.html() + "</div>")
 }
+
+
+$(".dropdown-menu li a").click(function(){
+    referenceModel = $(this).text();
+    $(this).parents().find('#reference-model').text($(this).text());
+    $(this).parents().find('#reference-model').val($(this).text());
+    $(this).parents().find('#reference-model').append("<span class='caret'></span>")
+});

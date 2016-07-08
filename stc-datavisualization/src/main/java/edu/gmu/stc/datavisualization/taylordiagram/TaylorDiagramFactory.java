@@ -20,7 +20,8 @@ public class TaylorDiagramFactory {
 
   public static void drawTaylorDiagram(String pythonscript, String inputPath, String x_axis, String y_axis, String output)
       throws IOException, InterruptedException {
-    String command = "Python " + pythonscript + " " + inputPath + " " + x_axis + " " + y_axis + " " + output;
+    String command = "python " + pythonscript + " " + inputPath + " " + x_axis + " " + y_axis + " " + output;
+    System.out.println(" python command ******** " + command);
     Process process = Runtime.getRuntime().exec(command);
     process.waitFor();
   }

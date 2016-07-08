@@ -6,7 +6,7 @@
 	<groupId>edu.gmu.stc</groupId>
 	<artifactId>stc-website</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>war</packaging>
+	<packaging>jar</packaging>
 
 	<name>stc-website</name>
 	<description>STC HPC website project for Spring Boot</description>
@@ -52,17 +52,6 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-        <dependency>
-            <groupId>edu.gmu.stc</groupId>
-            <artifactId>stc-spark</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.gmu.stc</groupId>
-            <artifactId>stc-datavisualization</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
 	</dependencies>
 	

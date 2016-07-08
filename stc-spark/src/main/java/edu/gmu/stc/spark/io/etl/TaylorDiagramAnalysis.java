@@ -68,9 +68,10 @@ public class TaylorDiagramAnalysis {
                                            int startTime, int endTime) throws IOException,
                                                                               InvalidRangeException,
                                                                               ParseException {
-    Path path = new Path(inputPath);
-    NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
-    NetcdfFile nc = NetcdfFile.open(raf, path.toString());
+    //Path path = new Path(inputPath);
+    //NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
+    //NetcdfFile nc = NetcdfFile.open(raf, path.toString());
+    NetcdfFile nc = NetcdfFile.open(inputPath);
     int[] corner = new int[3];
     int[] shape = new int[3];
 
@@ -285,9 +286,9 @@ public class TaylorDiagramAnalysis {
    * @throws InterruptedException
    */
   public static void main(final String[] args) throws ClassNotFoundException, IOException, InvalidRangeException, InterruptedException, ParseException {
-    if (args.length != 22) {
+    if (args.length != 23) {
       LOG.info("Please input 16 input paramters, start_time,end_time,min_lat,max_lat,min_lon,max_lon,spark_master,merra2Path, cfsr_path, cmap_path, gpcp_path, json_output, tydPythonScript,"
-               + "x_axis,y_axis, tyd_output");
+               + "x_axis,y_axis, tyd_output, reference_name");
       return;
     }
 
@@ -313,6 +314,7 @@ public class TaylorDiagramAnalysis {
     String isMERRA1 = args[19];
     String isCFSR = args[20];
     String isERAINTRIM = args[21];
+    String referenceModel = args[22];
 
     int startTime = Integer.parseInt(start_time);
     int endTime = Integer.parseInt(end_time);
@@ -325,7 +327,11 @@ public class TaylorDiagramAnalysis {
     int[] MERRA1_SHAPE = new int[]{1, 361, 540};
     int[] ERA_INTRIM_SHAPE = new int[]{1, 256, 512};
 
-    final SparkConf sconf = new SparkConf().setAppName("SparkTest").setMaster(spark_master);
+    final SparkConf sconf = new SparkConf().setAppName("SparkTest"); //.setMaster(spark_master);
+    if (spark_master.contains("local")) {
+      sconf.setMaster("local[6]");
+    }
+
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
     sconf.set("spark.driver.allowMultipleContexts", "true");
@@ -342,58 +348,107 @@ public class TaylorDiagramAnalysis {
     hconf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
     FileSystem fs = FileSystem.get(hconf);
 
-
+    TaylorDiagramUnit cmapUnit = null, gpcpUnit = null, merra2Unit = null, cfsrUnit = null, eraIntrimUnit = null, merra1Unit = null;
     List<TaylorDiagramUnit> taylorDiagramUnits = new ArrayList<TaylorDiagramUnit>();
 
-    TaylorDiagramUnit cmapUnit = TaylorDiagramAnalysis.cmapmean(fs, cmap_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
-    float[] yFloat = cmapUnit.getValues();
-    double[] yArray = new double[yFloat.length];
-    for (int i=0; i<yArray.length; i++) {
-      yArray[i] = yFloat[i];
+    double[] yArray = null;
+
+    if (Boolean.parseBoolean(isCMAP)) {
+      cmapUnit = TaylorDiagramAnalysis.cmapmean(fs, cmap_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
     }
 
-    cmapUnit.calSTDAndPersonsCorrelation(yArray);
-    taylorDiagramUnits.add(cmapUnit);
 
     if (Boolean.parseBoolean(isGPCP)) {
-      TaylorDiagramUnit gpcpUnit = TaylorDiagramAnalysis.gpcpmean(fs, gpcp_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
-      gpcpUnit.calSTDAndPersonsCorrelation(yArray);
-      taylorDiagramUnits.add(gpcpUnit);
+      gpcpUnit = TaylorDiagramAnalysis.gpcpmean(fs, gpcp_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
     }
 
     if (Boolean.parseBoolean(isMERRA2)) {
-      TaylorDiagramUnit merra2Unit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "MERRA-2", merra2Path, new String[]{"nc4"}, new String[]{"PRECTOT"},
+      merra2Unit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "MERRA-2", merra2Path, new String[]{"nc4"}, new String[]{"PRECTOT"},
                                                                                      1000.0f, 0.0f,
                                                                                      lat_min, lat_max, lon_min, lon_max, MERRA2_SHAPE,
                                                                                      startTime, endTime, 3600*24);
-      merra2Unit.calSTDAndPersonsCorrelation(yArray);
-      taylorDiagramUnits.add(merra2Unit);
     }
 
     if (Boolean.parseBoolean(isCFSR)) {
-      TaylorDiagramUnit cfsrUnit = TaylorDiagramAnalysis.cfsrmean(fs, cfsr_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
-      cfsrUnit.calSTDAndPersonsCorrelation(yArray);
-      taylorDiagramUnits.add(cfsrUnit);
+      cfsrUnit = TaylorDiagramAnalysis.cfsrmean(fs, cfsr_path, lat_min, lat_max, lon_min, lon_max, startTime, endTime);
     }
 
     if (Boolean.parseBoolean(isERAINTRIM)) {
-      TaylorDiagramUnit eraIntrimUnit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "ERA-INTRIM",
+      eraIntrimUnit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "ERA-INTRIM",
                                                                                         "/Users/feihu/Documents/Data/era-interim/", new String[]{"00"},
                                                                                         new String[]{"Total_precipitation_surface_12_Hour_120"},
                                                                                         1000.0f, 0.0f,
                                                                                         lat_min, lat_max, lon_min, lon_max, ERA_INTRIM_SHAPE, startTime*10000+100, endTime*10000+100, 1000);
-      eraIntrimUnit.calSTDAndPersonsCorrelation(yArray);
-      taylorDiagramUnits.add(eraIntrimUnit);
     }
 
     if (Boolean.parseBoolean(isMERRA1)) {
-      TaylorDiagramUnit merra1Unit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "MERRA-1",
+      merra1Unit = TaylorDiagramAnalysis.generateTaylorDiagramUnit(sc, "MERRA-1",
                                                                                      "/Users/feihu/Documents/Data/Merra/", new String[]{"hdf"},
                                                                                      new String[]{"PRECTOT"},
                                                                                      1000.0f, 0.0f,
                                                                                      lat_min, lat_max, lon_min, lon_max, MERRA1_SHAPE, startTime, endTime,3600*24);
-      merra1Unit.calSTDAndPersonsCorrelation(yArray);
-      taylorDiagramUnits.add(merra1Unit);
+    }
+
+    float[] yFloat = null;
+    switch (referenceModel) {
+      case "CMAP":
+        yFloat = cmapUnit.getValues();
+        taylorDiagramUnits.add(cmapUnit);
+        if (Boolean.parseBoolean(isGPCP)) taylorDiagramUnits.add(gpcpUnit);
+        if (Boolean.parseBoolean(isMERRA2)) taylorDiagramUnits.add(merra2Unit);
+        if (Boolean.parseBoolean(isCFSR)) taylorDiagramUnits.add(cfsrUnit);
+        if (Boolean.parseBoolean(isERAINTRIM)) taylorDiagramUnits.add(eraIntrimUnit);
+        if (Boolean.parseBoolean(isMERRA1)) taylorDiagramUnits.add(merra1Unit);
+        break;
+
+      case "GPCP":
+        yFloat = gpcpUnit.getValues();
+        taylorDiagramUnits.add(gpcpUnit);
+        if (Boolean.parseBoolean(isCMAP)) taylorDiagramUnits.add(cmapUnit);
+        if (Boolean.parseBoolean(isMERRA2)) taylorDiagramUnits.add(merra2Unit);
+        if (Boolean.parseBoolean(isCFSR)) taylorDiagramUnits.add(cfsrUnit);
+        if (Boolean.parseBoolean(isERAINTRIM)) taylorDiagramUnits.add(eraIntrimUnit);
+        if (Boolean.parseBoolean(isMERRA1)) taylorDiagramUnits.add(merra1Unit);
+        break;
+
+      case "MERRA-2":
+        yFloat = merra2Unit.getValues();
+        taylorDiagramUnits.add(merra2Unit);
+        if (Boolean.parseBoolean(isGPCP)) taylorDiagramUnits.add(gpcpUnit);
+        if (Boolean.parseBoolean(isCMAP)) taylorDiagramUnits.add(cmapUnit);
+        if (Boolean.parseBoolean(isCFSR)) taylorDiagramUnits.add(cfsrUnit);
+        if (Boolean.parseBoolean(isERAINTRIM)) taylorDiagramUnits.add(eraIntrimUnit);
+        if (Boolean.parseBoolean(isMERRA1)) taylorDiagramUnits.add(merra1Unit);
+        break;
+
+      case "ERA-INTRIM":
+        yFloat = eraIntrimUnit.getValues();
+        taylorDiagramUnits.add(eraIntrimUnit);
+        if (Boolean.parseBoolean(isGPCP)) taylorDiagramUnits.add(gpcpUnit);
+        if (Boolean.parseBoolean(isMERRA2)) taylorDiagramUnits.add(merra2Unit);
+        if (Boolean.parseBoolean(isCFSR)) taylorDiagramUnits.add(cfsrUnit);
+        if (Boolean.parseBoolean(isCMAP)) taylorDiagramUnits.add(cmapUnit);
+        if (Boolean.parseBoolean(isMERRA1)) taylorDiagramUnits.add(merra1Unit);
+        break;
+
+      case "MERRA-1":
+        yFloat = merra1Unit.getValues();
+        taylorDiagramUnits.add(merra1Unit);
+        if (Boolean.parseBoolean(isGPCP)) taylorDiagramUnits.add(gpcpUnit);
+        if (Boolean.parseBoolean(isMERRA2)) taylorDiagramUnits.add(merra2Unit);
+        if (Boolean.parseBoolean(isCFSR)) taylorDiagramUnits.add(cfsrUnit);
+        if (Boolean.parseBoolean(isCMAP)) taylorDiagramUnits.add(cmapUnit);
+        if (Boolean.parseBoolean(isERAINTRIM)) taylorDiagramUnits.add(eraIntrimUnit);
+        break;
+    }
+
+    yArray = new double[yFloat.length];
+    for (int i=0; i<yArray.length; i++) {
+      yArray[i] = yFloat[i];
+    }
+
+    for (int i=0; i<taylorDiagramUnits.size(); i++) {
+      taylorDiagramUnits.get(i).calSTDAndPersonsCorrelation(yArray);
     }
 
     TaylorDiagramFactory.savetoJSON(taylorDiagramUnits, json_output);

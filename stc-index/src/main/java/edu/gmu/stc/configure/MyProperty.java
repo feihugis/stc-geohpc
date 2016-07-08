@@ -45,11 +45,13 @@ public class MyProperty {
 	public static String nameNode = "hdfs://SERVER-A8-C-U26:8020";*/
       //data container
       //Index for Merra2
-	/*public static String mysql_connString = "jdbc:postgresql://192.168.8.84:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+	/*public static String mysql_connString = "jdbc:postgresql://10.192.21.253:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
 	public static String mysql_user = "postgres"; //"root";
 	public static String mysql_password = "cisc255b";
 	public static String mysql_catalog = "merra2datacontainer";
-	public static String nameNode = "hdfs://svr-A3-A-U2:8020";*/
+	public static String nameNode = "hdfs://svr-A3-A-U2:8020";
+	public static String geoJSONPath = "/gz_2010_us_040_00_500k.json";
+        public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";*/
 
     //For localhost
     public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
@@ -57,6 +59,7 @@ public class MyProperty {
     public static String mysql_password = "feihu";
     public static String mysql_catalog = "merra2test";
     public static String nameNode = "file:////";
+    public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
 
 	public MyProperty() {
 		// TODO Auto-generated constructor stub

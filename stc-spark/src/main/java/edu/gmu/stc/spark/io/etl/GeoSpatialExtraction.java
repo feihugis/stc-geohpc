@@ -1,6 +1,8 @@
 package edu.gmu.stc.spark.io.etl;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.yarn.util.SystemClock;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
@@ -15,10 +17,12 @@ import org.apache.spark.broadcast.Broadcast;
 import java.awt.*;
 import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.datavisualization.netcdf.PngFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
@@ -37,7 +41,8 @@ import ucar.ma2.ArrayFloat;
  */
 public class GeoSpatialExtraction {
 
-  public static void main(String[] args) throws ClassNotFoundException {
+  public static void main(String[] args)
+      throws ClassNotFoundException, IOException, InterruptedException {
     if (args.length != 9) {
       System.out.println("Please input 8 paprameters, e.g. <spark.master>, <vars>, <filepath>, <startTime>, <endTime>, <statename>, <isObject>, <isGlobal>"
                          + "for example: local[6] EVAP /Users/feihu/Documents/Data/Merra2/ 19800101 20151201 Alaska,Hawaii,Puerto false true /Users/feihu/Documents/GitHub/stc-geohpc/stc-website/src/main/resources/static/img/gif");
@@ -48,7 +53,7 @@ public class GeoSpatialExtraction {
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
-    sconf.set("spark.master", args[0]);
+    //sconf.set("spark.master", args[0]);
     String vars = args[1];
     String filePath = args[2];
     String startTime = args[3];
@@ -60,6 +65,7 @@ public class GeoSpatialExtraction {
 
     JavaSparkContext sc = new JavaSparkContext(sconf);
     Configuration hconf = new Configuration();
+    hconf.set("fs.defaultFS", MyProperty.nameNode);
     hconf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
     hconf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
     hconf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
@@ -69,7 +75,7 @@ public class GeoSpatialExtraction {
     hconf.setStrings("startTime", "19800101");
     hconf.setStrings("endTime", "20151201");*/
 
-    String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
+    String geoJSONPath = MyProperty.geoJSONPath;     //"/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
 
 
     /*final String[] stateNames = new String[]{"Alaska", "Hawaii", "Puerto"}; //new String[]{"Alaska", "Hawaii", "Puerto"};
@@ -85,9 +91,9 @@ public class GeoSpatialExtraction {
     hconf.setStrings("variables", vars);
 
     //Did not use the following setting
-    hconf.setStrings("datanodeNum", "14");
-    hconf.setStrings("slotNum", "10");
-    hconf.setStrings("threadNumPerNode", "10");
+    //hconf.setStrings("datanodeNum", "14");
+    //hconf.setStrings("slotNum", "10");
+    //hconf.setStrings("threadNumPerNode", "10");
 
     final int width = 576, height = 364;
     final double xResolution = 360.0 / width; //MetaData.MERRA2.lonUnit;
@@ -161,7 +167,7 @@ public class GeoSpatialExtraction {
       maskLocal = GeoExtracting.combineChunkMasks(maskList);
     }
 
-    PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
+    //PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
     final Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask = sc.broadcast(maskLocal);
 
@@ -207,7 +213,7 @@ public class GeoSpatialExtraction {
               Tuple2<String, ArrayFloatSerializer> tuple2) throws Exception {
             String[] tmps = tuple2._1().split("_");
             String hour = String.format("%02d", Integer.parseInt(tmps[2]));
-            return new Tuple2<String, Tuple2<String, ArrayFloatSerializer>>(tmps[0] + tmps[1],
+            return new Tuple2<String, Tuple2<String, ArrayFloatSerializer>>(tmps[0] + "-" + tmps[1],
                                                                             new Tuple2<String, ArrayFloatSerializer>(
                                                                                 tmps[0] + "_"
                                                                                 + tmps[1] + "_"
@@ -245,9 +251,6 @@ public class GeoSpatialExtraction {
                         min = v;
                       }
                     }
-                    else {
-                      System.out.println("---- v " + v);
-                    }
                   }
                   mark = false;
                 }
@@ -260,18 +263,15 @@ public class GeoSpatialExtraction {
               images.set(index, image);
             }
 
-            PngFactory.geneGIFBilinear(images, outputPath + tuple2._1(), 1, 500);
+            PngFactory.geneGIFBilinear(images, outputPath + "-" + tuple2._1(), 1, 500);
           }
         });
 
-    /*timeChunks.foreach(new VoidFunction<Tuple2<String, Tuple2<String, ArrayFloatSerializer>>>() {
-      @Override
-      public void call(Tuple2<String, Tuple2<String, ArrayFloatSerializer>> tuple2)
-          throws Exception {
-        Tuple2<String, ArrayFloatSerializer> tuple = tuple2._2();
-        PngFactory.drawPNG(tuple._2().getArray(), "/Users/feihu/Desktop/test/" + tuple._1() + ".png",
-                            107.2249f, 319.2336f, tuple._1(), pngScale);
-      }
-    });*/
+    String shellscript = "sh /opt/cloudera/parcels/CDH/bin/hadoop fs -copyToLocal " + outputPath + "-*" + " " + "/var/lib/hadoop-hdfs/gif/";
+    System.out.println("******" + shellscript);
+    Process ps = Runtime.getRuntime().exec(shellscript);
+    int shellState = ps.waitFor();
+    System.out.println("*** shell " + shellState );
   }
 }
+

@@ -5,7 +5,9 @@
 var merra2gifs = [], x = -1;
 var refreshIntervalId;
 
-googledrive = "https://googledrive.com/host/0B8as2mZ2Oud6aklmR3lIclFjYTg/EVAP198001"
+//googledrive = "https://googledrive.com/host/0B8as2mZ2Oud6aklmR3lIclFjYTg/EVAP198001"
+
+googledrive = "/gif/EVAP198001"
 
 for (i = 1; i< 31; i++) {
     if (i<10) {
@@ -16,7 +18,8 @@ for (i = 1; i< 31; i++) {
 }
 
 var map;
-var slectedStates = []
+var selectedStates = []
+
 AmCharts.ready( function() {
     map = new AmCharts.AmMap();
     map.panEventsEnabled = true;
@@ -57,9 +60,10 @@ AmCharts.ready( function() {
             var area = map.dataProvider.areas[ i ];
             if ( area.showAsSelected ) {
                 states.push( area.title );
-                slectedStates.push( area.title );
             }
         }
+
+        selectedStates = states;
     } );
     map.export = {
         enabled: true
@@ -90,11 +94,18 @@ function stopTimer() {
 
 function queryMerra2() {
     var varName = $('#varName').val();
+    var startDate = $('#startDate').val();
+    var endDate = $('#endDate').val();
+    var states = "Puerto";
+    for (i =0; i < selectedStates.length; i++ ) {
+        states =  states + "," + selectedStates[i]
+    }
+
     urlParams = {
-        vars: "EVAP",
-        startTime: "19800101",
-        endTime: "20150101",
-        statename: "Alaska,Hawaii,Puerto",
+        vars: varName,
+        startTime: startDate,
+        endTime: endDate,
+        statename: states,
         isObject: "false",
         isGlobal: "false"
     }

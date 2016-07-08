@@ -69,6 +69,8 @@ public class DataChunkInputFormat extends FileInputFormat {
        DataChunkInputSplit dataChunkInputSplit = new DataChunkInputSplit(dataChunkList);
        inputSplits.add(dataChunkInputSplit);
      }
+
+    System.out.println("+++++++++++++++++++++++ inputsplits " + inputSplits.size());
     return inputSplits;
   }
 

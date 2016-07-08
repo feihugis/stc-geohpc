@@ -2,7 +2,6 @@ package edu.gmu.stc.website.mvc.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.hadoop.yarn.util.StringHelper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,9 +11,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Map;
 
-import edu.gmu.stc.datavisualization.taylordiagram.TaylorDiagramFactory;
 import edu.gmu.stc.website.WebProperties;
-import ucar.ma2.InvalidRangeException;
 
 /**
  * Created by Fei Hu on 5/8/16.
@@ -25,7 +22,7 @@ public class TaylorDiagramQuery {
   private static final Log LOG = LogFactory.getLog(TaylorDiagramQuery.class);
 
   @RequestMapping(value = "/query/taylordiagram", method = RequestMethod.GET)
-  public String queryMerra2test(@RequestParam Map<String, String> requestParams) throws ClassNotFoundException, IOException, InterruptedException, ParseException, InvalidRangeException {
+  public String queryMerra2test(@RequestParam Map<String, String> requestParams) throws ClassNotFoundException, IOException, InterruptedException, ParseException {
 
     String start_time = requestParams.get("start_time"); //"198001";
     String end_time = requestParams.get("end_time");  //"198012";
@@ -39,6 +36,7 @@ public class TaylorDiagramQuery {
     String isMERRA1 = requestParams.get("isMERRA1");
     String isCFSR = requestParams.get("isCFSR");
     String isERAINTRIM = requestParams.get("isERAINTRIM");
+    String referenceModel = requestParams.get("referenceModel");
 
     WebProperties.initilizeProperties();
     String spark_master = WebProperties.SPARK_MASTER;  //"local[6]";
@@ -56,6 +54,7 @@ public class TaylorDiagramQuery {
     String tyd_output = WebProperties.TAYLORDIAGRAM_RESULT_PATH + taylordiagram_file_nanme;  //"/Users/feihu/Desktop/taylordiagram-reanalysis.png";
     String result_uri = WebProperties.RESULT_URI+"taylordiagram/" + taylordiagram_file_nanme;
     String shellscript = "sh " + WebProperties.SPARK_HOME + " "
+                         + "--master yarn --deploy-mode client --num-executors 20 --driver-memory 3g --executor-memory 18g --executor-cores 12 "
                          + "--class " + WebProperties.SPARK_TAYLORDIAGRAM_CLASS + " "
                          + WebProperties.SPARK_JAR_PATH + " "
                          + start_time + " "
@@ -79,7 +78,8 @@ public class TaylorDiagramQuery {
                          + isMERRA2 + " "
                          + isMERRA1 + " "
                          + isCFSR + " "
-                         + isERAINTRIM;
+                         + isERAINTRIM + " "
+                         + referenceModel;
 
     LOG.info("taylordiagram service shell : " + shellscript);
     Process ps = Runtime.getRuntime().exec(shellscript);
