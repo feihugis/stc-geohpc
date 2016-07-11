@@ -325,15 +325,12 @@ public class Merra2IndexSQL {
                                                            List<Integer[]> starConer,
                                                            List<Integer[]> endCorner) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
-    /*String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
                  + "WHERE merra.geometry = spaceindex.geometry\n"
                  + "AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
-                 + "'::geometry)\n";*/
+                 + "'::geometry)\n";
 
-    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
-                 + "WHERE ";
-
-    String varSQL = "(";
+    String varSQL = "AND (";
     for (int i = 0; i < varList.size(); i++) {
       varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' ";
       if (i < varList.size()-1) {
@@ -342,10 +339,6 @@ public class Merra2IndexSQL {
     }
 
     varSQL = varSQL + ") \n";
-
-    String geometrySQL = " AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
-                      + "'::geometry)\n";
-                      //+ " AND merra.geometry = spaceindex.geometry\n";
 
     /*String cornerSQL = " AND (";
 
@@ -372,11 +365,12 @@ public class Merra2IndexSQL {
     String orderSQL = "ORDER BY merra.filepos,merra.corner;";
 
 
-    sql = sql + varSQL + geometrySQL + orderSQL;
+    sql = sql + varSQL + orderSQL;
     //sql = sql + varSQL + cornerSQL + orderSQL;
 
     if (debug) {
       LOG.info(sql);
+      System.out.println(sql);
     }
 
     ResultSet rs;
