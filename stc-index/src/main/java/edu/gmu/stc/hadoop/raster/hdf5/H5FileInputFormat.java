@@ -76,6 +76,8 @@ public class H5FileInputFormat extends FileInputFormat {
     //Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
     //inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon));
     inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon, startCorners, endCorners));
+
+    LOG.info("**************************  Finish getSplits");
     return inputSplits;
   }
 

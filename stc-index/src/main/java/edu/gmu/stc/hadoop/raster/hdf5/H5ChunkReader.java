@@ -42,6 +42,7 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     this.conf = taskAttemptContext.getConfiguration();
     fs = FileSystem.get(conf);
     inputStream = fs.open(new Path(this.h5ChunkInputSplit.getChunkList().get(0).getFilePath()));
+    LOG.info("************************* Start to read");
   }
 
   @Override
@@ -50,6 +51,7 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     if (currentKeyMark < keySize) {
       return true;
     } else {
+      LOG.info("************************* End to read");
       return false;
     }
   }

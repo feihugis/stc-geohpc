@@ -53,13 +53,23 @@ public class MyProperty {
 	public static String geoJSONPath = "/gz_2010_us_040_00_500k.json";
         public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";*/
 
-    //For localhost
-    public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
-    public static String mysql_user = "feihu"; //"root";
-    public static String mysql_password = "feihu";
-    public static String mysql_catalog = "merra2test";
-    public static String nameNode = "file:////";
-    public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
+        //data container svr-A3-A-U17
+        //Index for Merra2
+        public static String mysql_connString = "jdbc:postgresql://10.3.1.17:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_user = "feihu"; //"root";
+        public static String mysql_password = "cisc255b";
+        public static String mysql_catalog = "merra2datacontainer";
+        public static String nameNode = "hdfs://svr-A3-A-U2:8020";
+        public static String geoJSONPath = "/gz_2010_us_040_00_500k.json";
+        public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";
+
+        //For localhost
+        /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_user = "feihu"; //"root";
+        public static String mysql_password = "feihu";
+        public static String mysql_catalog = "merra2test";
+        public static String nameNode = "file:////";
+        public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";*/
 
 	public MyProperty() {
 		// TODO Auto-generated constructor stub

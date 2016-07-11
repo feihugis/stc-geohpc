@@ -33,7 +33,7 @@ public class Merra2IndexSQL {
   private Statement statement = null;
   private String merra2SpaceIndex = "merra2spaceindex";
   private String optorClass = "merraindex";
-  private boolean debug = true;
+  private boolean debug = false;
 
   public Merra2IndexSQL(Statement statement) {
     this.statement = statement;
@@ -325,12 +325,15 @@ public class Merra2IndexSQL {
                                                            List<Integer[]> starConer,
                                                            List<Integer[]> endCorner) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
-    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+    /*String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
                  + "WHERE merra.geometry = spaceindex.geometry\n"
                  + "AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
-                 + "'::geometry)\n";
+                 + "'::geometry)\n";*/
 
-    String varSQL = "AND (";
+    String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
+                 + "WHERE ";
+
+    String varSQL = "(";
     for (int i = 0; i < varList.size(); i++) {
       varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' ";
       if (i < varList.size()-1) {
@@ -340,7 +343,11 @@ public class Merra2IndexSQL {
 
     varSQL = varSQL + ") \n";
 
-    String cornerSQL = " AND (";
+    String geometrySQL = " AND ST_Intersects(spaceindex.geometry, '" + polygon.toPostGISPGgeometry().toString()
+                      + "'::geometry)\n";
+                      //+ " AND merra.geometry = spaceindex.geometry\n";
+
+    /*String cornerSQL = " AND (";
 
     for (int i = 0; i < starConer.size(); i++ ) {
       Integer[] subStart = starConer.get(i);
@@ -359,20 +366,17 @@ public class Merra2IndexSQL {
       }
     }
 
-    cornerSQL = cornerSQL + " )\n";
-
-
+    cornerSQL = cornerSQL + " )\n";*/
 
 
     String orderSQL = "ORDER BY merra.filepos,merra.corner;";
 
 
-
-    sql = sql + varSQL + cornerSQL + orderSQL;
+    sql = sql + varSQL + geometrySQL + orderSQL;
+    //sql = sql + varSQL + cornerSQL + orderSQL;
 
     if (debug) {
       LOG.info(sql);
-      System.out.println(sql);
     }
 
     ResultSet rs;

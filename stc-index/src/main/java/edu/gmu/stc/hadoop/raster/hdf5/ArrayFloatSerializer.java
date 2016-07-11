@@ -98,4 +98,5 @@ public class ArrayFloatSerializer implements Writable, KryoSerializable {
     }
     array = (ArrayFloat) Array.factory(float.class, shape, data);
   }
+
 }
