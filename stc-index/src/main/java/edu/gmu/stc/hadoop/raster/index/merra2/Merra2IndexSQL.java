@@ -340,6 +340,7 @@ public class Merra2IndexSQL {
 
     varSQL = varSQL + ") \n";
 
+
     /*String cornerSQL = " AND (";
 
     for (int i = 0; i < starConer.size(); i++ ) {
@@ -364,13 +365,11 @@ public class Merra2IndexSQL {
 
     String orderSQL = "ORDER BY merra.filepos,merra.corner;";
 
-
     sql = sql + varSQL + orderSQL;
     //sql = sql + varSQL + cornerSQL + orderSQL;
 
     if (debug) {
       LOG.info(sql);
-      System.out.println(sql);
     }
 
     ResultSet rs;
