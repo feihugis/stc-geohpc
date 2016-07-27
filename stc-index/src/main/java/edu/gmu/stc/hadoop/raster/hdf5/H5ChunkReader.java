@@ -42,7 +42,7 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     this.conf = taskAttemptContext.getConfiguration();
     fs = FileSystem.get(conf);
     inputStream = fs.open(new Path(this.h5ChunkInputSplit.getChunkList().get(0).getFilePath()));
-    LOG.info("************************* Start to read");
+    //LOG.info("************************* Start to read");
   }
 
   @Override
@@ -51,7 +51,7 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     if (currentKeyMark < keySize) {
       return true;
     } else {
-      LOG.info("************************* End to read");
+      //LOG.info("************************* End to read");
       return false;
     }
   }
@@ -73,6 +73,7 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     byte[] byteArray = new byte[(int) h5ChunkInputSplit.getChunkList().get(currentKeyMark).getByteSize()];
     long filePos = h5ChunkInputSplit.getChunkList().get(currentKeyMark).getFilePos();
     int n = this.inputStream.read(filePos, byteArray, 0, byteArray.length);
+    //LOG.info("***************** filepos " + filePos + " bytelength " + byteArray.length + " filepath" + this.h5ChunkInputSplit.getChunkList().get(0).getFilePath());
     //int filterMask = h5ChunkInputSplit.getChunkList().get(currentKeyMark).getFilterMask();
 
     byteArray = inflate(byteArray);

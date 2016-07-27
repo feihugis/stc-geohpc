@@ -21,6 +21,7 @@ import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
 import edu.gmu.stc.hadoop.raster.hdf5.H5ChunkInputSplit;
+import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import edu.gmu.stc.hadoop.raster.hdf5.Merra2Chunk;
 import edu.gmu.stc.hadoop.raster.index.MetaData;
 import edu.gmu.stc.hadoop.vector.Polygon;
@@ -62,6 +63,17 @@ public class Merra2IndexSQL {
       this.createFileIndexTable(table);
       this.addBtreeIndex2Table(table, "geometry");
       this.addForeignKey(table);
+    }
+  }
+
+  /**
+   * Create tables for each variable in this kind of product
+   * @param varShortNames
+   * @param productName
+   */
+  public void createVarIndexTablesInBatch(List<String> varShortNames, String productName) {
+    for (String var : varShortNames) {
+      this.createVarIndexTable(productName + "_" + var);
     }
   }
 
@@ -123,6 +135,32 @@ public class Merra2IndexSQL {
             + "CONSTRAINT id" + tableName + " PRIMARY KEY (id)"
             + ");";
       LOG.info( " Create FileIndex table : ************* " + tableName + " ************* by " + sql);
+      this.statement.execute(sql);
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void createVarIndexTable(String tableName) {
+    try {
+      String sql;
+      sql = "CREATE TABLE public." + tableName + "("
+            + "id serial NOT NULL,"
+            + "corner integer[],"
+            + "date integer,"
+            //+ "shape integer[],"
+            //+ "dimensions text[],"
+            + "filepos integer,"
+            + "bytesize integer,"
+            //+ "filtermask smallint,"
+            + "hosts text[],"
+            //+ "datatype text,"
+            //+ "varshortname text,"
+            //+ "filepath text,"
+            + "geometryID smallint,"
+            + "CONSTRAINT id" + tableName + " PRIMARY KEY (id)"
+            + ");";
+      LOG.info( " Create VarIndex table : ************* " + tableName + " ************* by " + sql);
       this.statement.execute(sql);
     } catch (SQLException e) {
       e.printStackTrace();
@@ -257,6 +295,46 @@ public class Merra2IndexSQL {
     }
   }
 
+
+  /**
+   * Insert Merra2Chunk to table by var
+   * @param tableName
+   * @param chunks
+   */
+  public void insertDataChunksByVar(String tableName, List<DataChunk> chunks) {
+    String sql = "insert into " + tableName
+                 + "(corner, date, filepos, bytesize, hosts, geometryID)"
+                 + "values (?,?,?,?,?,?)";
+    try {
+      Connection c = this.statement.getConnection();
+      PreparedStatement ps = c.prepareStatement(sql);
+      int count = 0;
+      for (DataChunk chk : chunks) {
+        Merra2Chunk chunk = new Merra2Chunk(chk.getVarShortName(), chk.getFilePath(), chk.getCorner(),
+                                            chk.getShape(), chk.getDimensions(),chk.getFilePos(),
+                                            chk.getByteSize(),chk.getFilterMask(),chk.getHosts(),chk.getDataType(), chk.getTime());
+
+        Array corner = c.createArrayOf("integer", RasterUtils.intToInteger(chunk.getCorner()));
+        ps.setArray(1, corner);
+        ps.setLong(2, chunk.getTime());
+        ps.setLong(3, chunk.getFilePos());
+        ps.setLong(4, chunk.getByteSize());
+        Array hosts = c.createArrayOf("text", chunk.getHosts());
+        ps.setArray(5, hosts);
+        ps.setInt(6, chunk.getGeometryID());
+        count++;
+        if ( count%500 == 0 || count == chunks.size()) {
+          ps.addBatch();
+          ps.executeBatch();
+        }
+        ps.addBatch();
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+      e.getNextException().printStackTrace();
+    }
+  }
+
   public List<H5ChunkInputSplit> queryDataChunks(List<String> tableNameList, List<String> varList, Polygon polygon) {
     List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
     for (String tableName : tableNameList) {
@@ -280,6 +358,37 @@ public class Merra2IndexSQL {
 
     return inputSplits;
   }
+
+  public List<H5ChunkInputSplit> queryDataChunks(List<String> tableNameList,
+                                                 List<String> varList,
+                                                 Polygon polygon,
+                                                 List<Integer[]> starConer,
+                                                 List<Integer[]> endCorner,
+                                                 int startDate,
+                                                 int endDate) {
+    List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
+    for (String tableName : tableNameList) {
+      inputSplits.addAll(queryIntersectedDataChunk(tableName, varList, polygon, starConer, endCorner, startDate, endDate));
+      //inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    }
+
+    return inputSplits;
+  }
+
+  public List<H5ChunkInputSplit> queryDataChunks(List<String> tableNames,
+                                                 List<Integer[]> starConer, List<Integer[]> endCorner,
+                                                 int startDate, int endDate,
+                                                 String[] geometryIDs) {
+    List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
+    for (String tableName : tableNames) {
+      inputSplits.addAll(queryIntersectedDataChunk(tableName, starConer, endCorner, startDate, endDate, geometryIDs));
+      //inputSplits.addAll(queryContainedDataChunk(tableName, varList, polygon));
+    }
+
+    return inputSplits;
+
+  }
+
 
   public List<H5ChunkInputSplit> queryDataChunks(String tableName, List<String> varList, Polygon polygon) {
     List<H5ChunkInputSplit> inputSplits = new ArrayList<H5ChunkInputSplit>();
@@ -383,6 +492,140 @@ public class Merra2IndexSQL {
     return generateInputSplitByHosts(chunkList);
   }
 
+  public List<H5ChunkInputSplit> queryIntersectedDataChunk(String tableName,
+                                                           List<String> varList,
+                                                           Polygon polygon,
+                                                           List<Integer[]> starConer,
+                                                           List<Integer[]> endCorner,
+                                                           int startDate,
+                                                           int endDate) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    String sql = "SELECT * FROM " + tableName + " AS merra \n"
+                 + "WHERE date >= " + startDate + " AND date <= " + endDate + "\n"
+                 + "AND ST_Intersects(merra.geometry, '" + polygon.toPostGISPGgeometry().toString()
+                 + "'::geometry)\n";
+
+    String varSQL = "AND (";
+    for (int i = 0; i < varList.size(); i++) {
+      varSQL = varSQL + "merra.varshortname = '" + varList.get(i) + "' ";
+      if (i < varList.size()-1) {
+        varSQL = varSQL + " OR ";
+      }
+    }
+
+    varSQL = varSQL + ") \n";
+
+
+    /*String cornerSQL = " AND (";
+
+    for (int i = 0; i < starConer.size(); i++ ) {
+      Integer[] subStart = starConer.get(i);
+      Integer[] subEnd = endCorner.get(i);
+      String subCornerSQL = "(";
+      for (int j = 0; j < subStart.length; j++) {
+        subCornerSQL = subCornerSQL + " ( merra.corner["+(j+1)+"] >=" + subStart[j] + " AND merra.corner["+(j+1)+"] <=" + subEnd[j] + ")";
+        if (j < subStart.length-1) {
+          subCornerSQL = subCornerSQL + "AND ";
+        }
+      }
+      subCornerSQL = subCornerSQL + " )";
+      cornerSQL = cornerSQL + subCornerSQL;
+      if (i<starConer.size()-1) {
+        cornerSQL = cornerSQL + " OR ";
+      }
+    }
+
+    cornerSQL = cornerSQL + " )\n";*/
+
+
+    String orderSQL = "ORDER BY merra.date,merra.filepos,merra.corner;";
+
+    sql = sql + varSQL + orderSQL;
+    //sql = sql + varSQL + cornerSQL + orderSQL;
+
+    if (debug) {
+      LOG.info(sql);
+    }
+
+    ResultSet rs;
+    try {
+      rs = this.statement.executeQuery(sql);
+      LOG.info("++++++++++++++++++++ finish sql");
+      chunkList = generateDataChunk(rs, false); //PostGIS query is ST_Intersects, so the datachunk is not contained in the bbox
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    LOG.info("******************** chunk size : " + chunkList.size());
+    return generateInputSplitByHosts(chunkList);
+  }
+
+  public List<H5ChunkInputSplit> queryIntersectedDataChunk(String tableName,
+                                                           List<Integer[]> starConer,
+                                                           List<Integer[]> endCorner,
+                                                           int startDate,
+                                                           int endDate,
+                                                           String[] geometryIDs) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    String var = tableName.split("_")[1];
+
+    String sql = "SELECT * FROM " + tableName + " AS merra \n"
+                 + "WHERE date >= " + startDate + " AND date <= " + endDate + "\n";
+
+    String geometrySQL = "AND (";
+    for (int i = 0; i < geometryIDs.length; i++) {
+      geometrySQL = geometrySQL + "merra.geometryid = " + geometryIDs[i] + " ";
+      if (i < geometryIDs.length - 1) {
+        geometrySQL = geometrySQL + " OR ";
+      }
+    }
+
+    geometrySQL = geometrySQL + ") \n";
+
+    /*String cornerSQL = " AND (";
+
+    for (int i = 0; i < starConer.size(); i++ ) {
+      Integer[] subStart = starConer.get(i);
+      Integer[] subEnd = endCorner.get(i);
+      String subCornerSQL = "(";
+      for (int j = 0; j < subStart.length; j++) {
+        subCornerSQL = subCornerSQL + " ( merra.corner["+(j+1)+"] >=" + subStart[j] + " AND merra.corner["+(j+1)+"] <=" + subEnd[j] + ")";
+        if (j < subStart.length-1) {
+          subCornerSQL = subCornerSQL + "AND ";
+        }
+      }
+      subCornerSQL = subCornerSQL + " )";
+      cornerSQL = cornerSQL + subCornerSQL;
+      if (i<starConer.size()-1) {
+        cornerSQL = cornerSQL + " OR ";
+      }
+    }
+
+    cornerSQL = cornerSQL + " )\n";*/
+
+
+    String orderSQL = "ORDER BY merra.date,merra.filepos,merra.corner;";
+
+    sql = sql + geometrySQL + orderSQL;
+    //sql = sql + varSQL + cornerSQL + orderSQL;
+
+    if (debug) {
+      LOG.info(sql);
+    }
+
+    ResultSet rs;
+    try {
+      rs = this.statement.executeQuery(sql);
+      LOG.info("++++++++++++++++++++ finish sql");
+      chunkList = generateDataChunk(rs, var, false); //PostGIS query is ST_Intersects, so the datachunk is not contained in the bbox
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    LOG.info("******************** chunk size : " + chunkList.size());
+    return generateInputSplitByHosts(chunkList);
+  }
+
   public List<H5ChunkInputSplit> queryContainedDataChunk(String tableName, List<String> varList, Polygon polygon) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     String sql = "SELECT * FROM " + tableName + " AS merra, " + this.merra2SpaceIndex + " AS spaceindex\n"
@@ -407,6 +650,9 @@ public class Merra2IndexSQL {
       e.printStackTrace();
     }
 
+    /*for (DataChunk dataChunk : chunkList) {
+      LOG.info("+++++++++++++++   " +  dataChunk.getFilePath());
+    }*/
     return generateInputSplitByHosts(chunkList);
   }
 
@@ -416,7 +662,8 @@ public class Merra2IndexSQL {
     inputChunkList.add(null);
     for(int i=0; i<inputChunkList.size()-1; i++) {
       chunkList.add(inputChunkList.get(i));
-      if (RasterUtils.isShareHosts(inputChunkList.get(i), inputChunkList.get(i+1))) {
+      if (RasterUtils.isShareHosts(inputChunkList.get(i), inputChunkList.get(i+1))
+          && inputChunkList.get(i).getFilePath().equals(inputChunkList.get(i+1).getFilePath())) {
         continue;
       } else {
         inputSplitList.add(new H5ChunkInputSplit(chunkList));
@@ -426,7 +673,7 @@ public class Merra2IndexSQL {
     return inputSplitList;
   }
 
-  public List<DataChunk> generateDataChunk(ResultSet rs, boolean isContain) {
+ public List<DataChunk> generateDataChunk(ResultSet rs, boolean isContain) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     try {
       rs.last();
@@ -445,7 +692,12 @@ public class Merra2IndexSQL {
           String[] hosts = (String[]) rs.getArray("hosts").getArray();
           String datatype = rs.getString("datatype");
           String varshortname = rs.getString("varshortname");
-          String filepath = rs.getString("filepath");
+          String date = rs.getString("date");
+          String year = date.substring(0,4);
+          String month = date.substring(4,6);
+          String day = date.substring(6,8);
+          String filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                            + H5FileInputFormat.MERRA2_FILE_PREFIX + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
 
           Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
                                                     dimensions, filepos, bytesize, filtermask,
@@ -461,6 +713,58 @@ public class Merra2IndexSQL {
 
     return chunkList;
   }
+
+
+  public List<DataChunk> generateDataChunk(ResultSet rs, String varshortname, boolean isContain) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    try {
+      rs.last();
+      if (rs.getRow() == 0) {
+        System.out.println(this.getClass().getName() + ".generateDataChunk: ResultSet is empty");
+        rs.close();
+      } else {
+        rs.first();
+        do {
+          Integer[] corner = (Integer[]) rs.getArray("corner").getArray();
+          Integer[] shape = new Integer[] {1, 91, 144};
+          String[] dimensions = new String[] {"time", "lat", "lon"};
+          Long filepos = rs.getLong("filepos");
+          Long bytesize = rs.getLong("bytesize");
+          int filtermask = 0; //rs.getInt("filtermask");
+          String[] hosts = (String[]) rs.getArray("hosts").getArray();
+          String datatype = "float"; //rs.getString("datatype");
+          //String varshortname = rs.getString("varshortname");
+          String date = rs.getString("date");
+          String year = date.substring(0,4);
+          String month = date.substring(4,6);
+          String day = date.substring(6,8);
+          int yyyy = Integer.parseInt(year);
+          String filepath = "";
+
+          //TODO: even for the same product, it may have different name rule.
+          if (yyyy >= 1992) {
+            filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                       + H5FileInputFormat.MERRA2_FILE_PREFIX_Sec + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
+          } else {
+            filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                       + H5FileInputFormat.MERRA2_FILE_PREFIX + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
+          }
+
+          Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
+                                                    dimensions, filepos, bytesize, filtermask,
+                                                    hosts,datatype);
+          merra2Chunk.setContain(isContain);
+          chunkList.add(merra2Chunk);
+          rs.next();
+        } while (!rs.isAfterLast());
+      }
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+
+    return chunkList;
+  }
+
 
   public static void main(String[] args) {
     Merra2IndexSQL hdf5IdxBuilder = new Merra2IndexSQL(new DBConnector().GetConnStatement());

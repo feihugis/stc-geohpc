@@ -58,10 +58,22 @@ public class ChunkFactory {
     return chunkList;
   }
 
+  /**
+   * TODO: fix the time extraction, here it treat the last second one as the time info
+   * @param metaInfo
+   * @param dimensions
+   * @param varShortName
+   * @param filePath
+   * @param dataType
+   * @return
+   * @throws IOException
+   */
   //0:0,0:90,288:431  ChunkedDataNode size=37348 filterMask=0 filePos=72345715 offsets= 0 0 288 0
   public static H5Chunk h5ChunkInfoParser(String metaInfo, String dimensions, String varShortName, String filePath, String dataType)
       throws IOException {
     String cnr = metaInfo.substring(0, metaInfo.indexOf("  ChunkedDataNode"));
+    String[] tmps = filePath.split("\\.");
+    int time = Integer.parseInt(tmps[tmps.length-2]);
 
     String byteSizeIn = subString(metaInfo, "size=", " filterMask=");
     String filterMaskIn = subString(metaInfo, "filterMask=", " filePos=");
@@ -90,7 +102,7 @@ public class ChunkFactory {
     String[] hsts = new String[hosts.size()];
     hosts.toArray(hsts);
     H5Chunk h5Chunk = new H5Chunk(varShortName, filePath, corners, shape, dims, filePos, byteSize, filterMask,
-                                  hsts, dataType);
+                                  hsts, dataType, time);
     return h5Chunk;
   }
 
@@ -109,6 +121,41 @@ public class ChunkFactory {
       e.printStackTrace();
     }
     return chunkList;
+  }
+
+  public static List<DataChunk> geneDataChunksByVar(Path path, String varShortName, String fileFormat) {
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    try {
+      NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
+      NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
+      List<Variable> variableList = ncfile.getVariables();
+      for (Variable var : variableList) {
+        if (var.getShortName().equals(varShortName)) {
+          chunkList.addAll(geneDataChunks(var, "nc4", path.toString()));
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InvalidRangeException e) {
+      e.printStackTrace();
+    }
+    return chunkList;
+  }
+
+  public static List<String> getAllVarShortNames(String fileInput) {
+    Path path = new Path(fileInput);
+    List<String> varsList = new ArrayList<String>();
+    try {
+      NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
+      NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
+      List<Variable> variableList = ncfile.getVariables();
+      for (Variable var : variableList) {
+        varsList.add(var.getShortName());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    return varsList;
   }
 
   /**

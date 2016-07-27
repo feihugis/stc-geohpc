@@ -21,6 +21,12 @@ public class Merra2Chunk extends H5Chunk{
     initBoundary(corner, shape, dimensions);
   }
 
+  public Merra2Chunk(String shortName, String path, int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
+                     int filterMask, String[] hosts, String dataType, int time) {
+    super( shortName, path, corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, time);
+    initBoundary(corner, shape, dimensions);
+  }
+
   public void initBoundary(int[] corner, int[] shape, String[] dimensions) {
     double[] lats = new double[4];
     double[] lons = new double[4];
@@ -61,6 +67,24 @@ public class Merra2Chunk extends H5Chunk{
 
   public Polygon getBoundary() {
     return boundary;
+  }
+
+  public int getGeometryID() {
+    int latMark = -1, lonMark = -1;
+    for (int i = 0; i<this.getDimensions().length; i++) {
+      if (this.getDimensions()[i].equals("lat")) latMark = i;
+      if (this.getDimensions()[i].equals("lon")) lonMark = i;
+    }
+
+    if (latMark == -1 || lonMark == -1) {
+      return 0;
+    }
+
+    int corner_lat = this.getCorner()[latMark];
+    int corner_lon = this.getCorner()[lonMark];
+
+    int id = corner_lat/MetaData.MERRA2.latChunkShape*4 + corner_lon/MetaData.MERRA2.lonChunkShape;
+    return id;
   }
 
   public void setBoundary(Polygon boundary) {

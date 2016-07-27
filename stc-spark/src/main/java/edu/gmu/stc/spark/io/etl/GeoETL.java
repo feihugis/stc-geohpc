@@ -47,7 +47,7 @@ public class GeoETL {
                          + "for example: local[6] EVAP /Users/feihu/Documents/Data/Merra2/ 19800101 20151201 Alaska,Hawaii,Puerto false true /Users/feihu/Documents/GitHub/stc-geohpc/stc-website/src/main/resources/static/img/gif");
       return;
     }
-    String jobName = "spark" + args[3] + "-" + args[4] + "-" + args[5];
+    String jobName = "spark" + args[3] + "-" + args[4] + "-" + args[5].split(",").length + '-' + args[1].split(",").length;
     final SparkConf sconf = new SparkConf().setAppName(jobName);//.setMaster("local[6]");
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
@@ -168,6 +168,22 @@ public class GeoETL {
 
     //PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
+    int[] bboxcorner = maskLocal._1().getCorner();
+    int[] bboxshape = maskLocal._1().getShape();
+    int start_geometry_id = bboxcorner[0]/MetaData.MERRA2.latChunkShape*4 + bboxcorner[1]/MetaData.MERRA2.lonChunkShape;
+    int end_geometry_id = (bboxcorner[0] + bboxshape[0])/MetaData.MERRA2.latChunkShape * 4 + (bboxcorner[1] + bboxshape[1])/MetaData.MERRA2.lonChunkShape;
+    int lon_size = (end_geometry_id - start_geometry_id)%4;
+    int lat_size = (end_geometry_id - start_geometry_id)/4;
+    String geometryIDs = "";
+    for (int y=0; y<=lat_size; y++) {
+      for (int x=0; x<=lon_size; x++) {
+        geometryIDs = geometryIDs + (start_geometry_id + y*4 + x) + ",";
+      }
+    }
+
+    hconf.set("geometryIDs", geometryIDs);
+
+
     LOG.info("***************** Broadcast start : " + System.currentTimeMillis());
     final Broadcast<Tuple2<H5Chunk, ArrayIntSerializer>> mask = sc.broadcast(maskLocal);
     LOG.info("***************** Broadcast end : " + System.currentTimeMillis());
@@ -194,7 +210,7 @@ public class GeoETL {
         new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, ArrayFloatSerializer>() {
           @Override
           public Tuple2<String, ArrayFloatSerializer> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
-            String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2] + "_" + tuple2._1().getCorner()[0];
+            String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2].substring(0,7); // + "_" + tuple2._1().getCorner()[0];
 
             return new Tuple2<String, ArrayFloatSerializer>(key, tuple2._2());
           }
@@ -223,8 +239,15 @@ public class GeoETL {
           }
         });
 
-    meanHourlyRDD.saveAsTextFile("/Output/Merra2/mean/"+System.currentTimeMillis());
+    //meanHourlyRDD.saveAsTextFile("/Output/Merra2/mean/"+System.currentTimeMillis());
     //meanHourlyRDD.saveAsTextFile("/Users/feihu/Desktop/Merra2/mean/"+System.currentTimeMillis());
+    meanHourlyRDD.foreach(new VoidFunction<Tuple2<String, Float>>() {
+      @Override
+      public void call(Tuple2<String, Float> stringFloatTuple2) throws Exception {
+        LOG.info(" +++++++  mean result: " + stringFloatTuple2._1() + "   value :" + stringFloatTuple2._2());
+      }
+    });
+
   }
 
 }

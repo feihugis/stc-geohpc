@@ -50,6 +50,15 @@ public class Merr2IndexBuilder {
     this.sqlOptor.createFileIndexTablesInBatch(tableNames);
   }
 
+  /**
+   * create the variable index table by variable short name
+   * @param varShortNames
+   * @param productName
+   */
+  public void createVarIndexTablesInBatch(List<String> varShortNames, String productName) {
+    this.sqlOptor.createVarIndexTablesInBatch(varShortNames, productName);
+  }
+
   public void insertMerra2SpaceIndex() {
     this.sqlOptor.insertMerra2SpaceIndex();
   }
@@ -71,6 +80,26 @@ public class Merr2IndexBuilder {
   public void insertdataChunks(String tableName, List<DataChunk> chunks) {
     this.sqlOptor.insertDataChunks(tableName, chunks);
   }
+
+  public void insertdataChunks(List<String> files, String productName) {
+    List<String> varShortNames = ChunkFactory.getAllVarShortNames(files.get(0));
+    for (String var : varShortNames) {
+      List<DataChunk> merr2ChunkList = new ArrayList<DataChunk>();
+      String tableName = productName + "_" + var;
+      for (String file : files) {
+        Path path = new Path(file);
+        merr2ChunkList.addAll(ChunkFactory.geneDataChunksByVar(path, var, "nc4"));
+      }
+      this.insertdataChunksByVar(tableName, merr2ChunkList);
+    }
+  }
+
+  public void insertdataChunksByVar(String tableName, List<DataChunk> chunks) {
+    this.sqlOptor.insertDataChunksByVar(tableName, chunks);
+  }
+
+
+
 
 
 
@@ -100,6 +129,27 @@ public class Merr2IndexBuilder {
     List<String> tableNameList = RasterUtils.fileStatusToTableNames(fileStatusList);
     return this.sqlOptor.queryDataChunks(tableNameList, varList, polygon, starConer, endCorner);
   }
+
+  public List<H5ChunkInputSplit> queryDataChunksByinputFileStatus(List<String> tableNames,
+                                                                  List<String> varList,
+                                                                  Polygon polygon,
+                                                                  List<Integer[]> starConer,
+                                                                  List<Integer[]> endCorner,
+                                                                  int startDate,
+                                                                  int endDate) {
+    return this.sqlOptor.queryDataChunks(tableNames, varList, polygon, starConer, endCorner, startDate, endDate);
+  }
+
+  public List<H5ChunkInputSplit> queryDataChunksByinputFileStatus(List<String> tableNames,
+                                                                  List<Integer[]> starConer,
+                                                                  List<Integer[]> endCorner,
+                                                                  int startDate,
+                                                                  int endDate,
+                                                                  String[] geometryIDs) {
+    return this.sqlOptor.queryDataChunks(tableNames, starConer, endCorner, startDate, endDate, geometryIDs);
+  }
+
+
 
 
 

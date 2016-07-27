@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
+import edu.gmu.stc.hadoop.raster.ChunkFactory;
 import edu.gmu.stc.hadoop.raster.index.merra2.Merr2IndexBuilder;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
+import ucar.nc2.iosp.IndexChunker;
 
 /**
  * Created by Fei Hu on 3/22/16.
@@ -91,14 +93,15 @@ public class Merra2IndexOperator {
   }
 
   public static void main(String[] args) throws ClassNotFoundException, IOException, SQLException {
-    if (args.length != 3) {
-      System.out.println("Please input <configFilePath> <inputDir><isInitMetaIndex>");
+    if (args.length != 4) {
+      System.out.println("Please input <configFilePath> <inputDir> <isInitMetaIndex> <productName>");
       return;
     }
 
     String configFile = args[0];
     String inputDir = args[1]; //"/Users/feihu/Documents/Data/Merra2/";
     boolean isInitMetaIndex = Boolean.parseBoolean(args[2]);
+    final String productName = args[3]; //M2T1NXINT
 
 
     Merra2IndexOperator merra2IndexOperator = new Merra2IndexOperator();
@@ -112,15 +115,15 @@ public class Merra2IndexOperator {
       merra2IndexBuilder.insertMerra2SpaceIndex();
     }
 
-    //merra2IndexBuilder.closeDBConnnection();
-
-    final SparkConf sconf = new SparkConf().setAppName("SparkTest");//.setMaster("local[6]");
+    final SparkConf sconf = new SparkConf().setAppName("SparkIndexBuilder");//.setMaster("local[6]");
 
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
     JavaSparkContext sc = new JavaSparkContext(sconf);
 
+    //create index tables by variable names
+    merra2IndexBuilder.createVarIndexTablesInBatch(ChunkFactory.getAllVarShortNames(inputFiles.get(0)), productName);
 
     JavaRDD<String> inputMerra2 = sc.parallelize(inputFiles);
 
@@ -130,8 +133,8 @@ public class Merra2IndexOperator {
         List<String> files = new ArrayList<String>();
         files.add(s);
         Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
-        merra2IndexBuilder.createFileIndexTablesInBatch(files);
-        merra2IndexBuilder.insertdataChunks(files);
+        //merra2IndexBuilder.createFileIndexTablesInBatch(files);
+        merra2IndexBuilder.insertdataChunks(files, productName);
         //merra2IndexBuilder.closeDBConnnection();
       }
     });

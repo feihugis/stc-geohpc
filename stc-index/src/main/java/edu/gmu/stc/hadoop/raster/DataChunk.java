@@ -22,6 +22,7 @@ public class DataChunk implements Writable {
   String varShortName;
   String filePath;
   boolean isContain = true;
+  int time = 0;
 
   public DataChunk() {}
 
@@ -37,6 +38,21 @@ public class DataChunk implements Writable {
     this.dataType = dataType;
     this.varShortName = varShortName;
     this.filePath = filePath;
+  }
+
+  public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
+                   int filterMask, String[] hosts, String dataType, String varShortName, String filePath, int time) {
+    this.corner = corner;
+    this.shape = shape;
+    this.dimensions = dimensions;
+    this.filePos = filePos;
+    this.byteSize = byteSize;
+    this.filterMask = filterMask;
+    this.hosts = hosts;
+    this.dataType = dataType;
+    this.varShortName = varShortName;
+    this.filePath = filePath;
+    this.time = time;
   }
 
 
@@ -80,6 +96,7 @@ public class DataChunk implements Writable {
     Text.writeString(out, filePath);
 
     out.writeBoolean(isContain);
+    out.writeInt(this.time);
   }
 
   @Override
@@ -115,6 +132,7 @@ public class DataChunk implements Writable {
     varShortName = Text.readString(in);
     filePath = Text.readString(in);
     isContain = in.readBoolean();
+    this.time = in.readInt();
   }
 
 
@@ -274,4 +292,8 @@ public class DataChunk implements Writable {
   public void setFilePath(String filePath) {
     this.filePath = filePath;
   }
+
+  public int getTime() {return  time; }
+
+  public void setTime(int time) { this.time = time;}
 }

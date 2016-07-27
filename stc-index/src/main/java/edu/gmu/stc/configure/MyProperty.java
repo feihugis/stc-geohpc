@@ -45,7 +45,7 @@ public class MyProperty {
 	public static String nameNode = "hdfs://SERVER-A8-C-U26:8020";*/
       //data container
       //Index for Merra2
-	/*public static String mysql_connString = "jdbc:postgresql://10.192.21.253:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+	/*public static String mysql_connString = "jdbc:postgresql://192.168.2.253:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";10.192.21.253
 	public static String mysql_user = "postgres"; //"root";
 	public static String mysql_password = "cisc255b";
 	public static String mysql_catalog = "merra2datacontainer";
@@ -55,7 +55,7 @@ public class MyProperty {
 
         //data container svr-A3-A-U17
         //Index for Merra2
-        public static String mysql_connString = "jdbc:postgresql://10.3.1.17:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_connString = "jdbc:postgresql://10.3.1.16:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "cisc255b";
         public static String mysql_catalog = "merra2datacontainer";
@@ -64,10 +64,10 @@ public class MyProperty {
         public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";
 
         //For localhost
-        /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2test";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";
-        public static String mysql_catalog = "merra2test";
+        public static String mysql_catalog = "merra2testv2";
         public static String nameNode = "file:////";
         public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";*/
 

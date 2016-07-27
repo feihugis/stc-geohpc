@@ -7,7 +7,6 @@ import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.postgis.PGgeometry;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -16,24 +15,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import edu.gmu.stc.database.IndexOperator;
 import edu.gmu.stc.hadoop.index.tools.Utils;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
 import edu.gmu.stc.hadoop.raster.index.merra2.Merr2IndexBuilder;
 import edu.gmu.stc.hadoop.vector.Polygon;
 
 /**
- * Created by Fei Hu on 3/9/16.
+ * Created by Fei Hu on 7/14/16.
  */
-public class H5FileInputFormat extends FileInputFormat {
+public class H5RevisedFileInputFormat extends FileInputFormat {
   private static final Log LOG = LogFactory.getLog(H5FileInputFormat.class);
-  public static final String TABLE_PREFIX = "merra2_100_tavg1_2d_int_nx_";
-  public static final String TABLE_POSTFIX = "_nc4";
-  public static final String HDFS_FilePATH_PREFIX = "/merra2/daily/M2T1NXINT/"; //"/Users/feihu/Documents/Data/M2T1NXINT/"; //"/merra2/daily/M2T1NXINT/";
-  public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
-  public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
-  public static final String MERRA2_FILE_POSTFIX = ".nc4";
-  public static final String PRODUCT_NAME = "M2T1NXINT";
 
   @Override
   public List<InputSplit> getSplits(JobContext job) throws IOException {
@@ -46,15 +37,8 @@ public class H5FileInputFormat extends FileInputFormat {
     List<String> varNamesList = Arrays.asList(job.getConfiguration().getStrings("variables"));
     int startDate = Integer.parseInt(job.getConfiguration().get("startTime")); //For daily data, the format should be 20141001 (yyyymmdd)
     int endDate = Integer.parseInt(job.getConfiguration().get("endTime"));
-    String[] geometryIDs = job.getConfiguration().get("geometryIDs").split(",");
-
-    List<String> tableNames = new ArrayList<String>();
-    for (String var : varNamesList) {
-      tableNames.add(PRODUCT_NAME + "_" + var);
-    }
-
-    //List<FileStatus> fileStatusList = listStatus(job);
-    //fileStatusList = RasterUtils.filterMerraInputFilesByTime(fileStatusList, startDate, endDate);
+    List<FileStatus> fileStatusList = listStatus(job);
+    fileStatusList = RasterUtils.filterMerraInputFilesByTime(fileStatusList, startDate, endDate);
 
     String inputBbox = job.getConfiguration().get("bbox");
     HashMap<String, List<Integer[]>> bboxMap = Utils.parseBbox(inputBbox);
@@ -89,14 +73,9 @@ public class H5FileInputFormat extends FileInputFormat {
     Merr2IndexBuilder merra2IndexBuilder = new Merr2IndexBuilder();
     //Polygon plgn = new Polygon(new double[]{-180.0, -180.0, 180.0, 180.0}, new double[]{-90.0, 90.0, 90.0, -90.0}, 4);
     //inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon));
+    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(fileStatusList, varNamesList, geoPolygon, startCorners, endCorners));
 
-    LOG.info("**************************  Start Query");
-    inputSplits.addAll(merra2IndexBuilder.queryDataChunksByinputFileStatus(tableNames,
-                                                                           startCorners, endCorners,
-                                                                           startDate, endDate,
-                                                                           geometryIDs));
-    LOG.info("**************************  End Query");
-    LOG.info("**************************  Finish getSplits  " + inputSplits.size());
+    LOG.info("**************************  Finish getSplits");
     return inputSplits;
   }
 
