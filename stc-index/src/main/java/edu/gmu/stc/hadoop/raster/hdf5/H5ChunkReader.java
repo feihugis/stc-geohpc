@@ -18,6 +18,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import ucar.nc2.util.IO;
 
@@ -41,7 +42,28 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
     this.keySize = h5ChunkInputSplit.getChunkList().size();
     this.conf = taskAttemptContext.getConfiguration();
     fs = FileSystem.get(conf);
-    inputStream = fs.open(new Path(this.h5ChunkInputSplit.getChunkList().get(0).getFilePath()));
+    int time = this.h5ChunkInputSplit.getChunkList().get(0).getTime();
+    String date = time + "";
+    int year = time/10000;
+    String month = date.substring(4,6);
+    String filepath = "";
+
+    //TODO: optimise the filepath pattern
+    if (year >= 1992) {
+      filepath = MyProperty.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                 + MyProperty.MERRA2_FILE_PREFIX_Sec + date + MyProperty.MERRA2_FILE_POSTFIX;
+    } else {
+      filepath = MyProperty.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                 + MyProperty.MERRA2_FILE_PREFIX + date + MyProperty.MERRA2_FILE_POSTFIX;
+    }
+
+    System.out.println( " +++++++ " + filepath);
+
+    //filepath = this.h5ChunkInputSplit.getChunkList().get(0).getFilePath();
+
+    System.out.println( " ------- " + filepath);
+
+    inputStream = fs.open(new Path(filepath));
     //LOG.info("************************* Start to read");
   }
 

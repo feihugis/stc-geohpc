@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.IndexOperator;
 import edu.gmu.stc.hadoop.index.tools.Utils;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
@@ -27,13 +28,6 @@ import edu.gmu.stc.hadoop.vector.Polygon;
  */
 public class H5FileInputFormat extends FileInputFormat {
   private static final Log LOG = LogFactory.getLog(H5FileInputFormat.class);
-  public static final String TABLE_PREFIX = "merra2_100_tavg1_2d_int_nx_";
-  public static final String TABLE_POSTFIX = "_nc4";
-  public static final String HDFS_FilePATH_PREFIX = "/merra2/daily/M2T1NXINT/"; //"/Users/feihu/Documents/Data/M2T1NXINT/"; //"/merra2/daily/M2T1NXINT/";
-  public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
-  public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
-  public static final String MERRA2_FILE_POSTFIX = ".nc4";
-  public static final String PRODUCT_NAME = "M2T1NXINT";
 
   @Override
   public List<InputSplit> getSplits(JobContext job) throws IOException {
@@ -50,7 +44,7 @@ public class H5FileInputFormat extends FileInputFormat {
 
     List<String> tableNames = new ArrayList<String>();
     for (String var : varNamesList) {
-      tableNames.add(PRODUCT_NAME + "_" + var);
+      tableNames.add(MyProperty.PRODUCT_NAME + "_" + var);
     }
 
     //List<FileStatus> fileStatusList = listStatus(job);

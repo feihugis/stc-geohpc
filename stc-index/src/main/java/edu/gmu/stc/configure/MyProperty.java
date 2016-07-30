@@ -63,13 +63,31 @@ public class MyProperty {
         public static String geoJSONPath = "/gz_2010_us_040_00_500k.json";
         public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";
 
+        public static final String TABLE_PREFIX = "merra2_100_tavg1_2d_int_nx_";
+        public static final String TABLE_POSTFIX = "_nc4";
+        public static final String HDFS_FilePATH_PREFIX = "/merra2/daily/M2T1NXINT/"; //"/Users/feihu/Documents/Data/M2T1NXINT/"; //"/merra2/daily/M2T1NXINT/";
+        public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
+        public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
+        public static final String MERRA2_FILE_POSTFIX = ".nc4";
+        public static final String PRODUCT_NAME = "M2T1NXINT";
+
         //For localhost
         /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";
         public static String mysql_catalog = "merra2testv2";
         public static String nameNode = "file:////";
-        public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";*/
+        public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
+
+        public static final String TABLE_PREFIX = "merra2_100_tavg1_2d_int_nx_";
+        public static final String TABLE_POSTFIX = "_nc4";
+        public static final String HDFS_FilePATH_PREFIX = "/Users/feihu/Documents/Data/M2T1NXINT/"; //"/merra2/daily/M2T1NXINT/";
+        public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
+        public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
+        public static final String MERRA2_FILE_POSTFIX = ".nc4";
+        public static final String PRODUCT_NAME = "M2T1NXINT";*/
+
+
 
 	public MyProperty() {
 		// TODO Auto-generated constructor stub

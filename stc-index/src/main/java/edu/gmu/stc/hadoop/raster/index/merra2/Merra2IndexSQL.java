@@ -17,6 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.DBConnector;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
@@ -696,8 +697,8 @@ public class Merra2IndexSQL {
           String year = date.substring(0,4);
           String month = date.substring(4,6);
           String day = date.substring(6,8);
-          String filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
-                            + H5FileInputFormat.MERRA2_FILE_PREFIX + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
+          String filepath = MyProperty.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                            + MyProperty.MERRA2_FILE_PREFIX + date + MyProperty.MERRA2_FILE_POSTFIX;
 
           Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
                                                     dimensions, filepos, bytesize, filtermask,
@@ -735,24 +736,27 @@ public class Merra2IndexSQL {
           String datatype = "float"; //rs.getString("datatype");
           //String varshortname = rs.getString("varshortname");
           String date = rs.getString("date");
+          int time = Integer.parseInt(date);
           String year = date.substring(0,4);
           String month = date.substring(4,6);
           String day = date.substring(6,8);
-          int yyyy = Integer.parseInt(year);
-          String filepath = "";
+          int yyyy = time/10000; //Integer.parseInt(year);
+
+          //TODO: filepath need be used in the chunk combination, so it could not be null
+          String filepath = "" + time;
 
           //TODO: even for the same product, it may have different name rule.
-          if (yyyy >= 1992) {
-            filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
-                       + H5FileInputFormat.MERRA2_FILE_PREFIX_Sec + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
+          /*if (yyyy >= 1992) {
+            filepath = MyProperty.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                       + MyProperty.MERRA2_FILE_PREFIX_Sec + date + MyProperty.MERRA2_FILE_POSTFIX;
           } else {
-            filepath = H5FileInputFormat.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
-                       + H5FileInputFormat.MERRA2_FILE_PREFIX + date + H5FileInputFormat.MERRA2_FILE_POSTFIX;
-          }
+            filepath = MyProperty.HDFS_FilePATH_PREFIX + year + "/" + month + "/"
+                       + MyProperty.MERRA2_FILE_PREFIX + date + MyProperty.MERRA2_FILE_POSTFIX;
+          }*/
 
           Merra2Chunk merra2Chunk = new Merra2Chunk(varshortname, filepath, RasterUtils.IntegerToint(corner), RasterUtils.IntegerToint(shape),
                                                     dimensions, filepos, bytesize, filtermask,
-                                                    hosts,datatype);
+                                                    hosts,datatype, time);
           merra2Chunk.setContain(isContain);
           chunkList.add(merra2Chunk);
           rs.next();

@@ -14,6 +14,7 @@ import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
 
 import java.awt.*;
+import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,7 +49,7 @@ public class GeoETL {
       return;
     }
     String jobName = "spark" + args[3] + "-" + args[4] + "-" + args[5].split(",").length + '-' + args[1].split(",").length;
-    final SparkConf sconf = new SparkConf().setAppName(jobName); //.setMaster("local[6]");
+    final SparkConf sconf = new SparkConf().setAppName(jobName);//.setMaster("local[6]");
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
@@ -210,41 +211,54 @@ public class GeoETL {
         new PairFunction<Tuple2<DataChunk, ArrayFloatSerializer>, String, ArrayFloatSerializer>() {
           @Override
           public Tuple2<String, ArrayFloatSerializer> call(Tuple2<DataChunk, ArrayFloatSerializer> tuple2) throws Exception {
-            String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2].substring(0,7); // + "_" + tuple2._1().getCorner()[0];
-
+            //String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getFilePath().split("\\.")[2].substring(0,7); // + "_" + tuple2._1().getCorner()[0];
+            String key = tuple2._1.getVarShortName() + "_" + tuple2._1().getTime()/100;
             return new Tuple2<String, ArrayFloatSerializer>(key, tuple2._2());
           }
         });
 
-    JavaPairRDD<String,Float> meanHourlyRDD = hourlyRDD.groupByKey().mapValues(
-        new Function<Iterable<ArrayFloatSerializer>, Float>() {
+    JavaPairRDD<String, Tuple2<Long, Float>> reduceMonthRDD = hourlyRDD.mapValues(
+        new Function<ArrayFloatSerializer, Tuple2<Long, Float>>() {
           @Override
-          public Float call(Iterable<ArrayFloatSerializer> iterable) throws Exception {
-            Iterator<ArrayFloatSerializer> itor = iterable.iterator();
-            int count = 0;
+          public Tuple2<Long, Float> call(ArrayFloatSerializer v1) throws Exception {
+            Long count = 0L;
             float sum = 0.0f;
-
-            while (itor.hasNext()) {
-              ArrayFloat values = itor.next().getArray();
-              long size = values.getSize();
-              for (int i =0; i<size; i++) {
-                float value = values.getFloat(i);
-                if (value != GeoExtracting.image_fill_value && value < MetaData.MERRA2.fillValue) {
-                  sum = sum + values.getFloat(i);
-                  count++;
-                }
+            ArrayFloat values = v1.getArray();
+            long size = values.getSize();
+            for (int i =0; i<size; i++) {
+              float value = values.getFloat(i);
+              if (value != GeoExtracting.image_fill_value && value < MetaData.MERRA2.fillValue) {
+                sum = sum + values.getFloat(i);
+                count = count + 1;
               }
             }
-            return sum/count;
+            return new Tuple2<Long, Float>(count, sum);
+          }
+        }).reduceByKey(
+        new Function2<Tuple2<Long, Float>, Tuple2<Long, Float>, Tuple2<Long, Float>>() {
+          @Override
+          public Tuple2<Long, Float> call(Tuple2<Long, Float> v1, Tuple2<Long, Float> v2)
+              throws Exception {
+            return new Tuple2<Long, Float>(v1._1()+v2._1(), v2._2()+v2._2());
           }
         });
 
+    JavaPairRDD<String, Float> monthlyMeanRDD = reduceMonthRDD.mapValues(
+        new Function<Tuple2<Long, Float>, Float>() {
+          @Override
+          public Float call(Tuple2<Long, Float> v1) throws Exception {
+            return v1._2()/v1._1();
+          }
+        });
+
+
     //meanHourlyRDD.saveAsTextFile("/Output/Merra2/mean/"+System.currentTimeMillis());
     //meanHourlyRDD.saveAsTextFile("/Users/feihu/Desktop/Merra2/mean/"+System.currentTimeMillis());
-    meanHourlyRDD.foreach(new VoidFunction<Tuple2<String, Float>>() {
+    monthlyMeanRDD.foreach(new VoidFunction<Tuple2<String, Float>>() {
       @Override
       public void call(Tuple2<String, Float> stringFloatTuple2) throws Exception {
-        LOG.info(" +++++++  mean result: " + stringFloatTuple2._1() + "   value :" + stringFloatTuple2._2());
+        System.out.println(" +++++++  mean result: " + stringFloatTuple2._1() + "   value :" + stringFloatTuple2._2());
+        //LOG.info(" +++++++  mean result: " + stringFloatTuple2._1() + "   value :" + stringFloatTuple2._2());
       }
     });
 
