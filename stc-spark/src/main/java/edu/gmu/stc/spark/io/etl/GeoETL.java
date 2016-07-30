@@ -48,7 +48,7 @@ public class GeoETL {
       return;
     }
     String jobName = "spark" + args[3] + "-" + args[4] + "-" + args[5].split(",").length + '-' + args[1].split(",").length;
-    final SparkConf sconf = new SparkConf().setAppName(jobName);//.setMaster("local[6]");
+    final SparkConf sconf = new SparkConf().setAppName(jobName); //.setMaster("local[6]");
     sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
     sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
