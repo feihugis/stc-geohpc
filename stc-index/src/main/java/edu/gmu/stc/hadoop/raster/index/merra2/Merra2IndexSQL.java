@@ -571,9 +571,9 @@ public class Merra2IndexSQL {
     String var = tableName.split("_")[1];
 
     String sql = "SELECT * FROM " + tableName + " AS merra \n"
-                 + "WHERE date >= " + startDate + " AND date <= " + endDate + "\n";
+                 + "WHERE ";
 
-    String geometrySQL = "AND (";
+    String geometrySQL = "";
     for (int i = 0; i < geometryIDs.length; i++) {
       geometrySQL = geometrySQL + "merra.geometryid = " + geometryIDs[i] + " ";
       if (i < geometryIDs.length - 1) {
@@ -581,7 +581,10 @@ public class Merra2IndexSQL {
       }
     }
 
-    geometrySQL = geometrySQL + ") \n";
+    geometrySQL = geometrySQL + " \n";
+
+    String dateSQL = "AND (";
+    dateSQL = dateSQL + "date >= " + startDate + " AND date <= " + endDate + ") \n";
 
     /*String cornerSQL = " AND (";
 
@@ -609,6 +612,8 @@ public class Merra2IndexSQL {
 
     sql = sql + geometrySQL + orderSQL;
     //sql = sql + varSQL + cornerSQL + orderSQL;
+
+    LOG.info(sql);
 
     if (debug) {
       LOG.info(sql);
