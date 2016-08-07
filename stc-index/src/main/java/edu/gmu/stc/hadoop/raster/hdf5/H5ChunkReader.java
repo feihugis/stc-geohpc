@@ -57,12 +57,6 @@ public class H5ChunkReader extends RecordReader<DataChunk, ArrayFloatSerializer>
                  + MyProperty.MERRA2_FILE_PREFIX + date + MyProperty.MERRA2_FILE_POSTFIX;
     }
 
-    System.out.println( " +++++++ " + filepath);
-
-    //filepath = this.h5ChunkInputSplit.getChunkList().get(0).getFilePath();
-
-    System.out.println( " ------- " + filepath);
-
     inputStream = fs.open(new Path(filepath));
     //LOG.info("************************* Start to read");
   }

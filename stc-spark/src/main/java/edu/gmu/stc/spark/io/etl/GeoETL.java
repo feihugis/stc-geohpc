@@ -182,6 +182,8 @@ public class GeoETL {
       }
     }
 
+    LOG.info("***************** GeometryIDs : " + geometryIDs + "   -----   state number: " + stateNames.length);
+
     hconf.set("geometryIDs", geometryIDs);
 
 
@@ -192,6 +194,7 @@ public class GeoETL {
     JavaPairRDD<DataChunk, ArrayFloatSerializer> records = sc.newAPIHadoopRDD(hconf, H5FileInputFormat.class,
                                                                               DataChunk.class,
                                                                               ArrayFloatSerializer.class);
+
     //filter out the data by the mask
     JavaPairRDD<DataChunk, ArrayFloatSerializer> recordsWithCoordinateChanging = records.mapToPair(
         new GeoExtracting.ChunkExtractingByMask(mask)).filter(new Function<Tuple2<DataChunk, ArrayFloatSerializer>, Boolean>() {
