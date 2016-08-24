@@ -1,7 +1,6 @@
 package edu.gmu.stc.hadoop.raster.index.merra2;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.LocatedFileStatus;
@@ -16,7 +15,7 @@ import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.DBConnector;
-import edu.gmu.stc.hadoop.raster.ChunkFactory;
+import edu.gmu.stc.hadoop.raster.ChunkUtils;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.RasterUtils;
 import edu.gmu.stc.hadoop.raster.hdf5.H5ChunkInputSplit;
@@ -72,7 +71,7 @@ public class Merr2IndexBuilder {
         tableName = tableName.replace(".", "_");
       }
       List<DataChunk> merr2ChunkList = new ArrayList<DataChunk>();
-      merr2ChunkList = ChunkFactory.geneDataChunks(path, "nc4");
+      merr2ChunkList = ChunkUtils.geneDataChunks(path, "nc4");
       this.insertdataChunks(tableName, merr2ChunkList);
     }
   }
@@ -82,13 +81,13 @@ public class Merr2IndexBuilder {
   }
 
   public void insertdataChunks(List<String> files, String productName) {
-    List<String> varShortNames = ChunkFactory.getAllVarShortNames(files.get(0));
+    List<String> varShortNames = ChunkUtils.getAllVarShortNames(files.get(0));
     for (String var : varShortNames) {
       List<DataChunk> merr2ChunkList = new ArrayList<DataChunk>();
       String tableName = productName + "_" + var;
       for (String file : files) {
         Path path = new Path(file);
-        merr2ChunkList.addAll(ChunkFactory.geneDataChunksByVar(path, var, "nc4"));
+        merr2ChunkList.addAll(ChunkUtils.geneDataChunksByVar(path, var, "nc4"));
       }
       this.insertdataChunksByVar(tableName, merr2ChunkList);
     }
@@ -97,11 +96,6 @@ public class Merr2IndexBuilder {
   public void insertdataChunksByVar(String tableName, List<DataChunk> chunks) {
     this.sqlOptor.insertDataChunksByVar(tableName, chunks);
   }
-
-
-
-
-
 
   /**
    *

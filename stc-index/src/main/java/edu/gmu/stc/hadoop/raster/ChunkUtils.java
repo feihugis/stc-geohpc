@@ -13,6 +13,7 @@ import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
+import edu.gmu.stc.hadoop.raster.hdf4.H4VarParser;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.NetcdfFile;
@@ -21,10 +22,11 @@ import ucar.nc2.Variable;
 /**
  * Created by Fei Hu on 2/17/16.
  */
-public class ChunkFactory {
+public class ChunkUtils {
   private static FileSystem fs = null;
   private FSDataInputStream fsInput = null;
   private static Configuration conf = new Configuration();
+
   static {
     conf.set("fs.defaultFS", MyProperty.nameNode);
     conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
@@ -40,6 +42,10 @@ public class ChunkFactory {
   public static List<DataChunk> geneDataChunks(Variable var, String dataFormat, String filePath) throws IOException, InvalidRangeException {
     if (dataFormat.equals("netCDF-4") || dataFormat.equals("nc4") || dataFormat.equals("hdf-5") || dataFormat.equals("hdf5")) {
       return  h5VarLocInfoParser(var, filePath);
+    }
+
+    if (dataFormat.equals("hdf4")) {
+      return new H4VarParser().layoutParse(var, filePath, fs);
     }
 
     return null;
@@ -168,6 +174,7 @@ public class ChunkFactory {
   public static String subString(String input, String start, String end) {
     return input.substring(input.indexOf(start) + start.length(), input.indexOf(end));
   }
+
 
 
 }

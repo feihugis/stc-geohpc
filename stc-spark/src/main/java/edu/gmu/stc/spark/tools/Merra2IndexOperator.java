@@ -20,10 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
-import edu.gmu.stc.hadoop.raster.ChunkFactory;
+import edu.gmu.stc.hadoop.raster.ChunkUtils;
 import edu.gmu.stc.hadoop.raster.index.merra2.Merr2IndexBuilder;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
-import ucar.nc2.iosp.IndexChunker;
 
 /**
  * Created by Fei Hu on 3/22/16.
@@ -123,7 +122,7 @@ public class Merra2IndexOperator {
     JavaSparkContext sc = new JavaSparkContext(sconf);
 
     //create index tables by variable names
-    merra2IndexBuilder.createVarIndexTablesInBatch(ChunkFactory.getAllVarShortNames(inputFiles.get(0)), productName);
+    merra2IndexBuilder.createVarIndexTablesInBatch(ChunkUtils.getAllVarShortNames(inputFiles.get(0)), productName);
 
     JavaRDD<String> inputMerra2 = sc.parallelize(inputFiles);
 

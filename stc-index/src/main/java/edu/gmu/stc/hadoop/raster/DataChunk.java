@@ -23,6 +23,7 @@ public class DataChunk implements Writable {
   String filePath;
   boolean isContain = true;
   int time = 0;
+  String geometryInfo = "";
 
   public DataChunk() {}
 
@@ -97,6 +98,8 @@ public class DataChunk implements Writable {
 
     out.writeBoolean(isContain);
     out.writeInt(this.time);
+
+    Text.writeString(out, geometryInfo);
   }
 
   @Override
@@ -133,6 +136,7 @@ public class DataChunk implements Writable {
     filePath = Text.readString(in);
     isContain = in.readBoolean();
     this.time = in.readInt();
+    this.geometryInfo = Text.readString(in);
   }
 
 
@@ -296,4 +300,12 @@ public class DataChunk implements Writable {
   public int getTime() {return  time; }
 
   public void setTime(int time) { this.time = time;}
+
+  public String getGeometryInfo() {
+    return geometryInfo;
+  }
+
+  public void setGeometryInfo(String geometryInfo) {
+    this.geometryInfo = geometryInfo;
+  }
 }

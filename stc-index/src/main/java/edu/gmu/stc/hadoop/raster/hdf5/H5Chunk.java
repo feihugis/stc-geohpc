@@ -1,13 +1,9 @@
 package edu.gmu.stc.hadoop.raster.hdf5;
 
-import org.apache.hadoop.io.Text;
-
-import java.io.DataInput;
-import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
-import edu.gmu.stc.hadoop.raster.ChunkFactory;
+import edu.gmu.stc.hadoop.raster.ChunkUtils;
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.NetcdfFile;
@@ -42,7 +38,7 @@ public class H5Chunk extends DataChunk {
   }
 
   public static void checkChunk(Variable variable, NetcdfFile ncfile) throws IOException, InvalidRangeException {
-    List<DataChunk> chunkList = ChunkFactory.geneDataChunks(variable, ncfile.getFileTypeId(), ncfile.getLocation());
+    List<DataChunk> chunkList = ChunkUtils.geneDataChunks(variable, ncfile.getFileTypeId(), ncfile.getLocation());
     int count = 0;
     long min = Long.MAX_VALUE;
     long max = 0;
