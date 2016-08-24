@@ -573,7 +573,7 @@ public class Merra2IndexSQL {
     String sql = "SELECT * FROM " + tableName + " AS merra \n"
                  + "WHERE ";
 
-    String geometrySQL = "";
+    String geometrySQL = "(";
     for (int i = 0; i < geometryIDs.length; i++) {
       geometrySQL = geometrySQL + "merra.geometryid = " + geometryIDs[i] + " ";
       if (i < geometryIDs.length - 1) {
@@ -581,7 +581,7 @@ public class Merra2IndexSQL {
       }
     }
 
-    geometrySQL = geometrySQL + " \n";
+    geometrySQL = geometrySQL + ") \n";
 
     String dateSQL = "AND (";
     dateSQL = dateSQL + "date >= " + startDate + " AND date <= " + endDate + ") \n";
@@ -610,7 +610,7 @@ public class Merra2IndexSQL {
 
     String orderSQL = "ORDER BY merra.date,merra.filepos,merra.corner;";
 
-    sql = sql + geometrySQL + orderSQL;
+    sql = sql + geometrySQL + dateSQL + orderSQL;
     //sql = sql + varSQL + cornerSQL + orderSQL;
 
     LOG.info(sql);
@@ -673,6 +673,7 @@ public class Merra2IndexSQL {
         continue;
       } else {
         inputSplitList.add(new H5ChunkInputSplit(chunkList));
+
         chunkList = new ArrayList<DataChunk>();
       }
     }
@@ -742,13 +743,13 @@ public class Merra2IndexSQL {
           //String varshortname = rs.getString("varshortname");
           String date = rs.getString("date");
           int time = Integer.parseInt(date);
-          String year = date.substring(0,4);
-          String month = date.substring(4,6);
-          String day = date.substring(6,8);
-          int yyyy = time/10000; //Integer.parseInt(year);
+          //String year = date.substring(0,4);
+          //String month = date.substring(4,6);
+          //String day = date.substring(6,8);
+          //int yyyy = time/10000; //Integer.parseInt(year);
 
           //TODO: filepath need be used in the chunk combination, so it could not be null
-          String filepath = "" + time;
+          String filepath = date;
 
           //TODO: even for the same product, it may have different name rule.
           /*if (yyyy >= 1992) {

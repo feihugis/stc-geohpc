@@ -1,6 +1,8 @@
 package edu.gmu.stc.hadoop.raster.index;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import edu.gmu.stc.hadoop.vector.Polygon;
 import ucar.nc2.iosp.hdf5.H5header;
@@ -61,6 +63,28 @@ public class MetaData {
                                                     new double[]{0.0, 0.0, 0.0, 0.0},
                                                     4));
       return chunkBoundaries;
+    }
+
+    public static List<Integer> xyTogeometryID(double x_min, double y_min, double x_max, double y_max) {
+      int x_corner = (int) ((x_min - lon_orig)/lonUnit);
+      int y_corner = (int) ((y_min - lat_orig)/latUnit);
+      int x_shape = (int) ((x_max - x_min)/lonUnit);
+      int y_shape = (int) ((y_max - y_min)/latUnit);
+
+      int start_geometryID = y_corner/MetaData.MERRA2.latChunkShape*4 + x_corner/MetaData.MERRA2.lonChunkShape;
+      int end_geometryID = (y_corner + y_shape)/MetaData.MERRA2.latChunkShape * 4 + (x_corner + x_shape)/MetaData.MERRA2.lonChunkShape;
+
+      int lon_size = (end_geometryID - start_geometryID)%4;
+      int lat_size = (end_geometryID - start_geometryID)/4;
+      ArrayList<Integer> geometryIDs = new ArrayList<Integer>();
+      for (int y=0; y<=lat_size; y++) {
+        for (int x=0; x<=lon_size; x++) {
+          int geometryID = start_geometryID + y*4 + x;
+          geometryIDs.add(geometryID);
+        }
+      }
+
+      return geometryIDs;
     }
   }
 

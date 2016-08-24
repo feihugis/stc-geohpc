@@ -18,6 +18,7 @@ import java.awt.geom.Arc2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -58,6 +59,7 @@ public class GeoETL {
     String filePath = args[2];
     String startTime = args[3];
     String endTime = args[4];
+    args[5] = "Arizona,California,Nevada,Texas,Utah,Colorado,New Mexico,Nebraska,Oklahoma,Kansas,Louisiana,Arkansas,Missouri,Iowa,Illinois,Mississippi,Tennessee,Kentucky,Alabama,West Virginia,Indiana,Ohio,Pennsylvania,Connecticut,Rhode Island,Massachusetts,New Jersey, Delaware,Maryland,Virginia,North Carolina,South Carolina,Georgia,Florida,Maine,New Hampshire,New York,Vermont,Michigan,Minnesota";
     final String[] stateNames = args[5].split(",");
     final boolean isObject = Boolean.parseBoolean(args[6]);
     boolean isGlobal = Boolean.parseBoolean(args[7]);
@@ -102,6 +104,8 @@ public class GeoETL {
     final double y_orig = -90.0; //MetaData.MERRA2.lat_orig;
     final int interplateScale = 1;
     final int pngScale = 4;
+
+    List<Integer> geometryIDList = new ArrayList<Integer>();
 
     //generate the filter mask
     Tuple2<H5Chunk, ArrayIntSerializer> maskLocal = null;
@@ -150,6 +154,7 @@ public class GeoETL {
         }
       });
 
+
       List<Rectangle> statesBList = stateBoundaries.collect();
       double x_min = Double.MAX_VALUE, x_max = -1 * Double.MAX_VALUE, y_min = Double.MAX_VALUE, y_max = -1 * Double.MAX_VALUE;
       for (Rectangle rectangle : statesBList) {
@@ -157,7 +162,13 @@ public class GeoETL {
         x_max = Math.max(x_max, rectangle.getMaxX());
         y_min = Math.min(y_min, rectangle.getMinY());
         y_max = Math.max(y_max, rectangle.getMaxY());
+        geometryIDList.addAll(MetaData.MERRA2.xyTogeometryID(rectangle.getMinX(), rectangle.getMinY(), rectangle.getMaxX(), rectangle.getMaxY()));
       }
+
+      HashSet h = new HashSet(geometryIDList);
+      geometryIDList.clear();
+      geometryIDList.addAll(h);
+
 
       Rectangle queryBBox = new Rectangle(x_min, y_min, x_max, y_max);
       hconf.set("geoBBox", queryBBox.toWKT());
@@ -169,20 +180,24 @@ public class GeoETL {
 
     //PngFactory.drawPNG(maskLocal._2().getArray(), "/Users/feihu/Desktop/test/boundary" + ".png", 0.0f, 1.0f, null, pngScale);
 
-    int[] bboxcorner = maskLocal._1().getCorner();
+    /*int[] bboxcorner = maskLocal._1().getCorner();
     int[] bboxshape = maskLocal._1().getShape();
     int start_geometry_id = bboxcorner[0]/MetaData.MERRA2.latChunkShape*4 + bboxcorner[1]/MetaData.MERRA2.lonChunkShape;
     int end_geometry_id = (bboxcorner[0] + bboxshape[0])/MetaData.MERRA2.latChunkShape * 4 + (bboxcorner[1] + bboxshape[1])/MetaData.MERRA2.lonChunkShape;
     int lon_size = (end_geometry_id - start_geometry_id)%4;
-    int lat_size = (end_geometry_id - start_geometry_id)/4;
+    int lat_size = (end_geometry_id - start_geometry_id)/4;*/
     String geometryIDs = "";
-    for (int y=0; y<=lat_size; y++) {
+   /* for (int y=0; y<=lat_size; y++) {
       for (int x=0; x<=lon_size; x++) {
         geometryIDs = geometryIDs + (start_geometry_id + y*4 + x) + ",";
       }
+    }*/
+
+    for (Integer id: geometryIDList) {
+      geometryIDs = geometryIDs + id + ",";
     }
 
-    LOG.info("***************** GeometryIDs : " + geometryIDs + "   -----   state number: " + stateNames.length);
+    geometryIDs = "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15";
 
     hconf.set("geometryIDs", geometryIDs);
 

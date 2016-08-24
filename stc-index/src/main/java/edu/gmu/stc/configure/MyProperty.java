@@ -55,7 +55,7 @@ public class MyProperty {
 
         //data container svr-A3-A-U17
         //Index for Merra2
-        public static String mysql_connString = "jdbc:postgresql://10.3.1.16:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        /*public static String mysql_connString = "jdbc:postgresql://10.3.1.16:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "cisc255b";
         public static String mysql_catalog = "merra2datacontainer";
@@ -69,10 +69,10 @@ public class MyProperty {
         public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_POSTFIX = ".nc4";
-        public static final String PRODUCT_NAME = "M2T1NXINT";
+        public static final String PRODUCT_NAME = "M2T1NXINT";*/
 
         //For localhost
-        /*public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";
         public static String mysql_catalog = "merra2testv2";
@@ -85,7 +85,7 @@ public class MyProperty {
         public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_POSTFIX = ".nc4";
-        public static final String PRODUCT_NAME = "M2T1NXINT";*/
+        public static final String PRODUCT_NAME = "M2T1NXINT";
 
 
 
