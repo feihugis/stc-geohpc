@@ -1,8 +1,11 @@
 package edu.gmu.stc.hadoop.raster.hdf4;
 
-import org.apache.hadoop.fs.Path;
-
 import java.io.IOException;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
 import edu.gmu.stc.hadoop.raster.ChunkUtils;
 import edu.gmu.stc.hadoop.raster.DataChunk;
@@ -13,7 +16,9 @@ import ucar.nc2.Variable;
 /**
  * Created by Fei Hu on 8/24/16.
  */
+
 public class H4Chunk extends DataChunk {
+
   public H4Chunk() {
   }
 

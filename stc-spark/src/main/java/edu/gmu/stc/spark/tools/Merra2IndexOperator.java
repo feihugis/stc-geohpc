@@ -126,6 +126,7 @@ public class Merra2IndexOperator {
 
     JavaRDD<String> inputMerra2 = sc.parallelize(inputFiles);
 
+
     inputMerra2.foreach(new VoidFunction<String>() {
       @Override
       public void call(String s) throws Exception {

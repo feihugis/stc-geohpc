@@ -7,22 +7,43 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
 /**
  * Created by Fei Hu on 2/17/16.
  */
+
 public class DataChunk implements Writable {
+  //@Id @GeneratedValue(strategy = GenerationType.AUTO)
+  private int id;
+  //@Column(name = "corner")
   int[] corner = null;         //relative to the whole picture
+  //@Column(name = "shape")
   int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
+  //@Column(name = "dimension")
   String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
+  //@Column(name = "filepos")
   long filePos = 0;            //the start location in the file
+  //@Column(name = "bytesize")
   long byteSize = 0;           // byte size for this chunk
+  //@Column(name = "filtermask")
   int filterMask = -1;         //compression type for HDF4; filter type for HDF5
+  //@Column(name = "hosts")
   String[] hosts = null;       //the data nodes who host these data
+  //@Column(name = "dataType")
   String dataType;             //the data type
+  //@Column(name = "varshortname")
   String varShortName;
+  //@Column(name = "filePath")
   String filePath;
   boolean isContain = true;
+  //@Column(name = "time")
   int time = 0;
+  //@Column(name = "geometryinfo")
   String geometryInfo = "";
 
   public DataChunk() {}
@@ -307,5 +328,13 @@ public class DataChunk implements Writable {
 
   public void setGeometryInfo(String geometryInfo) {
     this.geometryInfo = geometryInfo;
+  }
+
+  public int getId() {
+    return id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 }
