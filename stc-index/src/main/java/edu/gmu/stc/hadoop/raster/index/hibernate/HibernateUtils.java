@@ -63,8 +63,9 @@ public class HibernateUtils {
     dataChunk.setByteSize(101L);
     dataChunk.setTime(2016);
     dataChunk.setCorner(new int[]{1,2,3});
+    dataChunk.setFilePath("/adf/dsfs/dfsdf/asdfsdfsdfsadf/asdfsdfsadfasdf/asdfsdfsdfsdfsa/asdfasdfsdfdfs");
 
-    Criteria criteria = session.createCriteria(DataChunk.class);
+    //Criteria criteria = session.createCriteria(DataChunk.class);
     //criteria.add(Restrictions.gt("time", 1000));
     //List<DataChunk> dataChunkList = criteria.list();
     //System.out.println(criteria.list().size());

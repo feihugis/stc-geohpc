@@ -72,10 +72,10 @@ public class MyProperty {
         public static final String PRODUCT_NAME = "M2T1NXINT";*/
 
         //For localhost
-        public static String mysql_connString = "jdbc:postgresql://localhost:5432/merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_connString = "jdbc:postgresql://localhost:5432/mod08"; //merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";
-        public static String mysql_catalog = "merra2testv2";
+        public static String mysql_catalog = "mod08"; //"merra2testv2";
         public static String nameNode = "file:////";
         public static String geoJSONPath = "/Users/feihu/Desktop/gz_2010_us_040_00_500k.json";
 

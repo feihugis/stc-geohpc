@@ -20,30 +20,18 @@ import javax.persistence.Id;
 public class DataChunk implements Writable {
   //@Id @GeneratedValue(strategy = GenerationType.AUTO)
   private int id;
-  //@Column(name = "corner")
-  int[] corner = null;         //relative to the whole picture
-  //@Column(name = "shape")
-  int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
-  //@Column(name = "dimension")
-  String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
-  //@Column(name = "filepos")
-  long filePos = 0;            //the start location in the file
-  //@Column(name = "bytesize")
-  long byteSize = 0;           // byte size for this chunk
-  //@Column(name = "filtermask")
-  int filterMask = -1;         //compression type for HDF4; filter type for HDF5
-  //@Column(name = "hosts")
-  String[] hosts = null;       //the data nodes who host these data
-  //@Column(name = "dataType")
-  String dataType;             //the data type
-  //@Column(name = "varshortname")
-  String varShortName;
-  //@Column(name = "filePath")
-  String filePath;
-  boolean isContain = true;
-  //@Column(name = "time")
-  int time = 0;
-  //@Column(name = "geometryinfo")
+  private int[] corner = null;         //relative to the whole picture
+  private int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
+  private String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
+  private long filePos = 0;            //the start location in the file
+  private long byteSize = 0;           // byte size for this chunk
+  private int filterMask = -1;         //compression type for HDF4; filter type for HDF5
+  private String[] hosts = null;       //the data nodes who host these data
+  private String dataType;             //the data type
+  private String varShortName;
+  private String filePath;
+  private boolean isContain = true;
+  private int time = 0;
   String geometryInfo = "";
 
   public DataChunk() {}
@@ -77,7 +65,21 @@ public class DataChunk implements Writable {
     this.time = time;
   }
 
-
+  public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
+                   int filterMask, String[] hosts, String dataType, String varShortName, String filePath, int time, String geometryInfo) {
+    this.corner = corner;
+    this.shape = shape;
+    this.dimensions = dimensions;
+    this.filePos = filePos;
+    this.byteSize = byteSize;
+    this.filterMask = filterMask;
+    this.hosts = hosts;
+    this.dataType = dataType;
+    this.varShortName = varShortName;
+    this.filePath = filePath;
+    this.time = time;
+    this.geometryInfo = geometryInfo;
+  }
 
   @Override
   public String toString() {

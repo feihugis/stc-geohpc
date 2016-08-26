@@ -1,5 +1,7 @@
 package edu.gmu.stc.hadoop.raster.hdf4;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -19,6 +21,7 @@ import ucar.nc2.Variable;
  * Created by Fei Hu on 8/24/16.
  */
 public class H4VarParser extends VarLayoutParser {
+  private static final Log LOG = LogFactory.getLog(H4VarParser.class);
 
   @Override
   public List<DataChunk> layoutParse(Variable var, String filePath, FileSystem fs) {
@@ -26,7 +29,10 @@ public class H4VarParser extends VarLayoutParser {
     try {
       String[] chunks = var.getVarLocationInformation().split(";");
       for (String chunk : chunks) {
-        chunkList.add(chunkInfoParser(chunk, var.getDimensionsString(), var.getShortName(), var.getDataType().toString(), filePath, fs));
+        H4Chunk h4Chunk = chunkInfoParser(var.getShape(), chunk, var.getDimensionsString(), var.getShortName(), var.getDataType().toString(), filePath, fs);
+        if (h4Chunk != null) {
+          chunkList.add(h4Chunk);
+        }
       }
       return chunkList;
     } catch (IOException e) {
@@ -50,8 +56,13 @@ public class H4VarParser extends VarLayoutParser {
    * @throws IOException
    */
 
-  private H4Chunk chunkInfoParser(String metaInfo, String dimensions, String varShortName, String dataType,
+  private H4Chunk chunkInfoParser(int[] varShape, String metaInfo, String dimensions, String varShortName, String dataType,
                                     String filePath, FileSystem fs) throws IOException {
+    //TODO: for some special variable, the extended netcdf library does not support them, and the library need be improved.
+    if (metaInfo.contains("Do not support this format of data")) {
+      LOG.error(String.format("The extended NetCDF library does not support the variable %1$s in %2$s", varShortName, filePath));
+      return null;
+    }
     String[] parcels =  metaInfo.split(" ");
     String cnr = parcels[0];
     String[] cnrs = cnr.split(",");
@@ -97,8 +108,10 @@ public class H4VarParser extends VarLayoutParser {
     String[] hsts = new String[hosts.size()];
     hosts.toArray(hsts);
 
+    String geometryInfo = getGeometryInfo(varShape, corners, shape);
+
     H4Chunk h4Chunk = new H4Chunk(corners, shape, dims, filePos, byteSize, filterMask,
-                              hsts, dataType, varShortName, filePath, time);
+                              hsts, dataType, varShortName, filePath, time, geometryInfo);
     return h4Chunk;
   }
 }

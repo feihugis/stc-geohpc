@@ -81,13 +81,12 @@ public class Merr2IndexBuilder {
   }
 
   public void insertdataChunks(List<String> files, String productName) {
-    List<String> varShortNames = ChunkUtils.getAllVarShortNames(files.get(0));
+    List<String> varShortNames = ChunkUtils.getAllVarShortNames(files.get(0), "Data_Fields");
     for (String var : varShortNames) {
       List<DataChunk> merr2ChunkList = new ArrayList<DataChunk>();
       String tableName = productName + "_" + var;
       for (String file : files) {
-        Path path = new Path(file);
-        merr2ChunkList.addAll(ChunkUtils.geneDataChunksByVar(path, var, "nc4"));
+        merr2ChunkList.addAll(ChunkUtils.geneDataChunksByVar(file, var));
       }
       this.insertdataChunksByVar(tableName, merr2ChunkList);
     }

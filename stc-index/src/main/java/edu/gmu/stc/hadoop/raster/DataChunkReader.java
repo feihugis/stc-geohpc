@@ -74,7 +74,7 @@ public class DataChunkReader extends RecordReader<DataChunk, ArrayFloatSerialize
       if (var.getShortName().equals(dataChunk.getVarShortName())) {
         ArrayFloat v = null;
         try {
-           v = (ArrayFloat) var.read(dataChunk.corner, dataChunk.shape);
+           v = (ArrayFloat) var.read(dataChunk.getCorner(), dataChunk.getShape());
         } catch (InvalidRangeException e) {
           e.printStackTrace();
         }

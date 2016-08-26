@@ -23,8 +23,8 @@ public class H4Chunk extends DataChunk {
   }
 
   public H4Chunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
-                 int filterMask, String[] hosts, String dataType, String shortName, String filePath, int time) {
-    super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, filePath, time);
+                 int filterMask, String[] hosts, String dataType, String shortName, String filePath, int time, String geometryInfo) {
+    super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, filePath, time, geometryInfo);
   }
 
   /*

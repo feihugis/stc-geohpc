@@ -15,7 +15,9 @@ import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
 import edu.gmu.stc.hadoop.raster.hdf4.H4VarParser;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
+import edu.gmu.stc.hadoop.raster.hdf5.H5VarParser;
 import ucar.ma2.InvalidRangeException;
+import ucar.nc2.Group;
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.Variable;
 
@@ -41,75 +43,14 @@ public class ChunkUtils {
 
   public static List<DataChunk> geneDataChunks(Variable var, String dataFormat, String filePath) throws IOException, InvalidRangeException {
     if (dataFormat.equals("netCDF-4") || dataFormat.equals("nc4") || dataFormat.equals("hdf-5") || dataFormat.equals("hdf5")) {
-      return  h5VarLocInfoParser(var, filePath);
+      return new H5VarParser().layoutParse(var, filePath, fs);
     }
 
-    if (dataFormat.equals("hdf4")) {
+    if (dataFormat.equals("hdf4") || dataFormat.equals("HDF4-EOS")) {
       return new H4VarParser().layoutParse(var, filePath, fs);
     }
 
     return null;
-  }
-
-  //0:0,0:90,0:143  ChunkedDataNode size=37709 filterMask=0 filePos=72270231 offsets= 0 0 0 0 ;
-  //0:0,0:90,144:287  ChunkedDataNode size=37775 filterMask=0 filePos=72307940 offsets= 0 0 144 0 ;
-  //0:0,0:90,288:431  ChunkedDataNode size=37348 filterMask=0 filePos=72345715 offsets= 0 0 288 0 ;
-  public static List<DataChunk> h5VarLocInfoParser(Variable var, String filePath) throws IOException, InvalidRangeException {
-    List<DataChunk> chunkList = new ArrayList<DataChunk>();
-    String[] chunks = var.getVarLocationInformation().split(";");
-    for (String chunk : chunks) {
-      //System.out.println(chunk);
-      chunkList.add(h5ChunkInfoParser(chunk, var.getDimensionsString(), var.getShortName(), filePath, var.getDataType().toString()));
-    }
-    return chunkList;
-  }
-
-  /**
-   * TODO: fix the time extraction, here it treat the last second one as the time info
-   * @param metaInfo
-   * @param dimensions
-   * @param varShortName
-   * @param filePath
-   * @param dataType
-   * @return
-   * @throws IOException
-   */
-  //0:0,0:90,288:431  ChunkedDataNode size=37348 filterMask=0 filePos=72345715 offsets= 0 0 288 0
-  public static H5Chunk h5ChunkInfoParser(String metaInfo, String dimensions, String varShortName, String filePath, String dataType)
-      throws IOException {
-    String cnr = metaInfo.substring(0, metaInfo.indexOf("  ChunkedDataNode"));
-    String[] tmps = filePath.split("\\.");
-    int time = Integer.parseInt(tmps[tmps.length-2]);
-
-    String byteSizeIn = subString(metaInfo, "size=", " filterMask=");
-    String filterMaskIn = subString(metaInfo, "filterMask=", " filePos=");
-    String filePosIn = subString(metaInfo, "filePos=", " offsets");
-
-    String[] cnrs = cnr.split(",");
-    int corners[] = new int[cnrs.length];
-    int shape[] = new int[cnrs.length];
-    for (int i=0; i<cnrs.length; i++) {
-      String[] r = cnrs[i].split(":");
-      corners[i] = Integer.parseInt(r[0]);
-      shape[i] = Integer.parseInt(r[1]) - Integer.parseInt(r[0]) + 1;
-    }
-
-    long byteSize = Long.parseLong(byteSizeIn);
-    long filePos = Long.parseLong(filePosIn);
-    int filterMask = Integer.parseInt(filterMaskIn);
-
-    String[] dims = dimensions.split(" ");
-
-    BlockLocation[] blockLocations = fs.getFileBlockLocations(fs.getFileLinkStatus(new Path(filePath)), filePos, byteSize);
-    List<String> hosts = new ArrayList<String>();
-    for (BlockLocation blck: blockLocations) {
-      hosts.addAll(Arrays.asList(blck.getHosts()));
-    }
-    String[] hsts = new String[hosts.size()];
-    hosts.toArray(hsts);
-    H5Chunk h5Chunk = new H5Chunk(varShortName, filePath, corners, shape, dims, filePos, byteSize, filterMask,
-                                  hsts, dataType, time);
-    return h5Chunk;
   }
 
   public static List<DataChunk> geneDataChunks(Path path, String fileFormat) {
@@ -117,9 +58,11 @@ public class ChunkUtils {
     try {
       NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
       NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
+      String dataformat = ncfile.getFileTypeId();
       List<Variable> variableList = ncfile.getVariables();
+
       for (Variable var : variableList) {
-        chunkList.addAll(geneDataChunks(var, "nc4", path.toString()));
+        chunkList.addAll(geneDataChunks(var, dataformat, path.toString()));
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -129,15 +72,23 @@ public class ChunkUtils {
     return chunkList;
   }
 
-  public static List<DataChunk> geneDataChunksByVar(Path path, String varShortName, String fileFormat) {
+  /**
+   * TODO: need improve the efficiency
+   * @param filePath
+   * @param varShortName
+   * @return
+   */
+  public static List<DataChunk> geneDataChunksByVar(String filePath, String varShortName) {
+    Path path = new Path(filePath);
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     try {
       NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
       NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
+      String fileformat = ncfile.getFileTypeId();
       List<Variable> variableList = ncfile.getVariables();
       for (Variable var : variableList) {
         if (var.getShortName().equals(varShortName)) {
-          chunkList.addAll(geneDataChunks(var, "nc4", path.toString()));
+          chunkList.addAll(geneDataChunks(var, fileformat, path.toString()));
         }
       }
     } catch (IOException e) {
@@ -148,13 +99,25 @@ public class ChunkUtils {
     return chunkList;
   }
 
-  public static List<String> getAllVarShortNames(String fileInput) {
+  public static List<String> getAllVarShortNames(String fileInput, String groupName) {
     Path path = new Path(fileInput);
     List<String> varsList = new ArrayList<String>();
     try {
       NcHdfsRaf raf = new NcHdfsRaf(fs.getFileStatus(path), fs.getConf());
       NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
-      List<Variable> variableList = ncfile.getVariables();
+
+      // null means no group in this datasat
+      if (groupName == null) {
+        List<Variable> variableList = ncfile.getVariables();
+        for (Variable var : variableList) {
+          varsList.add(var.getShortName());
+        }
+        return varsList;
+      }
+
+      List<Group> groupList = ncfile.getRootGroup().getGroups();
+      Group group = findGroup(ncfile.getRootGroup(), groupName);
+      List<Variable> variableList = group.getVariables();
       for (Variable var : variableList) {
         varsList.add(var.getShortName());
       }
@@ -162,6 +125,25 @@ public class ChunkUtils {
       e.printStackTrace();
     }
     return varsList;
+  }
+
+  public static Group findGroup(Group rootGroup, String groupName) {
+    List<Group> groupList = rootGroup.getGroups();
+    Group targetGroup = null;
+
+    for (Group group : groupList) {
+      if (group.getShortName().equals(groupName)) {
+        targetGroup = group;
+        return targetGroup;
+      } else {
+        targetGroup = findGroup(group, groupName);
+        if (targetGroup != null) {
+          return targetGroup;
+        }
+      }
+    }
+
+    return targetGroup;
   }
 
   /**

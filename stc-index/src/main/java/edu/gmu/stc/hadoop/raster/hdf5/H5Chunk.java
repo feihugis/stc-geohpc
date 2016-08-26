@@ -27,6 +27,12 @@ public class H5Chunk extends DataChunk {
     super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, path, time);
   }
 
+  public H5Chunk(String shortName, String path, int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
+                 int filterMask, String[] hosts, String dataType, int time, String geometryInfo) {
+    super(corner, shape, dimensions, filePos, byteSize, filterMask, hosts, dataType, shortName, path, time, geometryInfo);
+  }
+
+
   @Override
   public String toString() {
     String output = this.getVarShortName() + " corner : ";

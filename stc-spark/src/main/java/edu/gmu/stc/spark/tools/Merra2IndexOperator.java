@@ -122,7 +122,7 @@ public class Merra2IndexOperator {
     JavaSparkContext sc = new JavaSparkContext(sconf);
 
     //create index tables by variable names
-    merra2IndexBuilder.createVarIndexTablesInBatch(ChunkUtils.getAllVarShortNames(inputFiles.get(0)), productName);
+    merra2IndexBuilder.createVarIndexTablesInBatch(ChunkUtils.getAllVarShortNames(inputFiles.get(0), "Data_Fields"), productName);
 
     JavaRDD<String> inputMerra2 = sc.parallelize(inputFiles);
 

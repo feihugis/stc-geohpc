@@ -284,11 +284,11 @@ public class Merra2IndexSQL {
 
         Polygon polygon = chunk.getBoundary();
         ps.setObject(11, polygon.toPostGISPGgeometry());
+        ps.addBatch();
         count++;
         if ( count%500 == 0 || count == chunks.size()) {
           ps.executeBatch();
         }
-        ps.addBatch();
       }
     } catch (SQLException e) {
       e.printStackTrace();

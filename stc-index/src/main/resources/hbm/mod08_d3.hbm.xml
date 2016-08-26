@@ -14,5 +14,6 @@
         <property name="filePos" column="filpos" type="long"/>
         <property name="byteSize" column="bytesize" type="long"/>
         <property name="time" column="time" type="int"/>
+        <property name="filePath" column="filepath" type="java.lang.String"/>
     </class>
 </hibernate-mapping>

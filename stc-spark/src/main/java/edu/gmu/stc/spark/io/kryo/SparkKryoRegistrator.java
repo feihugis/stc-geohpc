@@ -4,6 +4,9 @@ import com.esotericsoftware.kryo.Kryo;
 
 import org.apache.spark.serializer.KryoRegistrator;
 
+import edu.gmu.stc.hadoop.raster.DataChunk;
+import edu.gmu.stc.hadoop.raster.index.DataChunkIndexBuilderImp;
+
 /**
  * Created by Fei Hu on 3/17/16.
  */
@@ -22,6 +25,8 @@ public class SparkKryoRegistrator implements KryoRegistrator {
       kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.hdf5.H5Chunk"));
       kryo.register(Class.forName("ucar.ma2.ArrayInt"));
       kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.hdf5.Merra2Chunk"));
+      //kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.index.DataChunkIndexBuilderImp"));
+      kryo.register(DataChunkIndexBuilderImp.class);
 
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
