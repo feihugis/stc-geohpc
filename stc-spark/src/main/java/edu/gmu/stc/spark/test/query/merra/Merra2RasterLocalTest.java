@@ -5,7 +5,6 @@ import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.sql.SQLContext;
 
@@ -13,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import scala.Tuple2;
 import ucar.ma2.Array;

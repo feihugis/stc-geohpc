@@ -3,7 +3,6 @@ package edu.gmu.stc.spark.test.query.merra;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.apache.log4j.net.SyslogAppender;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -15,13 +14,11 @@ import org.apache.spark.api.java.function.PairFunction;
 import java.util.List;
 
 import edu.gmu.stc.datavisualization.netcdf.PngFactory;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
-import edu.gmu.stc.hadoop.raster.index.MetaData;
 import edu.gmu.stc.hadoop.vector.Point;
 import edu.gmu.stc.hadoop.vector.Polygon;
 import edu.gmu.stc.hadoop.vector.Rectangle;
-import edu.gmu.stc.hadoop.vector.VectorOptor;
 import edu.gmu.stc.hadoop.vector.extension.CountyFeature;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyMultiPolygonJSON;
 import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyPolygonJSON;

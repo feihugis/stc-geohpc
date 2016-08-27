@@ -56,8 +56,17 @@ public class DBConnector {
 		this.password = password;
 		this.catalog = catalog;
 		this.connection = this.Connect(connString, user, password, catalog);
-
-	}
+                try {
+                  System.out.println("connected" + this.connString + this.user + this.password + this.catalog);
+                  this.statement = this.connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE,
+                                                                   ResultSet.HOLD_CURSORS_OVER_COMMIT);
+                  System.out.println("statement created");
+                } catch (Exception e) {
+                  System.out.println("Cannot createStatement===");
+                  System.out.print(e);
+                  // System.exit(0);
+                }
+        }
 
 	public DBConnector() {
 		super();

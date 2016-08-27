@@ -13,20 +13,15 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
 
-import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
-import edu.gmu.stc.datavisualization.netcdf.PngFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import edu.gmu.stc.hadoop.raster.index.MetaData;

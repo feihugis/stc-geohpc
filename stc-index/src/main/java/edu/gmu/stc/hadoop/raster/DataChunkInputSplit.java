@@ -18,20 +18,12 @@ import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 public class DataChunkInputSplit extends InputSplit implements Writable {
   protected List<DataChunk> chunkList = new ArrayList<DataChunk>();  //Each data chunk should be located on the same hosts
 
-  public List<DataChunk> getChunkList() {
-    return chunkList;
-  }
+  public DataChunkInputSplit() {
 
-  public void setChunkList(List<DataChunk> chunkList) {
-    this.chunkList = chunkList;
   }
 
   public DataChunkInputSplit(List<DataChunk> chunkList) {
     this.chunkList = chunkList;
-  }
-
-  public DataChunkInputSplit() {
-
   }
 
   @Override
@@ -62,5 +54,13 @@ public class DataChunkInputSplit extends InputSplit implements Writable {
       chunkList.add(chunk);
       n = n -1;
     }
+  }
+
+  public List<DataChunk> getChunkList() {
+    return chunkList;
+  }
+
+  public void setChunkList(List<DataChunk> chunkList) {
+    this.chunkList = chunkList;
   }
 }

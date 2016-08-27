@@ -252,6 +252,13 @@ public class DataChunk implements Writable {
     return shape;
   }
 
+  public int getShapeSize() {
+    int size = 1;
+    for (int i : shape) {
+      size = size * i;
+    }
+    return size;
+  }
   public void setShape(int[] shape) {
     this.shape = shape;
   }

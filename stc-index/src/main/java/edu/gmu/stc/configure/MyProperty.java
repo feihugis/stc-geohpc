@@ -72,6 +72,7 @@ public class MyProperty {
         public static final String PRODUCT_NAME = "M2T1NXINT";*/
 
         //For localhost
+        public static String db_host = "jdbc:postgresql://localhost:5432/";
         public static String mysql_connString = "jdbc:postgresql://localhost:5432/mod08"; //merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";

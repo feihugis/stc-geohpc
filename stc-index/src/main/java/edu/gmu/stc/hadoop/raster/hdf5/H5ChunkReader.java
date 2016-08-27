@@ -9,7 +9,6 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.RecordReader;
 import org.apache.hadoop.mapreduce.TaskAttemptContext;
-import org.apache.hadoop.yarn.util.SystemClock;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,6 +19,7 @@ import java.nio.FloatBuffer;
 
 import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.raster.DataChunk;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
 import ucar.nc2.util.IO;
 
 /**

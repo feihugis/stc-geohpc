@@ -1,7 +1,6 @@
 package edu.gmu.stc.spark.io.etl;
 
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.yarn.util.SystemClock;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
@@ -20,8 +19,8 @@ import java.util.List;
 
 import edu.gmu.stc.datavisualization.netcdf.PngFactory;
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import edu.gmu.stc.hadoop.vector.Rectangle;

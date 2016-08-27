@@ -6,6 +6,8 @@ import org.apache.spark.serializer.KryoRegistrator;
 
 import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.index.DataChunkIndexBuilderImp;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayShortSerializer;
 
 /**
  * Created by Fei Hu on 3/17/16.
@@ -19,8 +21,12 @@ public class SparkKryoRegistrator implements KryoRegistrator {
       kryo.register(Class.forName("org.apache.hadoop.io.Writable"));
       kryo.register(Class.forName("edu.gmu.stc.hadoop.vector.Polygon"));
       kryo.register(Class.forName("org.apache.hadoop.io.LongWritable"));
-      kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer"));
-      kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer"));
+
+      kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer"));
+      kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer"));
+      kryo.register(ArrayShortSerializer.class);
+      kryo.register(ArraySerializer.class);
+
       kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.DataChunk"));
       kryo.register(Class.forName("edu.gmu.stc.hadoop.raster.hdf5.H5Chunk"));
       kryo.register(Class.forName("ucar.ma2.ArrayInt"));

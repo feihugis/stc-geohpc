@@ -15,6 +15,7 @@ import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
 import edu.gmu.stc.hadoop.raster.hdf4.H4VarParser;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
+import edu.gmu.stc.hadoop.raster.hdf5.H5ChunkInputSplit;
 import edu.gmu.stc.hadoop.raster.hdf5.H5VarParser;
 import ucar.ma2.InvalidRangeException;
 import ucar.nc2.Group;
@@ -99,6 +100,23 @@ public class ChunkUtils {
     return chunkList;
   }
 
+  public static List<DataChunkInputSplit> generateInputSplitByHosts(List<DataChunk> dataChunkList) {
+    List<DataChunkInputSplit> inputSplitList = new ArrayList<DataChunkInputSplit>();
+    List<DataChunk> chunkList = new ArrayList<DataChunk>();
+    dataChunkList.add(null);
+    for(int i=0; i<dataChunkList.size()-1; i++) {
+      chunkList.add(dataChunkList.get(i));
+      if (ChunkUtils.isShareHosts(dataChunkList.get(i), dataChunkList.get(i+1))
+          && dataChunkList.get(i).getFilePath().equals(dataChunkList.get(i+1).getFilePath())) {
+        continue;
+      } else {
+        inputSplitList.add(new DataChunkInputSplit(chunkList));
+        chunkList = new ArrayList<DataChunk>();
+      }
+    }
+    return inputSplitList;
+  }
+
   public static List<String> getAllVarShortNames(String fileInput, String groupName) {
     Path path = new Path(fileInput);
     List<String> varsList = new ArrayList<String>();
@@ -144,6 +162,23 @@ public class ChunkUtils {
     }
 
     return targetGroup;
+  }
+
+  public static boolean isShareHosts(DataChunk chunk1, DataChunk chunk2) {
+    if (chunk2 == null) {
+      return false;
+    }
+    String[] hosts1 = chunk1.getHosts();
+    String[] hosts2 = chunk2.getHosts();
+
+    for (int i=0; i<hosts1.length; i++) {
+      for (int j = 0; j < hosts2.length; j++) {
+        if (hosts1[i].equals(hosts2[j])) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**

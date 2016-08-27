@@ -69,6 +69,7 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
                        + "geometryInfo character varying(255),"
                        + "CONSTRAINT id" + tableName + " PRIMARY KEY (id)"
                        + ");";
+    System.out.println(create_table_SQL);
     LOG.info("++++++++++  Create DataChunk Index Table by " + " ---" + create_table_SQL);
 
     try {
@@ -154,7 +155,6 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
   public String expandFilePath(String filePath, String prefix, String suffix) {
     filePath = filePath.replace("+", prefix);
     filePath = filePath.replace("!", suffix);
-    filePath = prefix + filePath + suffix;
     return  filePath;
   }
 
@@ -276,7 +276,6 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
     //output.writeString(this.file_suffix);
     kryo.writeClassAndObject(output, this.file_prefix);
     kryo.writeClassAndObject(output, this.file_suffix);
-
   }
 
   //@Override

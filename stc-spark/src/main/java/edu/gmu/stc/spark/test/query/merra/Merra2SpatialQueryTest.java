@@ -14,15 +14,13 @@ import org.apache.spark.api.java.function.PairFunction;
 import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import edu.gmu.stc.datavisualization.netcdf.PngFactory;
-import edu.gmu.stc.datavisualization.netcdf.test.NetCDFManager;
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import edu.gmu.stc.hadoop.vector.Point;
@@ -35,7 +33,6 @@ import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 import scala.Tuple2;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
-import ucar.ma2.ArrayInt;
 import ucar.ma2.Index;
 import ucar.ma2.Index2D;
 import ucar.ma2.Index3D;

@@ -1,4 +1,4 @@
-package edu.gmu.stc.hadoop.raster.hdf5;
+package edu.gmu.stc.hadoop.raster.io.datastructure;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.KryoSerializable;
@@ -19,11 +19,15 @@ import ucar.ma2.ArrayInt;
 /**
  * Created by Fei Hu on 3/13/16.
  */
-public class ArrayIntSerializer implements Writable, KryoSerializable {
+public class ArrayIntSerializer extends ArraySerializer {
   ArrayInt array;
 
   public ArrayIntSerializer() {
 
+  }
+
+  public ArrayIntSerializer(ArrayInt arrayInt) {
+    this.array = arrayInt;
   }
 
   public ArrayIntSerializer(int[] shape, int[] data) {
@@ -32,6 +36,11 @@ public class ArrayIntSerializer implements Writable, KryoSerializable {
 
   public ArrayInt getArray() {
     return array;
+  }
+
+  @Override
+  public void setArray(Array array) {
+    this.array = (ArrayInt) array;
   }
 
   @Override

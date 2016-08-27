@@ -4,15 +4,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.sql.columnar.BOOLEAN;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 
@@ -27,8 +24,8 @@ import edu.gmu.stc.datavisualization.taylordiagram.TaylorDiagramFactory;
 import edu.gmu.stc.datavisualization.taylordiagram.TaylorDiagramUnit;
 import edu.gmu.stc.hadoop.index.io.merra.NcHdfsRaf;
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.DataChunkInputFormat;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.DataChunkInputFormatWithoutIndex;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
 import edu.gmu.stc.spark.io.kryo.SparkKryoRegistrator;
 import scala.Tuple2;
 import ucar.ma2.ArrayFloat;
@@ -240,7 +237,7 @@ public class TaylorDiagramAnalysis {
     eraIntrimConf.setInt("startDate", startTime);
     eraIntrimConf.setInt("endDate", endTime);
 
-    JavaPairRDD<DataChunk, ArrayFloatSerializer> records = sc.newAPIHadoopRDD(eraIntrimConf, DataChunkInputFormat.class,
+    JavaPairRDD<DataChunk, ArrayFloatSerializer> records = sc.newAPIHadoopRDD(eraIntrimConf, DataChunkInputFormatWithoutIndex.class,
                                                                                        DataChunk.class,
                                                                                        ArrayFloatSerializer.class);
     JavaPairRDD<String, Tuple2<Float,Long>> sumCount = records.mapToPair(

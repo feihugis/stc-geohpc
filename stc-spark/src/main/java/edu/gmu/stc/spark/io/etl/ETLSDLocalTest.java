@@ -8,17 +8,15 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.api.java.function.Function;
 import org.apache.spark.api.java.function.Function2;
 import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.api.java.function.VoidFunction;
 import org.apache.spark.broadcast.Broadcast;
 import org.apache.spark.storage.StorageLevel;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import edu.gmu.stc.hadoop.raster.DataChunk;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayFloatSerializer;
-import edu.gmu.stc.hadoop.raster.hdf5.ArrayIntSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayIntSerializer;
 import edu.gmu.stc.hadoop.raster.hdf5.H5Chunk;
 import edu.gmu.stc.hadoop.raster.hdf5.H5FileInputFormat;
 import edu.gmu.stc.hadoop.raster.index.MetaData;
