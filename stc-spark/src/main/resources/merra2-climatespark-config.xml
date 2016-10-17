@@ -1,0 +1,116 @@
+<configuration>
+    <property>
+        <name>db.host</name>
+        <value>jdbc:postgresql://localhost</value>
+    </property>
+
+    <property>
+        <name>db.port</name>
+        <value>5432</value>
+    </property>
+
+    <property>
+        <name>db.databasename</name>
+        <value>m2t1nxint</value>
+        <description> dabasename is the name of the data product</description>
+    </property>
+
+    <property>
+        <name>db.username</name>
+        <value>feihu</value>
+    </property>
+
+    <property>
+        <name>db.pwd</name>
+        <value>feihu</value>
+    </property>
+
+    <!--++++++++++++++++++++++ HDFS Configuration ++++++++++++++++++++++-->
+    <property>
+        <name>fs.defaultFS</name>
+        <value>file:////</value>
+    </property>
+
+    <property>
+        <name>fs.hdfs.impl</name>
+        <value>org.apache.hadoop.hdfs.DistributedFileSystem</value>
+    </property>
+
+    <property>
+        <name>fs.file.impl</name>
+        <value>org.apache.hadoop.fs.LocalFileSystem</value>
+    </property>
+
+    <property>
+        <name>mapreduce.input.fileinputformat.input.dir.recursive</name>
+        <value>true</value>
+    </property>
+
+    <!--++++++++++++++++++++++ Spatiotemporal Index Configuration ++++++++++++++++++++++-->
+    <property>
+        <name>mapreduce.input.fileinputformat.inputdir</name>
+        <value>/Users/feihu/Documents/Data/M2T1NXINT/1980/01/</value>
+    </property>
+
+    <property>
+        <name>index.filepath.prefix</name>
+        <value>/Users/feihu/Documents/Data/M2T1NXINT/1980/01/MERRA2_100.tavg1_2d_int_Nx.</value>
+    </property>
+
+    <property>
+        <name>index.filepath.suffix</name>
+        <value>.nc4</value>
+    </property>
+
+    <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
+    <property>
+        <name>query.variable.names</name>
+        <value>LWGNET</value>
+        <description>it support multiple input variables, which are separated by comma</description>
+    </property>
+
+    <property>
+        <name>query.time.start</name>
+        <value>19800101</value>
+    </property>
+
+    <property>
+        <name>query.time.end</name>
+        <value>19800101</value>
+    </property>
+
+    <property>
+        <name>query.geometry.info</name>
+        <value>0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15</value>
+    </property>
+
+    <property>
+        <name>query.space.corner</name>
+        <value>0,0,0</value>
+        <description>the dimensions of corner should be same with that of the variable; leaving it blank means no input corner</description>
+    </property>
+
+    <property>
+        <name>query.space.shape</name>
+        <value>24,361,576</value>
+        <description>the dimensions of shape should be same with that of the variable; leaving it blank means no input shape</description>
+    </property>
+
+    <!--++++++++++++++++++++++ Input Climate Data MetaData ++++++++++++++++++++++-->
+    <property>
+        <name>climate.data.format</name>
+        <value>nc4</value>
+    </property>
+
+    <property>
+        <name>climate.data.product</name>
+        <value>m2t1nxint</value>
+        <description>this product name should be same with the dabase name</description>
+    </property>
+
+    <property>
+        <name>climate.data.product.group</name>
+        <value>null</value>
+        <description>null means no group in this datasat</description>
+    </property>
+</configuration>

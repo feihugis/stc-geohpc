@@ -1,5 +1,7 @@
 package edu.gmu.stc.hadoop.raster.hdf5;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.fs.BlockLocation;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -18,6 +20,7 @@ import ucar.nc2.Variable;
  * Created by Fei Hu on 8/24/16.
  */
 public class H5VarParser extends VarLayoutParser {
+  private static final Log LOG = LogFactory.getLog(H5VarParser.class);
 
   @Override
   public List<DataChunk> layoutParse(Variable var, String filePath, FileSystem fs) {
@@ -61,8 +64,14 @@ public class H5VarParser extends VarLayoutParser {
     }
     String[] dims = dimensions.split(" ");
 
-    String[] tmps = filePath.split("\\.");
-    int time = Integer.parseInt(tmps[tmps.length-2]);
+    int time = 0;
+    //TODO: need support more data set
+    if (filePath.contains("MERRA")) {
+      String[] tmps = filePath.split("\\.");
+      time = Integer.parseInt(tmps[tmps.length-2]);
+    } else {
+      LOG.error("Do not support this time interpretation in " + filePath);
+    }
 
     String byteSizeIn = subString(metaInfo, "size=", " filterMask=");
     String filterMaskIn = subString(metaInfo, "filterMask=", " filePos=");

@@ -11,6 +11,8 @@ import org.apache.hadoop.io.Text;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -51,6 +53,22 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
     this.file_suffix = file_suffix;
   }
 
+  @Override
+  public void createDatabase(String databaseName, String userName, Statement statement) {
+    String create_database_SQL;
+    create_database_SQL = "CREATE DATABASE " + databaseName + " WITH OWNER = " + userName;
+
+    LOG.info("++++++++++  Create Database Index Table by " + " ---" + create_database_SQL);
+
+    try {
+      statement.execute(create_database_SQL);
+    } catch (SQLException e) {
+      LOG.error(e.toString());
+      e.printStackTrace();
+    }
+
+  }
+
   public void createTable(String tableName, Statement statement) {
     String create_table_SQL;
     create_table_SQL = "CREATE TABLE public." + tableName + "("
@@ -69,12 +87,13 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
                        + "geometryInfo character varying(255),"
                        + "CONSTRAINT id" + tableName + " PRIMARY KEY (id)"
                        + ");";
-    System.out.println(create_table_SQL);
+
     LOG.info("++++++++++  Create DataChunk Index Table by " + " ---" + create_table_SQL);
 
     try {
       statement.execute(create_table_SQL);
     } catch (SQLException e) {
+      LOG.error(e.toString());
       e.printStackTrace();
     }
   }
@@ -188,6 +207,7 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
       return dataChunkList;
     } catch (SQLException e) {
       e.printStackTrace();
+      //new Exception(query_dataChunk_SQL);
     }
 
     return null;
@@ -240,6 +260,11 @@ public class DataChunkIndexBuilderImp implements DataChunkIndexBuilder{
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  public void dropDatabase(String databaseName, Statement statement) {
+
   }
 
   public String getFile_prefix() {

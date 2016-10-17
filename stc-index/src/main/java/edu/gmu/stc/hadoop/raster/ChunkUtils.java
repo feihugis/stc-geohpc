@@ -27,14 +27,14 @@ import ucar.nc2.Variable;
  */
 public class ChunkUtils {
   private static FileSystem fs = null;
-  private FSDataInputStream fsInput = null;
   private static Configuration conf = new Configuration();
 
   static {
-    conf.set("fs.defaultFS", MyProperty.nameNode);
-    conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
-    conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
-    conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
+    //conf.addResource(new Path(MyProperty.ClimateHadoop_Config_FilePath));
+    //conf.set("fs.defaultFS", MyProperty.nameNode);
+    //conf.set("fs.hdfs.impl", org.apache.hadoop.hdfs.DistributedFileSystem.class.getName());
+    //conf.set("fs.file.impl", org.apache.hadoop.fs.LocalFileSystem.class.getName());
+    //conf.setBoolean("mapreduce.input.fileinputformat.input.dir.recursive", true);
     try {
       fs = FileSystem.get(conf);
     } catch (IOException e) {
@@ -125,7 +125,7 @@ public class ChunkUtils {
       NetcdfFile ncfile = NetcdfFile.open(raf, path.toString());
 
       // null means no group in this datasat
-      if (groupName == null) {
+      if (groupName == null || groupName.equals("null")) {
         List<Variable> variableList = ncfile.getVariables();
         for (Variable var : variableList) {
           varsList.add(var.getShortName());
@@ -143,6 +143,16 @@ public class ChunkUtils {
       e.printStackTrace();
     }
     return varsList;
+  }
+
+  public static List<String> getSpecifiedVariables(String fileInput, String groupName, String variables) {
+
+    if (variables != null) {
+      String[] vars = variables.split(",");
+      return Arrays.asList(vars);
+    } else {
+      return getAllVarShortNames(fileInput, groupName);
+    }
   }
 
   public static Group findGroup(Group rootGroup, String groupName) {
@@ -179,6 +189,41 @@ public class ChunkUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * Get the intersection between two input array boundary
+   * @param orgCorner
+   * @param orgShape
+   * @param queryCorner
+   * @param queryShape
+   * @param targetCorner
+   * @param targetShape
+   * @return
+   */
+  public static boolean getIntersection(int[] orgCorner, int[] orgShape, int[] queryCorner, int[] queryShape, int[] targetCorner, int[] targetShape) {
+    if (orgCorner.length != queryCorner.length) {
+      return  false;
+    }
+
+    int[] orgEnd = new int[orgCorner.length], queryEnd = new int[queryCorner.length];
+
+    for (int i=0; i<orgCorner.length; i++) {
+      orgEnd[i] = orgCorner[i] + orgShape[i] - 1;
+      queryEnd[i] = queryCorner[i] + queryShape[i] - 1;
+      if ((orgCorner[i]<queryCorner[i]&&orgEnd[i]<queryCorner[i]) || (orgCorner[i]>queryEnd[i]&&orgEnd[i]>queryEnd[i])) {
+        return false;
+      }
+    }
+
+    int[] targetEnd = new int[orgCorner.length];
+    for (int i=0; i<orgCorner.length; i++) {
+      targetCorner[i] = Math.max(orgCorner[i], queryCorner[i]);
+      targetEnd[i] = Math.min(orgEnd[i], queryEnd[i]);
+      targetShape[i] = targetEnd[i] - targetCorner[i] + 1;
+    }
+
+    return true;
   }
 
   /**

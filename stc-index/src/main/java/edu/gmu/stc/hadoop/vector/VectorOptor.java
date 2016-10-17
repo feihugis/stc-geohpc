@@ -1,7 +1,5 @@
 package edu.gmu.stc.hadoop.vector;
 
-import org.apache.spark.sql.catalyst.expressions.If;
-
 /**
  * Created by Fei Hu on 3/11/16.
  */

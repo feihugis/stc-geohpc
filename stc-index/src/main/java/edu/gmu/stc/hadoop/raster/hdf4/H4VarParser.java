@@ -23,15 +23,29 @@ import ucar.nc2.Variable;
 public class H4VarParser extends VarLayoutParser {
   private static final Log LOG = LogFactory.getLog(H4VarParser.class);
 
+  /**
+   *
+   * @param var
+   * @param filePath
+   * @param fs
+   * @return
+   */
   @Override
   public List<DataChunk> layoutParse(Variable var, String filePath, FileSystem fs) {
     List<DataChunk> chunkList = new ArrayList<DataChunk>();
     try {
+      /*
+      Notice that it is ended with a blank space
+      0:0,0:360,0:539 start at 50667094, length is 778, compress code is 4; 1:1,0:360,0:539 start at 116708026, length is 778, compress code is 4;
+      23:23,0:360,0:539 start at 1563508948, length is 778, compress code is 4; ------
+      * */
       String[] chunks = var.getVarLocationInformation().split(";");
       for (String chunk : chunks) {
-        H4Chunk h4Chunk = chunkInfoParser(var.getShape(), chunk, var.getDimensionsString(), var.getShortName(), var.getDataType().toString(), filePath, fs);
-        if (h4Chunk != null) {
-          chunkList.add(h4Chunk);
+        if (chunk.contains(":")) {
+          H4Chunk h4Chunk = chunkInfoParser(var.getShape(), chunk, var.getDimensionsString(), var.getShortName(), var.getDataType().toString(), filePath, fs);
+          if (h4Chunk != null) {
+            chunkList.add(h4Chunk);
+          }
         }
       }
       return chunkList;
@@ -63,6 +77,12 @@ public class H4VarParser extends VarLayoutParser {
       LOG.error(String.format("The extended NetCDF library does not support the variable %1$s in %2$s", varShortName, filePath));
       return null;
     }
+
+    //Replace the beginning blank space in the metadata info for merra-1
+    if (metaInfo.startsWith(" ")) {
+      metaInfo = metaInfo.replaceFirst(" ", "");
+    }
+
     String[] parcels =  metaInfo.split(" ");
     String cnr = parcels[0];
     String[] cnrs = cnr.split(",");
@@ -90,15 +110,20 @@ public class H4VarParser extends VarLayoutParser {
     }
 
     String[] dims = dimensions.split(" ");
+    int time = 0;
 
     //For MOD08_D3
     //TODO: need support more datasets
     String timeS = "";
     if (filePath.contains("MOD08_D3")) {
       timeS = filePath.split("\\.A")[1].substring(0,7);
+      time = Integer.parseInt(timeS);
+    } else if (filePath.contains("MERRA")) {
+      String[] tmps = filePath.split("\\.");
+      time = Integer.parseInt(tmps[tmps.length-2]);
+    } else {
+      LOG.error("++++++++++ Do not support this time interpretation in " + filePath);
     }
-
-    int time = Integer.parseInt(timeS);
 
     BlockLocation[] blockLocations = fs.getFileBlockLocations(fs.getFileLinkStatus(new Path(filePath)), filePos, byteSize);
     List<String> hosts = new ArrayList<String>();

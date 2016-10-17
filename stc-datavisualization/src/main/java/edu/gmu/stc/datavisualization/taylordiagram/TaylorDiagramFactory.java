@@ -11,7 +11,6 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 
-import scala.tools.nsc.Global;
 
 /**
  * Created by Fei Hu on 4/17/16.

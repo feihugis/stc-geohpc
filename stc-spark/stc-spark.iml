@@ -19,8 +19,7 @@
     <orderEntry type="library" name="Maven: com.esri.geometry:esri-geometry-api:1.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.json:json:20090211" level="project" />
     <orderEntry type="module" module-name="stc-datavisualization" />
-    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.11:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.11:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:tests:1.7.7" level="project" />
@@ -29,10 +28,10 @@
     <orderEntry type="library" name="Maven: com.esotericsoftware.reflectasm:reflectasm:shaded:1.07" level="project" />
     <orderEntry type="library" name="Maven: com.esotericsoftware.minlog:minlog:1.2" level="project" />
     <orderEntry type="library" name="Maven: com.twitter:chill-java:0.5.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-launcher_2.11:1.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-network-common_2.11:1.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-network-shuffle_2.11:1.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-unsafe_2.11:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-launcher_2.11:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-network-common_2.11:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-network-shuffle_2.11:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-unsafe_2.11:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.jets3t:jets3t:0.7.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-recipes:2.4.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.curator:curator-framework:2.4.0" level="project" />
@@ -87,9 +86,9 @@
     <orderEntry type="library" name="Maven: net.razorvine:pyrolite:4.4" level="project" />
     <orderEntry type="library" name="Maven: net.sf.py4j:py4j:0.8.2.1" level="project" />
     <orderEntry type="library" name="Maven: org.spark-project.spark:unused:1.0.0" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.11:1.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-sql_2.11:1.5.2" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-catalyst_2.11:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.11:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-sql_2.11:1.5.0" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-catalyst_2.11:1.5.0" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.janino:janino:2.7.8" level="project" />
     <orderEntry type="library" name="Maven: org.codehaus.janino:commons-compiler:2.7.8" level="project" />
     <orderEntry type="library" name="Maven: org.apache.parquet:parquet-column:1.7.0" level="project" />
@@ -99,6 +98,7 @@
     <orderEntry type="library" name="Maven: org.apache.parquet:parquet-hadoop:1.7.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.parquet:parquet-format:2.3.0-incubating" level="project" />
     <orderEntry type="library" name="Maven: org.apache.parquet:parquet-jackson:1.7.0" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: junit:junit:3.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-common:2.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.hadoop:hadoop-annotations:2.6.0" level="project" />
     <orderEntry type="module-library">

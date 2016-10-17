@@ -38,26 +38,18 @@ public class DBConnector {
 
 	Statement statement = null;
 
-	/**
-	 * Constructor, passing the the necessary params to initate a MySQL
-	 * connection
-	 * 
-	 * @param connString
-	 *            basic connection string
-	 * @param user
-	 *            MySQL login name
-	 * @param password
-	 *            MySQL login password
-	 */
-	public DBConnector(String connString, String user, String password, String catalog) {
-		super();
-		this.connString = connString;
-		this.user = user;
-		this.password = password;
-		this.catalog = catalog;
-		this.connection = this.Connect(connString, user, password, catalog);
+
+
+        public DBConnector(String host, String port, String dbName, String user, String password) {
+                super();
+                this.connString = String.format("%1$s:%2$s/%3$s", host, port, dbName);
+                this.user = user;
+                this.password = password;
+                this.catalog = dbName;
+
+                this.connection = this.Connect(connString, user, password, catalog);
                 try {
-                  System.out.println("connected" + this.connString + this.user + this.password + this.catalog);
+                  System.out.println(String.format("connected to %1$s, user: %2$s, pwd: %3$s", this.connString, this.user, this.password));
                   this.statement = this.connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE,
                                                                    ResultSet.HOLD_CURSORS_OVER_COMMIT);
                   System.out.println("statement created");
@@ -67,6 +59,26 @@ public class DBConnector {
                   // System.exit(0);
                 }
         }
+
+    public DBConnector(String host, String port, String user, String password) {
+      super();
+      this.connString = String.format("%1$s:%2$s", host, port);
+      this.user = user;
+      this.password = password;
+
+      this.connection = this.Connect(connString, user, password);
+      try {
+        System.out.println(String.format("connected to %1$s, user: %2$s, pwd: %3$s", this.connString, this.user, this.password));
+
+        this.statement = this.connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE,
+                                                         ResultSet.HOLD_CURSORS_OVER_COMMIT);
+        System.out.println("statement created");
+      } catch (Exception e) {
+        System.out.println("Cannot createStatement===");
+        System.out.print(e);
+        // System.exit(0);
+      }
+    }
 
 	public DBConnector() {
 		super();
@@ -144,6 +156,34 @@ public class DBConnector {
 			//return null;
 		//}
 	}
+
+  public Connection Connect(String dbHost, String user, String password) {
+    try {
+      Class.forName(this.dbDriver).newInstance ();
+    } catch (InstantiationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (ClassNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    Connection connection;
+    try {
+      //"jdbc:mysql://localhost/?user=root&password=rootpassword");
+      System.out.println("*********** " + String.format("%1$s/?user=%2$s&password=%3$s", dbHost, user, password));
+
+      connection = DriverManager.getConnection(String.format("%1$s/?user=%2$s&password=%3$s", dbHost, user, password));
+
+      return connection;
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    return null;
+  }
 	
 	public Connection Connect(String dbDriver, String connUrl, String user, String password, String catalog) {
 		//try {

@@ -1,7 +1,6 @@
 package edu.gmu.stc.hadoop.raster.io.datastructure;
 
 import com.esotericsoftware.kryo.KryoSerializable;
-import com.sun.org.apache.xpath.internal.operations.String;
 
 import org.apache.hadoop.io.Writable;
 

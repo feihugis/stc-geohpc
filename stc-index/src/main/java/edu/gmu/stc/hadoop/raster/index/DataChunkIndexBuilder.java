@@ -3,7 +3,6 @@ package edu.gmu.stc.hadoop.raster.index;
 import com.esotericsoftware.kryo.KryoSerializable;
 
 import org.apache.hadoop.io.Writable;
-import org.apache.spark.serializer.KryoSerializer;
 
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -15,6 +14,8 @@ import edu.gmu.stc.hadoop.raster.DataChunk;
  * Created by Fei Hu on 8/25/16.
  */
 public interface DataChunkIndexBuilder extends Writable{
+
+  public void createDatabase(String databaseName, String userName, Statement statement);
 
   public void createTable(String tableName, Statement statement);
 
@@ -29,5 +30,7 @@ public interface DataChunkIndexBuilder extends Writable{
   public List<DataChunk> convertRSToDataChunk(ResultSet rs);
 
   public void dropTable(String tableName, Statement statement);
+
+  public void dropDatabase(String databaseName, Statement statement);
 
 }

@@ -53,9 +53,11 @@ public class MyProperty {
 	public static String geoJSONPath = "/gz_2010_us_040_00_500k.json";
         public static String gifOutputPath = "/var/lib/hadoop-hdfs/gif/";*/
 
+        public static String ClimateHadoop_Config_FilePath = "/stc-geohpc/stc-spark/src/main/resources/mod08-climatespark-config.xml";
+
         //data container svr-A3-A-U17
         //Index for Merra2
-        /*public static String mysql_connString = "jdbc:postgresql://10.3.1.16:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
+        public static String mysql_connString = "jdbc:postgresql://10.3.1.16:5432/merra2datacontainer";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "cisc255b";
         public static String mysql_catalog = "merra2datacontainer";
@@ -69,10 +71,10 @@ public class MyProperty {
         public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_POSTFIX = ".nc4";
-        public static final String PRODUCT_NAME = "M2T1NXINT";*/
+        public static final String PRODUCT_NAME = "M2T1NXINT";
 
         //For localhost
-        public static String db_host = "jdbc:postgresql://localhost:5432/";
+        /*public static String db_host = "jdbc:postgresql://localhost:5432/";
         public static String mysql_connString = "jdbc:postgresql://localhost:5432/mod08"; //merra2testv2";//"jdbc:mysql://199.26.254.190:3306/MerraIndex";
         public static String mysql_user = "feihu"; //"root";
         public static String mysql_password = "feihu";
@@ -86,7 +88,7 @@ public class MyProperty {
         public static final String MERRA2_FILE_PREFIX = "MERRA2_100.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_PREFIX_Sec = "MERRA2_200.tavg1_2d_int_Nx.";
         public static final String MERRA2_FILE_POSTFIX = ".nc4";
-        public static final String PRODUCT_NAME = "M2T1NXINT";
+        public static final String PRODUCT_NAME = "M2T1NXINT";*/
 
 
 

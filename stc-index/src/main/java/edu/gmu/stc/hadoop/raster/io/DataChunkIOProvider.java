@@ -91,6 +91,7 @@ public class DataChunkIOProvider {
       for (int i=0; i<pa.length; i++) {
         pa[i] = delegate.readDouble();
       }
+
       return Array.factory(DataType.getType(dataChunk.getDataType()), dataChunk.getShape(), pa);
     }
 

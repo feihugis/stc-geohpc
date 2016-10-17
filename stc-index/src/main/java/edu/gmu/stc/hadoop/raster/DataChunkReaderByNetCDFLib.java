@@ -77,7 +77,6 @@ public class DataChunkReaderByNetCDFLib extends RecordReader<DataChunk, ArraySer
         } catch (InvalidRangeException e) {
           e.printStackTrace();
         }
-        //value = new ArrayShortSerializer((ArrayShort) array);
         value = ArraySerializer.factory(array);
         break;
       }

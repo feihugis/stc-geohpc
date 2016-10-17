@@ -4,7 +4,6 @@ import com.esotericsoftware.kryo.Kryo;
 
 import org.apache.spark.serializer.KryoRegistrator;
 
-import edu.gmu.stc.hadoop.raster.DataChunk;
 import edu.gmu.stc.hadoop.raster.index.DataChunkIndexBuilderImp;
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer;
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayShortSerializer;

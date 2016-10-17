@@ -5,9 +5,6 @@ import com.esotericsoftware.kryo.KryoSerializable;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 
-import org.apache.hadoop.io.Writable;
-import org.apache.spark.serializer.KryoSerializer;
-
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;

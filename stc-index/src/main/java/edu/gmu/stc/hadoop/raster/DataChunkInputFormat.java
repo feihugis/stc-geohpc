@@ -1,6 +1,7 @@
 package edu.gmu.stc.hadoop.raster;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.InputSplit;
 import org.apache.hadoop.mapreduce.JobContext;
 import org.apache.hadoop.mapreduce.RecordReader;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import edu.gmu.stc.configure.MyProperty;
 import edu.gmu.stc.database.DBConnector;
+import edu.gmu.stc.hadoop.commons.ClimateHadoopConfigParameter;
 import edu.gmu.stc.hadoop.raster.index.DataChunkIndexBuilderImp;
 
 /**
@@ -24,16 +26,21 @@ public class DataChunkInputFormat extends FileInputFormat {
   @Override
   public List<InputSplit> getSplits(JobContext job) throws IOException {
     Configuration conf = job.getConfiguration();
-    int start_time = conf.getInt("start_time", 0);
-    int end_time = conf.getInt("end_time", 0);
-    String[] varShortNames = conf.getStrings("var_shortNames");
-    String[] geometryInfos = conf.getStrings("geometryinfo");
-    String filePath_prefix = conf.get("filePath_prefix");
-    String filePath_suffix = conf.get("filePath_suffix");
 
-    Statement statement = new DBConnector(MyProperty.db_host + MyProperty.mysql_catalog,
-                                          MyProperty.mysql_user, MyProperty.mysql_password,
-                                          MyProperty.mysql_catalog).GetConnStatement();
+    int start_time = conf.getInt(ClimateHadoopConfigParameter.QUERY_TIME_START, 0);
+    int end_time = conf.getInt(ClimateHadoopConfigParameter.QUERY_TIME_END, 0);
+    String[] varShortNames = conf.getStrings(ClimateHadoopConfigParameter.QUERY_VARIABLE_NAMES);
+    String[] geometryInfos = conf.getStrings(ClimateHadoopConfigParameter.QUERY_GEOMETRY_INFO);
+    String filePath_prefix = conf.get(ClimateHadoopConfigParameter.INDEX_FILEPATH_PREFIX);
+    String filePath_suffix = conf.get(ClimateHadoopConfigParameter.INDEX_FILEPATH_SUFFIX);
+
+    String dbHost = conf.get(ClimateHadoopConfigParameter.DB_HOST);
+    String dbPort = conf.get(ClimateHadoopConfigParameter.DB_Port);
+    String dbName = conf.get(ClimateHadoopConfigParameter.DB_DATABASE_NAME);
+    String dbUser = conf.get(ClimateHadoopConfigParameter.DB_USERNAME);
+    String dbPWD = conf.get(ClimateHadoopConfigParameter.DB_PWD);
+
+    Statement statement = new DBConnector(dbHost, dbPort, dbName, dbUser, dbPWD).GetConnStatement();
 
     DataChunkIndexBuilderImp dataChunkIndexBuilderImp = new DataChunkIndexBuilderImp(filePath_prefix , filePath_suffix);
     List<DataChunk> dataChunkList = new ArrayList<DataChunk>();
