@@ -32,14 +32,15 @@ import ucar.ma2.DataType;
 public class ModisOperator {
 
   public static void main(String[] args) {
-  if (args.length != 1) {
+  if (args.length != 2) {
     System.out.print("please input the configuration file");
     return;
   }
 
   String configFilePath = args[0];
+  String outputFilePath = args[1];
 
-  final SparkConf sconf = new SparkConf().setAppName(ModisOperator.class.getName());
+  final SparkConf sconf = new SparkConf().setAppName(ModisOperator.class.getName()).setMaster("local[6]");
   sconf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer");
   sconf.set("spark.kryo.registrator", SparkKryoRegistrator.class.getName());
 
@@ -72,7 +73,7 @@ public class ModisOperator {
             int[] shape = dataChunk.getShape();
             ArrayShort arrayShort = (ArrayShort) tuple2._2.getArray();
 
-            for (int lat = corner[0]; lat< corner[0]+shape[0]; lat++) {
+            for (int lat = corner[0]; lat < corner[0]+shape[0]; lat++) {
               for (int lon = corner[1]; lon < corner[1]+shape[1]; lon++) {
                 float value = arrayShort.getFloat(lat*shape[1] + lon);
                 cellList.add(new Cell(dataChunk.getVarShortName(), dataChunk.getTime(), lat, lon, value, "n"));
@@ -85,8 +86,8 @@ public class ModisOperator {
     SQLContext sqlContext = new org.apache.spark.sql.SQLContext(sc);
 
     DataFrame db = sqlContext.createDataFrame(cellRDD, Cell.class);
-    db.saveAsParquetFile("/modis/mod08");
-    //db.saveAsTable("", SaveMode.Append);
+    db.saveAsParquetFile(outputFilePath);
+    //db.saveAsTable(outputFilePath, SaveMode.Append);
     //db.saveAsTable();
 
     /*cellRDD.foreach(new VoidFunction<Cell>() {

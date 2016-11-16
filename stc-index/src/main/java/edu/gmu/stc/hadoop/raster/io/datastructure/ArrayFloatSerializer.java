@@ -12,6 +12,7 @@ import java.io.IOException;
 import ucar.ma2.Array;
 import ucar.ma2.ArrayFloat;
 import ucar.ma2.ArrayInt;
+import ucar.ma2.MAMath;
 
 /**
  * Created by Fei Hu on 3/9/16.
