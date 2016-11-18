@@ -10,9 +10,9 @@
     <artifactId>stc-climatespark</artifactId>
     <inceptionYear>2008</inceptionYear>
     <properties>
-        <scala.version>2.11.8</scala.version>
+        <scala.version>2.10.6</scala.version>
         <encoding>UTF-8</encoding>
-        <spark.version>1.5.2</spark.version>
+        <spark.version>1.5.0</spark.version>
     </properties>
 
     <repositories>
@@ -55,19 +55,20 @@
         </dependency>
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-core_2.11</artifactId>
+            <artifactId>spark-core_2.10</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
             <version>${spark.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.spark</groupId>
-            <artifactId>spark-streaming_2.11</artifactId>
-            <version>${spark.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.spark</groupId>
-            <artifactId>spark-sql_2.11</artifactId>
+            <artifactId>spark-sql_2.10</artifactId>
             <version>${spark.version}</version>
         </dependency>
     </dependencies>
@@ -90,7 +91,7 @@
                 <configuration>
                     <scalaVersion>${scala.version}</scalaVersion>
                     <args>
-                        <arg>-target:jvm-1.8</arg>
+                        <arg>-target:jvm-1.7</arg>
                     </args>
                 </configuration>
             </plugin>

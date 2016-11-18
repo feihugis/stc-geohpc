@@ -14,26 +14,42 @@ import org.apache.spark.{SparkContext, SparkConf}
   */
 class ClimateSparkContext (@transient val sparkContext: SparkContext){
   val logger = org.slf4j.LoggerFactory.getLogger(this.getClass)
-  val hconf = new Configuration()
+  val hConf = new Configuration()
   val dataChunk = classOf[edu.gmu.stc.hadoop.raster.DataChunk]
   val arraySerializer = classOf[edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer]
   val inputFormat = classOf[DataChunkInputFormat].asInstanceOf[Class[F] forSome {type F <: InputFormat[DataChunk, ArraySerializer]}]
 
-
   def this(conf: SparkConf) {
     this(new SparkContext(conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-                              .set("spark.kryo.registrationRequired", "true")
                                 .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)))
+  }
+
+  def this(sc: SparkContext, hadoopConf: String) {
+    this(sc)
+    this.hConf.addResource(new Path(hadoopConf))
+    this.sparkContext.getConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+                             .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)
   }
 
   def this(sparkConf: SparkConf, hadoopConf: String) {
     this(new SparkContext(sparkConf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
-      .set("spark.kryo.registrationRequired", "true")
-      .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)))
-    this.hconf.addResource(new Path(hadoopConf))
+                                   .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)))
+    this.hConf.addResource(new Path(hadoopConf))
+  }
+
+  def this(hadoopConf: String, uri: String, appName: String) {
+    this(new SparkContext(new SparkConf().set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)
+      .setMaster(uri)
+      .setAppName(appName)))
+    this.hConf.addResource(new Path(hadoopConf))
   }
 
   def getClimateRDD: RDD[(DataChunk, ArraySerializer)] = {
-    this.sparkContext.newAPIHadoopRDD(this.hconf, inputFormat, dataChunk, arraySerializer).map(rdd => rdd ).filter(_._1 != null)
+    this.sparkContext.newAPIHadoopRDD(this.hConf, inputFormat, dataChunk, arraySerializer).map(rdd => rdd ).filter(_._1 != null)
   }
+
+  def getHadoopConfig = this.hConf
+
+  def getSparkContext = this.sparkContext
 }

@@ -84,7 +84,7 @@
     <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
     <property>
         <name>query.variable.names</name>
-        <value>Aerosol_Optical_Depth_Land_Mean</value>
+        <value>aerosol_optical_depth_land_ocean_mean</value>
         <description>it support multiple input variables, which are separated by comma, e.g. Aerosol_Optical_Depth_Land_Ocean_Mean</description>
     </property>
 
@@ -105,13 +105,13 @@
 
     <property>
         <name>query.space.corner</name>
-        <value>0,0,0</value>
+        <value>10,10</value>
         <description>the dimensions of corner should be same with that of the variable; leaving it blank means no input corner</description>
     </property>
 
     <property>
         <name>query.space.shape</name>
-        <value>3,180,360</value>
+        <value>3,3</value>
         <description>the dimensions of shape should be same with that of the variable; leaving it blank means no input shape</description>
     </property>
 
