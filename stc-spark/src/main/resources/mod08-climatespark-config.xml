@@ -105,13 +105,13 @@
 
     <property>
         <name>query.space.corner</name>
-        <value>10,10</value>
+        <value>33,0</value>
         <description>the dimensions of corner should be same with that of the variable; leaving it blank means no input corner</description>
     </property>
 
     <property>
         <name>query.space.shape</name>
-        <value>3,3</value>
+        <value>10,4</value>
         <description>the dimensions of shape should be same with that of the variable; leaving it blank means no input shape</description>
     </property>
 

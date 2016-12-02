@@ -97,6 +97,14 @@ public class DataChunkReader extends RecordReader<DataChunk, ArraySerializer> {
     int[] targetCorner = new int[queryCorner.length], targetShape = new int[queryCorner.length];
 
     if (queryCorner != null && queryShape != null) {
+      // the query bounding box is same with datachunk
+      if (ChunkUtils.isSameBoundingBox(dataChunk.getCorner(), dataChunk.getShape(), queryCorner, queryShape, targetCorner, targetShape)) {
+        Array array = DataChunkIOProvider.read(dataChunk, inputStream);
+        value = ArraySerializer.factory(array);
+        return value;
+      }
+
+      // the query bounding box is different from datachunk but intersected
       if (ChunkUtils.getIntersection(dataChunk.getCorner(), dataChunk.getShape(), queryCorner, queryShape, targetCorner, targetShape)) {
         Array array = DataChunkIOProvider.read(dataChunk, inputStream);
         int[] relativeCorner = new int[targetCorner.length];
@@ -104,7 +112,10 @@ public class DataChunkReader extends RecordReader<DataChunk, ArraySerializer> {
           relativeCorner[i] = targetCorner[i] - dataChunk.getCorner()[i];
         }
         try {
-          array = array.section(relativeCorner, targetShape);
+          //note that section function only does logical subseting, but refers to  the same array;
+          // so we need use copy function to generate a physical subsetting array
+          array = array.section(relativeCorner, targetShape).copy();
+
           if (array.getShape().length != relativeCorner.length) {
             array = array.reshape(targetShape);
           }

@@ -1,13 +1,15 @@
 package edu.gmu.stc.climatespark.functions
 
-import edu.gmu.stc.climatespark.io.datastructure.Cell
+import edu.gmu.stc.climatespark.io.datastructure.{MultiCell3, MultiCell, Cell}
 import edu.gmu.stc.hadoop.raster.DataChunk
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer
 import org.apache.spark.rdd.RDD
-import ucar.ma2.{IndexIterator, MAMath}
+import ucar.ma2.{ArrayShort, IndexIterator, MAMath}
+import edu.gmu.stc.climatespark.io.datastructure.Cell
 
 import scala.collection.mutable.ArrayBuffer
 
+import scala.math._
 /**
   * Created by Fei Hu on 11/16/16.
   */
@@ -24,12 +26,15 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val array = tuple._2.getArray
       var cellList = ArrayBuffer.empty[Cell]
 
+      val tt = array.copyTo1DJavaArray().asInstanceOf[Array[Short]]
+      print(tt.length + " -------")
+
       for (lat:Int <- 0 until shape(0)){
         for (lon:Int <- 0 until shape(1)){
           val index = lat*shape(1)+lon
           val value = array.getShort(index)
-          val y = -90 + (corner(0)+lat)*0.5F
-          val x = -180 + (corner(1)+lon)*0.5F
+          val y = 89.5F - (corner(0)+lat)*1.0F
+          val x = -179.5F + (corner(1)+lon)*1.0F
           val cell = Cell(varName, time, y, x, value)
           cellList += cell
         }
@@ -43,6 +48,32 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val key = tuple._1.getVarShortName + "_" + tuple._1.getTime
       val value = MAMath.sumDouble(tuple._2.getArray)
       key + " : " + value
+    })
+  }
+
+  def weightedAreaAvgDaily: RDD[String] = {
+    self.map(tuple => {
+      val key = tuple._1.getVarShortName + "_" + tuple._1.getTime
+      val corner = tuple._1.getCorner
+      val shape = tuple._1.getShape
+      val array = tuple._2.getArray
+      var numerator = 0D
+      var denominator = 0D
+
+      for (lat:Int <- 0 until shape(0)){
+        for (lon:Int <- 0 until shape(1)){
+          val index = lat*shape(1)+lon
+          val value = array.getShort(index)
+          if ( value != -9999) {
+            val y = 89.5F - (corner(0)+lat)*1.0F
+            val x = -179.5F + (corner(1)+lon)*1.0F
+            val area = 2*Pi*6371*6371*abs(sin((y - 0.5)/180*Pi) - sin((y + 0.5)/180*Pi)) * 1
+
+            numerator = numerator + area * value
+            denominator = denominator + area
+          }
+        }}
+      key + " : " + numerator/denominator
     })
   }
 
@@ -60,7 +91,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val iterA = a.getIndexIterator
       val iterB = b.getIndexIterator
 
-      while(iterA.hasNext()) {
+      while (iterA.hasNext()) {
         iterR.setIntNext(iterA.getIntNext + iterB.getIntNext)
       }
 
@@ -72,14 +103,36 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val iterR = result.getIndexIterator
 
       while (iterA.hasNext) {
-        iterR.setIntNext(iterA.getIntNext/num)
+        iterR.setIntNext(iterA.getIntNext / num)
       }
 
       ArraySerializer.factory(result)
     })
   }
 
+  def joinVars:RDD[MultiCell] = {
+    self.map(cRDD => (cRDD._1.getTime, cRDD)).groupByKey().flatMap(u => {
+      val varsList = u._2.toList.sortBy(_._1.getVarShortName)
+      val var_0 = varsList(0);
+      val corner = var_0._1.getCorner
+      val shape = var_0._1.getShape
+      val valueType = var_0._2.getArray.getElementType
+      val time = var_0._1.getTime
+      val multiCellList = ArrayBuffer.empty[MultiCell]
 
+      for (y: Int <- 0 until shape(0)) {
+        for (x: Int <- 0 until shape(1)) {
+          val values = ArrayBuffer.empty[Short]
+          val lat = 89.5F - (corner(0) + y)*1.0F
+          val lon = -179.5F + (corner(1) + x)*0.5F
+          val index = y * shape(1) + x
+          varsList.foreach(cRDD => values += cRDD._2.getArray.getShort(index))
+          multiCellList += MultiCell.factory(lat, lon, time, values.toList)
+        }
+      }
+      multiCellList.toList
+    })
+  }
 }
 
 object ClimateRDDFunctions {

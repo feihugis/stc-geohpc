@@ -226,6 +226,24 @@ public class ChunkUtils {
     return true;
   }
 
+  public static boolean isSameBoundingBox(int[] orgCorner, int[] orgShape, int[] queryCorner, int[] queryShape, int[] targetCorner, int[] targetShape) {
+    if (orgCorner.length != queryCorner.length) {
+      return  false;
+    }
+
+    int[] orgEnd = new int[orgCorner.length], queryEnd = new int[queryCorner.length];
+
+    for (int i=0; i<orgCorner.length; i++) {
+      orgEnd[i] = orgCorner[i] + orgShape[i] - 1;
+      queryEnd[i] = queryCorner[i] + queryShape[i] - 1;
+      if ( orgCorner[i] != queryCorner[i] || orgEnd[i] != queryCorner[i]) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   /**
    * get the subString between 'start' and 'end' in the 'input'
    * @param input the string to be subsetted

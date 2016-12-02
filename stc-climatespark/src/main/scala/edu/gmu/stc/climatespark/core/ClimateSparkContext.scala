@@ -45,6 +45,14 @@ class ClimateSparkContext (@transient val sparkContext: SparkContext){
     this.hConf.addResource(new Path(hadoopConf))
   }
 
+  def this(hadoopConf: Configuration, uri: String, appName: String) {
+    this(new SparkContext(new SparkConf().set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
+      .set("spark.kryo.registrator", classOf[ClimateSparkKryoRegistrator].getName)
+      .setMaster(uri)
+      .setAppName(appName)))
+    this.hConf.addResource(hadoopConf)
+  }
+
   def getClimateRDD: RDD[(DataChunk, ArraySerializer)] = {
     this.sparkContext.newAPIHadoopRDD(this.hConf, inputFormat, dataChunk, arraySerializer).map(rdd => rdd ).filter(_._1 != null)
   }
