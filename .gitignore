@@ -5,12 +5,13 @@ stc-mapreduce/target/
 stc-hive/target/
 */*.iml
 .DS_Store
-<<<<<<< HEAD
+
 */.DS_Store
 .idea/workspace.xml
 .idea/
-=======
+
 */.DS_Stor
 .idea/*
->>>>>>> master
 out/*
+
+/Users/feihu/Desktop/
