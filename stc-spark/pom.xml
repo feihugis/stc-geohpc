@@ -26,6 +26,11 @@
             <name>UNIDATA Releases</name>
             <url>https://artifacts.unidata.ucar.edu/content/repositories/unidata-releases/</url>
         </repository>
+        <repository>
+            <id>Spark-packages-repo</id>
+            <name>amplab</name>
+            <url>https://dl.bintray.com/spark-packages/maven/</url>
+        </repository>
     </repositories>
 
     <dependencies>

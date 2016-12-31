@@ -1,11 +1,10 @@
 package edu.gmu.stc.climatespark.functions
 
-import edu.gmu.stc.climatespark.io.datastructure.{MultiCell3, MultiCell, Cell}
+import edu.gmu.stc.climatespark.io.datastructure._
 import edu.gmu.stc.hadoop.raster.DataChunk
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer
 import org.apache.spark.rdd.RDD
 import ucar.ma2.{ArrayShort, IndexIterator, MAMath}
-import edu.gmu.stc.climatespark.io.datastructure.Cell
 
 import scala.collection.mutable.ArrayBuffer
 
@@ -26,9 +25,6 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val array = tuple._2.getArray
       var cellList = ArrayBuffer.empty[Cell]
 
-      val tt = array.copyTo1DJavaArray().asInstanceOf[Array[Short]]
-      print(tt.length + " -------")
-
       for (lat:Int <- 0 until shape(0)){
         for (lon:Int <- 0 until shape(1)){
           val index = lat*shape(1)+lon
@@ -36,6 +32,32 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
           val y = 89.5F - (corner(0)+lat)*1.0F
           val x = -179.5F + (corner(1)+lon)*1.0F
           val cell = Cell(varName, time, y, x, value)
+          cellList += cell
+        }
+      }
+      cellList.toList
+    })
+  }
+
+  def queryWeightPointTimeSeries: RDD[WeightCell] = {
+    self.flatMap(tuple => {
+      val dataChunk = tuple._1
+      val time = dataChunk.getTime.toString
+      val shape =  dataChunk.getShape
+      val corner = dataChunk.getCorner
+      val varName = dataChunk.getVarShortName
+
+      val array = tuple._2.getArray
+      var cellList = ArrayBuffer.empty[WeightCell]
+
+      for (lat:Int <- 0 until shape(0)){
+        for (lon:Int <- 0 until shape(1)){
+          val index = lat*shape(1)+lon
+          val value = array.getShort(index)
+          val y = 89.5F - (corner(0)+lat)*1.0F
+          val x = -179.5F + (corner(1)+lon)*1.0F
+          val weight = (2*Pi*6371*6371*abs(sin((y - 0.5)/180*Pi) - sin((y + 0.5)/180*Pi)) * 1).toFloat
+          val cell = WeightCell(varName, time, y, x, value, weight)
           cellList += cell
         }
       }

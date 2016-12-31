@@ -6,6 +6,9 @@ import org.apache.hadoop.io.Writable;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Arrays;
+
+import scala.Serializable;
 
 
 /**
@@ -14,7 +17,7 @@ import java.io.IOException;
 
 public class DataChunk implements Writable {
   //@Id @GeneratedValue(strategy = GenerationType.AUTO)
-  private int id;
+  private String id;
   private int[] corner = null;         //relative to the whole picture
   private int[] shape = null;          //chunk shape; to get the endcorner: corner[0] + shape[0] - 1
   private String[] dimensions = null;  //dimension info for each dimension, such [time, lat, lon]
@@ -40,9 +43,11 @@ public class DataChunk implements Writable {
     this.byteSize = byteSize;
     this.filterMask = filterMask;
     this.hosts = hosts;
+    Arrays.sort(hosts);
     this.dataType = dataType;
     this.varShortName = varShortName;
     this.filePath = filePath;
+    //this.id = varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
   }
 
   public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
@@ -54,10 +59,12 @@ public class DataChunk implements Writable {
     this.byteSize = byteSize;
     this.filterMask = filterMask;
     this.hosts = hosts;
+    Arrays.sort(hosts);
     this.dataType = dataType;
     this.varShortName = varShortName;
     this.filePath = filePath;
     this.time = time;
+    //this.id = varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
   }
 
   public DataChunk(int[] corner, int[] shape, String[] dimensions, long filePos, long byteSize,
@@ -69,20 +76,63 @@ public class DataChunk implements Writable {
     this.byteSize = byteSize;
     this.filterMask = filterMask;
     this.hosts = hosts;
+    Arrays.sort(hosts);
     this.dataType = dataType;
     this.varShortName = varShortName;
     this.filePath = filePath;
     this.time = time;
     this.geometryInfo = geometryInfo;
+    //this.id = varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
+  }
+
+  public DataChunk(Integer[] corner, Integer[] shape, String[] dimensions, Long filePos, Long byteSize,
+                   Integer filterMask, String[] hosts, String dataType, String varShortName, String filePath, Integer time, String geometryInfo) {
+    this.corner = RasterUtils.IntegerToint(corner);
+    this.shape = RasterUtils.IntegerToint(shape);
+    this.dimensions = dimensions;
+    this.filePos = filePos;
+    this.byteSize = byteSize;
+    this.filterMask = filterMask;
+    this.hosts = hosts;
+    Arrays.sort(hosts);
+    this.dataType = dataType;
+    this.varShortName = varShortName;
+    this.filePath = filePath;
+    this.time = time;
+    this.geometryInfo = geometryInfo;
+    //this.id = varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
+  }
+
+  public DataChunk(String metaData) {
+    String[] meta = metaData.split(",");
+    this.varShortName = meta[1];
+    this.corner = RasterUtils.stringToIntArray(meta[2] + "," + meta[3] + "," + meta[4]);
+    this.shape = RasterUtils.stringToIntArray(meta[5] + "," + meta[6] + "," + meta[7]);
+    this.dimensions = RasterUtils.stringToStringArray(meta[8] + "," + meta[9] + "," + meta[10]);
+    this.time = Integer.parseInt(meta[11]);
+    this.dataType = meta[12];
+    this.filePos = Long.parseLong(meta[13]);
+    this.byteSize = Long.parseLong(meta[14]);
+    this.filterMask = Integer.parseInt(meta[15]);
+    this.hosts = RasterUtils.stringToStringArray(meta[16] + "," + meta[17] + "," + meta[18]);
+    Arrays.sort(hosts);
+    this.filePath = meta[19];
+    this.geometryInfo = meta[20];
+
+    //this.id = varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
+  }
+
+
+  public String queryDataLocations() {
+    return Arrays.toString(this.hosts);
   }
 
   @Override
   public String toString() {
-    String output = this.getVarShortName() + " corner : ";
-    for (int corner : getCorner()) {
-      output = output + corner + " ";
-    }
-    output += "start : " + getFilePos() + " end : " + (getFilePos() + getByteSize());
+    String output = this.getVarShortName() + " time : " + this.time
+                    + " location: " + Arrays.toString(this.hosts)
+                    + " corner : " + Arrays.toString(corner)
+                    + "start : " + getFilePos() + " end : " + (getFilePos() + getByteSize());
     return output;
   }
 
@@ -254,6 +304,7 @@ public class DataChunk implements Writable {
     }
     return size;
   }
+
   public void setShape(int[] shape) {
     this.shape = shape;
   }
@@ -334,11 +385,11 @@ public class DataChunk implements Writable {
     this.geometryInfo = geometryInfo;
   }
 
-  public int getId() {
-    return id;
+  public String getId() {
+    return varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
   }
 
-  public void setId(int id) {
+  public void setId(String id) {
     this.id = id;
   }
 }

@@ -27,7 +27,7 @@ object SptiotemporalQuery {
 
     weightedAreaAvg.foreach(rdd => print(rdd + "\n"))
 
-    val cellRDD_1 = climateRDD_1.queryPointTimeSeries
+    val cellRDD_1 = climateRDD_1.queryWeightPointTimeSeries.sortBy(cell => cell.value)
 
     cellRDD_1.foreach(cell => {
       if (cell.value != -9999) {

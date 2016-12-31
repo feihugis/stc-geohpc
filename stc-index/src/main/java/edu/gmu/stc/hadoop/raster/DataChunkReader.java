@@ -46,6 +46,19 @@ public class DataChunkReader extends RecordReader<DataChunk, ArraySerializer> {
     inputStream = fs.open(path);
   }
 
+  public void initialize(InputSplit inputSplit, Configuration conf) throws
+                                                                    IOException, InterruptedException {
+    DataChunkInputSplit dataChunkInputSplit = (DataChunkInputSplit) inputSplit;
+    dataChunkList = dataChunkInputSplit.getChunkList();
+    keySize = dataChunkList.size();
+    FileSystem fs = FileSystem.get(conf);
+    DataChunk dataChunk = this.dataChunkList.get(0);
+    Path path = new Path(dataChunk.getFilePath());
+    inputStream = fs.open(path);
+  }
+
+
+
   @Override
   public boolean nextKeyValue() throws IOException, InterruptedException {
     currentKeyMark++;
@@ -115,7 +128,6 @@ public class DataChunkReader extends RecordReader<DataChunk, ArraySerializer> {
           //note that section function only does logical subseting, but refers to  the same array;
           // so we need use copy function to generate a physical subsetting array
           array = array.section(relativeCorner, targetShape).copy();
-
           if (array.getShape().length != relativeCorner.length) {
             array = array.reshape(targetShape);
           }

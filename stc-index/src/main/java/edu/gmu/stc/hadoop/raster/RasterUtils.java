@@ -68,6 +68,21 @@ public class RasterUtils {
     return result;
   }
 
+  public static int[] stringToIntArray(String str) {
+    String[] strs = str.substring(2, str.length()-2).split(",");
+    int[] array = new int[strs.length];
+    for (int i = 0; i < array.length; i++) {
+      array[i] = Integer.parseInt(strs[i]);
+    }
+
+    return array;
+  }
+
+  public static String[] stringToStringArray(String str) {
+    String[] strs = str.substring(2, str.length()-2).split(",");
+    return strs;
+  }
+
   public static int[] IntegerToint(Integer[] input) {
     int[] output = new int[input.length];
     for (int i=0; i<input.length; i++) {
