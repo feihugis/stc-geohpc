@@ -389,6 +389,14 @@ public class DataChunk implements Writable {
     return varShortName + Arrays.toString(hosts) + time + corner[0] + geometryInfo;
   }
 
+  public long getCoordId() {
+    String id = this.time + "";
+    for (int c : corner) {
+      id += c;
+    }
+    return Long.parseLong(id);
+  }
+
   public void setId(String id) {
     this.id = id;
   }

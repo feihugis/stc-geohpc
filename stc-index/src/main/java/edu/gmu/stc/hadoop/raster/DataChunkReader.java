@@ -51,6 +51,7 @@ public class DataChunkReader extends RecordReader<DataChunk, ArraySerializer> {
     DataChunkInputSplit dataChunkInputSplit = (DataChunkInputSplit) inputSplit;
     dataChunkList = dataChunkInputSplit.getChunkList();
     keySize = dataChunkList.size();
+    this.conf = conf;
     FileSystem fs = FileSystem.get(conf);
     DataChunk dataChunk = this.dataChunkList.get(0);
     Path path = new Path(dataChunk.getFilePath());
