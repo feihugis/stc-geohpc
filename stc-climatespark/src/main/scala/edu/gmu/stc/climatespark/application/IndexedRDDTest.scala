@@ -4,7 +4,10 @@ import edu.gmu.stc.climatespark.core.ClimateSparkContext
 import edu.gmu.stc.climatespark.functions.DataFormatFunctions
 import edu.gmu.stc.climatespark.rdd.{DataChunkRDD, DataChunkSplitRDD}
 import edu.gmu.stc.hadoop.raster._
+import edu.gmu.stc.climatespark.functions.ClimateRDDFunctions._
 
+import scala.collection.JavaConverters._
+import scala.collection.mutable.ArrayBuffer
 
 
 /**
@@ -17,7 +20,14 @@ object IndexedRDDTest {
     val sc = new ClimateSparkContext(configFile, "local[6]", "test")
     //val sparkConf = new SparkConf().setMaster("local[6]").setAppName("test").set("spark.driver.allowMultipleContexts", "true")
 
-    val dataChunkMeta = new DataChunkMeta(Array(1, 1, 91, 144), Array("date", "hour", "lat", "lon"), 0, "float", "PRECCU", "/Users/feihu/Documents/Data/Merra2/MERRA2_200.tavg1_2d_int_Nx.*.nc4")
+    val filterMask = 0
+    val dataType = "float"
+    val varName = "PRECCU"
+    val dataChunkMeta = new DataChunkMeta(Array(1, 1, 91, 144),
+      Array("date", "hour", "lat", "lon"),
+      filterMask, dataType, varName,
+      "/Users/feihu/Documents/Data/Merra2/MERRA2_200.tavg1_2d_int_Nx.YEAR.nc4",
+      "/Users/feihu/Documents/Data/Merra2/index/nodeindex/preccu_HOSTID.txt")
 
     val inputFile = "/Users/feihu/Documents/Data/Merra2/index/preccu"
     val outputFile = "/Users/feihu/Documents/Data/Merra2/index/preccu-index-test.parquet"
@@ -42,13 +52,52 @@ object IndexedRDDTest {
         chunkCorners(i) = new DataChunkCorner(chunkCoords(i).asInstanceOf[DataChunkCoord].getCorner)
       }
       (key, chunkCorners)
+    }).flatMap(tuple => {
+      val results = new Array[(String, Array[DataChunkCorner])](tuple._1.getHosts.length)
+      val dataChunkSize = tuple._2.length
+      val unit = dataChunkSize/results.length
+      for (i <- results.indices) {
+        val key = tuple._1.getHosts()(i)
+        if (unit*(i+2) > dataChunkSize) {
+          val value = tuple._2.slice(unit*i, dataChunkSize)
+          results(i) = (key, value)
+        } else {
+          val value = tuple._2.slice(unit*i, unit*(i+1))
+          results(i) = (key, value)
+        }
+      }
+      results
+    }).groupBy(tuple => {
+      tuple._1
+    }).values.map(itor => {
+      val group = itor.toArray
+      val values = new Array[Array[DataChunkCorner]](group.length)
+      for (i <- 0 until values.length) {
+        values(i) = group(i)._2
+      }
+      val key = new DataChunkHosts(Array(group(0)._1))
+      (key, values.toArray)
     }).toArray
 
+    var inputSplitSize = 0
+    val oneToMorePatitionNumMapping = new Array[(Int, Int)](scheduledDataChunks.length)
+    for (i <- oneToMorePatitionNumMapping.indices) {
+      val size = scheduledDataChunks(i)._2.length
+      if (i > 0) {
+        oneToMorePatitionNumMapping(i) = (i, size + oneToMorePatitionNumMapping(i-1)._2)
+      } else {
+        oneToMorePatitionNumMapping(i) = (i, size)
+      }
+      inputSplitSize = inputSplitSize + size
+    }
+
     val dataChunkInputSplitRDD = new DataChunkSplitRDD(scheduledDataChunks, dataChunkMeta, sc.getSparkContext, sc.getHadoopConfig)
-    val dataChunkRDD = new DataChunkRDD(dataChunkInputSplitRDD, sc.getSparkContext, sc.getHadoopConfig)
+    dataChunkInputSplitRDD.cache()
+    val dataChunkRDD = new DataChunkRDD(dataChunkInputSplitRDD, oneToMorePatitionNumMapping, inputSplitSize, sc.getSparkContext, sc.getHadoopConfig)
     val paritions = dataChunkRDD.partitions
     val size = dataChunkRDD.count()
     val dependency = dataChunkRDD.dependencies
-    println("--------" + dataChunkRDD.dependencies)
+    println("--------" + size)
+    dataChunkRDD.avgDaily.collect().foreach(s => println(s))
   }
 }

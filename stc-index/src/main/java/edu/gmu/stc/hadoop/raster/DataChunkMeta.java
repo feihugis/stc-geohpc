@@ -13,15 +13,17 @@ public class DataChunkMeta implements Serializable{
   private String dataType;
   private String varShortName;
   private String filePathPattern;
+  private String nodeIndexPattern;
 
   public DataChunkMeta(int[] shape, String[] dimensions, int filterMask, String dataType,
-                       String varShortName, String filePathPattern) {
+                       String varShortName, String filePathPattern, String nodeIndexPattern) {
     this.shape = shape;
     this.dimensions = dimensions;
     this.filterMask = filterMask;
     this.dataType = dataType;
     this.varShortName = varShortName;
     this.filePathPattern = filePathPattern;
+    this.nodeIndexPattern = nodeIndexPattern;
   }
 
   public int[] getShape() {
@@ -70,5 +72,13 @@ public class DataChunkMeta implements Serializable{
 
   public void setFilePathPattern(String filePathPattern) {
     this.filePathPattern = filePathPattern;
+  }
+
+  public String getNodeIndexPattern() {
+    return nodeIndexPattern;
+  }
+
+  public void setNodeIndexPattern(String nodeIndexPattern) {
+    this.nodeIndexPattern = nodeIndexPattern;
   }
 }

@@ -20,9 +20,11 @@ import scala.collection.JavaConverters._
   * Created by Fei Hu on 1/9/17.
   */
 
-class DataChunkSplitPartition(@transient dataChunkScheduler: (DataChunkHosts, Array[DataChunkCorner]),
+class DataChunkSplitPartition(@transient dataChunkScheduler: (DataChunkHosts, Array[Array[DataChunkCorner]]),
                               val index: Int) extends Partition {
   val dataChunkPartitions = dataChunkScheduler
+
+  def getDataChunkPartions = dataChunkPartitions
 }
 
 /**
@@ -32,7 +34,7 @@ class DataChunkSplitPartition(@transient dataChunkScheduler: (DataChunkHosts, Ar
   * @param conf
   */
 class DataChunkSplitRDD(
-                         dataChunkCoordScheduled: Array[(DataChunkHosts, Array[DataChunkCorner])],
+                         dataChunkCoordScheduled: Array[(DataChunkHosts, Array[Array[DataChunkCorner]])],
                          dataChunkMeta: DataChunkMeta,
                          sc: SparkContext,
                          @transient conf: Configuration)
@@ -64,38 +66,42 @@ class DataChunkSplitRDD(
 
   @DeveloperApi
   override def compute(split: Partition, context: TaskContext): Iterator[InputSplit] = {
-    val dataChunkCoords = split.asInstanceOf[DataChunkSplitPartition].dataChunkPartitions
-    val hosts = dataChunkCoords._1.getHosts
+    val dataChunkCoordsPair = split.asInstanceOf[DataChunkSplitPartition].dataChunkPartitions
+    val hosts = dataChunkCoordsPair._1.getHosts
+    val dataChunkCoordsArray = dataChunkCoordsPair._2
+    val dataChunkMeta = getDataChunkMeta
     val hostID = StringUtils.getHostID(hosts(0)) //StringUtils.getHostID(InetAddress.getLocalHost.getHostName)
-    val nodeIndexFile = new Path("/Users/feihu/Documents/Data/Merra2/index/nodeindex/preccu_" + hostID + ".txt")
+    val nodeIndexFile = new Path(dataChunkMeta.getNodeIndexPattern.replace("HOSTID", hostID.toString))
     val nodeIndex = getDataNodeIndex(nodeIndexFile)
 
-    val dataChunkMeta = getDataChunkMeta
+    val results = new Array[InputSplit](dataChunkCoordsArray.length)
 
-    val dataChunks = new Array[DataChunk](dataChunkCoords._2.size)
+    for (indice <- dataChunkCoordsArray.indices) {
+      val dataChunkCoords = dataChunkCoordsArray(indice)
+      val dataChunks = new Array[DataChunk](dataChunkCoords.size)
 
-    for (i <- dataChunkCoords._2.indices) {
-      val dataChunkCorner = dataChunkCoords._2(i)
-      val dataChunkByteLocation = nodeIndex.get(dataChunkCorner.getID)
-      val corner = dataChunkCorner.getCorner
-      val filePath = dataChunkMeta.getFilePathPattern.replace("*", corner(0).toString)
+      for (i <- dataChunkCoords.indices) {
+        val dataChunkCorner = dataChunkCoords(i)
+        val dataChunkByteLocation = nodeIndex.get(dataChunkCorner.getID)
+        val corner = dataChunkCorner.getCorner
+        val filePath = dataChunkMeta.getFilePathPattern.replace("YEAR", corner(0).toString)
 
-      val shape = dataChunkMeta.getShape.slice(1, dataChunkMeta.getShape.size)
-      val dims = dataChunkMeta.getDimensions.slice(1, dataChunkMeta.getDimensions.size)
+        val shape = dataChunkMeta.getShape.slice(1, dataChunkMeta.getShape.size)
+        val dims = dataChunkMeta.getDimensions.slice(1, dataChunkMeta.getDimensions.size)
 
-      dataChunks(i) = new DataChunk(corner.slice(1, corner.size), shape, dims,
-        dataChunkByteLocation.getFilePos, dataChunkByteLocation.getByteSize,
-        dataChunkMeta.getFilterMask, hosts, dataChunkMeta.getDataType, dataChunkMeta.getVarShortName, filePath)
+        dataChunks(i) = new DataChunk(corner.slice(1, corner.size), shape, dims,
+          dataChunkByteLocation.getFilePos, dataChunkByteLocation.getByteSize,
+          dataChunkMeta.getFilterMask, hosts, dataChunkMeta.getDataType, dataChunkMeta.getVarShortName, filePath)
+      }
+
+      results(indice) = new DataChunkInputSplit(dataChunks.toList.asJava)
     }
-
-    val results = new Array[InputSplit](1)
-    results(0) = new DataChunkInputSplit(dataChunks.toList.asJava)
     results.toIterator
   }
 
   override protected def getPartitions: Array[Partition] = {
     val partitions = new Array[Partition](dataChunkCoordScheduled.size)
-    for (i <- 0 until dataChunkCoordScheduled.size) {
+    for (i <- dataChunkCoordScheduled.indices) {
       partitions(i) = new DataChunkSplitPartition(dataChunkCoordScheduled(i), i)
     }
     partitions
