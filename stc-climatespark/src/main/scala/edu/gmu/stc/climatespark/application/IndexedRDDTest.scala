@@ -3,6 +3,7 @@ package edu.gmu.stc.climatespark.application
 import edu.gmu.stc.climatespark.core.ClimateSparkContext
 import edu.gmu.stc.climatespark.functions.DataFormatFunctions
 import edu.gmu.stc.climatespark.rdd.{DataChunkRDD, DataChunkSplitRDD}
+import edu.gmu.stc.climatespark.util.RuntimeMonitor
 import edu.gmu.stc.hadoop.raster._
 import edu.gmu.stc.climatespark.functions.ClimateRDDFunctions._
 
@@ -26,21 +27,110 @@ object IndexedRDDTest {
     val dataChunkMeta = new DataChunkMeta(Array(1, 1, 91, 144),
       Array("date", "hour", "lat", "lon"),
       filterMask, dataType, varName,
-      "/Users/feihu/Documents/Data/Merra2/MERRA2_200.tavg1_2d_int_Nx.YEAR.nc4",
+      "/merra2/daily/M2T1NXINT/YEAR/MONTH/MERRA2_CODE.tavg1_2d_int_Nx.TIME.nc4",
+      //"/Users/feihu/Documents/Data/Merra2/MERRA2_200.tavg1_2d_int_Nx.YEAR.nc4",
       "/Users/feihu/Documents/Data/Merra2/index/nodeindex/preccu_HOSTID.txt")
+    val filePath = dataChunkMeta.getFilePath(19950101)
+
+    println(filePath)
 
     val inputFile = "/Users/feihu/Documents/Data/Merra2/index/preccu"
     val outputFile = "/Users/feihu/Documents/Data/Merra2/index/preccu-index-test.parquet"
-    val kdTreeFile = "/Users/feihu/Documents/Data/Merra2/index/kdindexGson.txt"
+    val kdTreeFile = "/Users/feihu/Documents/Data/Merra2/index/kdindexGson-1.txt"
     //DataFormatFunctions.csvToParquet(inputFile, outputFile, 100, sc.getSparkContext)
     //val dataChunkRDD = DataFormatFunctions.parquetToDataChunkRDD(sc.getSparkContext, outputFile)
     //val dataChunkCoordRDD = DataFormatFunctions.parquetToDataChunkCoordRDD(sc.getSparkContext, outputFile)
     //DataFormatFunctions.csvToDataNodeIndexFile(inputFile, "/Users/feihu/Documents/Data/Merra2/index/nodeindex/", "preccu", 23, sc.getSparkContext)
+    //DataFormatFunctions.csvToKDTreeFile(sc.getSparkContext, sc.getHadoopConfig, inputFile, kdTreeFile)
 
 
     val kdTree = DataFormatFunctions.kdTreeFileToKDTree(sc.getSparkContext, sc.getHadoopConfig, kdTreeFile)
+    //376 113
+    val tree_height = kdTree.getTreeHeight
 
+    println(tree_height)
+
+    var time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19870101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19880101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19890101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19900101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19910101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19920101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19930101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19940101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19950101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+    time = 0L
+    for (i <- 0 until 30) {
+      time = time + RuntimeMonitor.show_timing(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19960101, 24.0, 364.0, 576.0)).toArray)._2
+    }
+
+    println(time/30)
+
+    /*
     val dataChunkCoordResults = kdTree.range(Array(19920101, 0.0, 0.0, 0.0), Array(19920102, 24.0, 364.0, 576.0)).toArray
+
+    println("**************************")
+
+
 
     val scheduledDataChunks = dataChunkCoordResults.groupBy(dataChunkCoord => {
       val coord = dataChunkCoord.asInstanceOf[DataChunkCoord]
@@ -94,10 +184,11 @@ object IndexedRDDTest {
     val dataChunkInputSplitRDD = new DataChunkSplitRDD(scheduledDataChunks, dataChunkMeta, sc.getSparkContext, sc.getHadoopConfig)
     dataChunkInputSplitRDD.cache()
     val dataChunkRDD = new DataChunkRDD(dataChunkInputSplitRDD, oneToMorePatitionNumMapping, inputSplitSize, sc.getSparkContext, sc.getHadoopConfig)
-    val paritions = dataChunkRDD.partitions
+    /*val paritions = dataChunkRDD.partitions
     val size = dataChunkRDD.count()
     val dependency = dataChunkRDD.dependencies
-    println("--------" + size)
+    println("--------" + size)*/
     dataChunkRDD.avgDaily.collect().foreach(s => println(s))
+    */
   }
 }

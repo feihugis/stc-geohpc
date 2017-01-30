@@ -26,6 +26,24 @@ public class DataChunkMeta implements Serializable{
     this.nodeIndexPattern = nodeIndexPattern;
   }
 
+  //TODO: to make it more general
+  public String getFilePath(int time) {
+    String filePath;
+    if (time <= 19911231) {
+      // /merra2/daily/M2T1NXINT/YEAR/MONTH/MERRA2_100.tavg1_2d_int_Nx.TIME.nc4
+      filePath = this.filePathPattern.replace("CODE", "100");
+    } else {
+      // /merra2/daily/M2T1NXINT/1992/12/MERRA2_200.tavg1_2d_int_Nx.19921201.nc4
+      filePath = this.filePathPattern.replace("CODE", "200");
+    }
+
+    filePath = filePath.replace("YEAR", time/10000 + "");
+    String month = String.format("%02d", (time % 10000) / 100);
+    filePath = filePath.replace("MONTH", month);
+    filePath = filePath.replace("TIME", time + "");
+    return filePath;
+  }
+
   public int[] getShape() {
     return shape;
   }

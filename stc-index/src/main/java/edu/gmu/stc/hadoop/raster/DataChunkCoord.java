@@ -129,7 +129,7 @@ public class DataChunkCoord implements Serializable, Writable, KryoSerializable 
   public double getID() {
     String id = "";
     for (int c : this.corner) {
-      id += c;
+      id += String.format("%03d", c);
     }
     return Double.parseDouble(id);
   }

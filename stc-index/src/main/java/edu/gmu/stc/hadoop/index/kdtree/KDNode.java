@@ -82,6 +82,15 @@ class KDNode<T> implements Serializable{
         return t;            
     }
 
+    public KDNode<T> getLeft() {
+      return this.left;
+    }
+
+    public KDNode<T> getRight() {
+      return this.left;
+    }
+
+
     protected static <T> boolean del(KDNode<T> t) {
         synchronized (t) {
             if (!t.deleted) {

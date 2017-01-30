@@ -60,14 +60,23 @@ object DataFormatFunctions {
   }
 
   def csvToDataChunkCoordRDD(sc : SparkContext, inputFile : String): RDD[DataChunkCoord] = {
-    this.csvToDataChunkRDD(inputFile, sc).map(dataChunk => new DataChunkCoord(dataChunk)).filter(d => {
-      val coord = d.getCorner
-      if (coord(0) > 19911231) {
-        true
-      } else {
-        false
-      }
+    val sortedRDD = this.csvToDataChunkRDD(inputFile, sc).map(dataChunk => new DataChunkCoord(dataChunk))
+        .filter(d => {
+          val coord = d.getCorner
+          if (coord(0) > 19851231) {
+            true
+          } else {
+            false
+          }
+        })
+      .map(dataChunkCoord => (dataChunkCoord.getID, dataChunkCoord))
+      .sortByKey()
+
+    val reducedRDD =  sortedRDD.reduceByKey((dataChunkCoord1, dataChunkCoord2) => {
+      dataChunkCoord1
     })
+
+    reducedRDD.map(tuple => tuple._2)
   }
 
   def parquetToKDTreeFile(sc : SparkContext, config: Configuration, inputFile : String, outputFile: String) = {
@@ -87,16 +96,46 @@ object DataFormatFunctions {
     fin.close()
   }
 
+  var max = 0
+  var count = 0
+
+  def buildBinaryTree(sortedArray: Array[DataChunkCoord],
+                      tartget: Array[DataChunkCoord],
+                      start: Int, end: Int,
+                      index: Int): Unit = {
+    if (start <= end && index < tartget.size) {
+      max = Math.max(max, index)
+      count = count + 1
+
+      val mid = (start + end) / 2
+      tartget(index) = sortedArray(mid)
+      buildBinaryTree(sortedArray, tartget, start, mid - 1, index * 2 + 1)
+      buildBinaryTree(sortedArray, tartget, mid + 1, end, index * 2 + 2)
+    }
+
+  }
+
   def csvToKDTreeFile(sc : SparkContext, config: Configuration, inputFile : String, outputFile: String) = {
     val dataChunkCoordRDD = DataFormatFunctions.csvToDataChunkCoordRDD(sc, inputFile)
     val coordArray = dataChunkCoordRDD.collect()
+
+    val size = coordArray.size
+
+    //some of the leaf nodes may be null
+    val binaryBree = new Array[DataChunkCoord](size*2 + 1)
+
+    buildBinaryTree(coordArray, binaryBree, 0, size - 1, 0)
+
     val kdTree = new KDTree[DataChunkCoord](coordArray(0).getCorner.length)
 
     coordArray.foreach(dataChunkCoor => {
-      kdTree.insert(dataChunkCoor.getCornerAsDouble, dataChunkCoor)
+      if (dataChunkCoor != null) {
+        kdTree.insert(dataChunkCoor.getCornerAsDouble, dataChunkCoor)
+      }
     })
 
     val gson = new Gson();
+
     val kdTreeString = gson.toJson(kdTree, new TypeToken[KDTree[DataChunkCoord]](){}.getType)
     val fs = FileSystem.get(config)
     val fin = fs.create(new Path(outputFile))

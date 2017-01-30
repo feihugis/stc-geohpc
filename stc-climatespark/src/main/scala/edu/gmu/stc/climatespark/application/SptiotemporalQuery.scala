@@ -16,17 +16,24 @@ import org.apache.spark.sql.types._
 object SptiotemporalQuery {
 
   def main(args: Array[String]) {
-    val configFile = "/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/mod08-climatespark-config.xml"
+    val configFile = "/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/merra2-climatespark-config.xml"      //"/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/mod08-climatespark-config.xml"
     val sc = new ClimateSparkContext(configFile, "local[6]", "test")
     val sqlContext = new SQLContext(sc.getSparkContext)
     import sqlContext.implicits._
 
     val climateRDD_1 = sc.getClimateRDD
 
-    val weightedAreaAvg = climateRDD_1.weightedAreaAvgDaily
+    val collect = climateRDD_1.avgDaily.collect()
 
-    weightedAreaAvg.foreach(rdd => print(rdd + "\n"))
+    collect.foreach(s => println(s))
 
+    println(collect.length)
+
+    //val weightedAreaAvg = climateRDD_1.weightedAreaAvgDaily
+
+    //weightedAreaAvg.foreach(rdd => print(rdd + "\n"))
+
+    /*
     val cellRDD_1 = climateRDD_1.queryWeightPointTimeSeries.sortBy(cell => cell.value)
 
     cellRDD_1.foreach(cell => {
@@ -66,6 +73,8 @@ object SptiotemporalQuery {
     sc.getHadoopConfig.set(ClimateHadoopConfigParameter.QUERY_VARIABLE_NAMES, "Aerosol_Scattering_Angle_Mean")
     val climateRDD_3 = sc.getClimateRDD
     val cellRDD_3 = climateRDD_3.queryPointTimeSeries
+
+    */
 
 
 

@@ -107,6 +107,25 @@ public class KDTree<T> implements Serializable{
     throws KeySizeException, KeyDuplicateException {
         this.edit(key, new Editor.Inserter<T>(value));
     }
+
+    public KDNode<T> getRootNode() {
+      return this.m_root;
+    }
+
+    public int getTreeHeight() {
+      return getTreeHeight(m_root);
+    }
+
+    public int getTreeHeight(KDNode<T> node) {
+      if (node == null) return 0;
+
+      int height_left = 1 + getTreeHeight(node.left);
+      int height_right = 1 + getTreeHeight(node.right);
+
+      return Math.max(height_left, height_right);
+    }
+
+
     
     /** 
     * Edit a node in a KD-tree
@@ -390,6 +409,7 @@ public class KDTree<T> implements Serializable{
 	
 	return nbrs;
     }
+
 
 
 }

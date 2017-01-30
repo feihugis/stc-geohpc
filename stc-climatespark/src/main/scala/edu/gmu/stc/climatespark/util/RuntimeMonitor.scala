@@ -5,11 +5,11 @@ package edu.gmu.stc.climatespark.util
   */
 object RuntimeMonitor {
 
-  def show_timing[T](proc: => T): T = {
+  def show_timing[T](proc: => T): (T, Long) = {
     val start=System.nanoTime()
     val res = proc // call the code
     val end = System.nanoTime()
-    println("Time elapsed: " + (end-start)/1000 + " microsecs")
-    res
+    //println("Time elapsed: " + (end-start)/1000 + " microsecs")
+    (res, (end-start)/1000)
   }
 }

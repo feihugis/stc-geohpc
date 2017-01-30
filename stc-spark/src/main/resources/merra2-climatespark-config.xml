@@ -65,7 +65,7 @@
     <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
     <property>
         <name>query.variable.names</name>
-        <value>LWGNET</value>
+        <value>PRECCU</value>
         <description>it support multiple input variables, which are separated by comma</description>
     </property>
 
@@ -76,7 +76,7 @@
 
     <property>
         <name>query.time.end</name>
-        <value>19800101</value>
+        <value>19800102</value>
     </property>
 
     <property>

@@ -43,10 +43,10 @@ public class DataChunkCorner implements Serializable {
   }
 
   public double getID() {
-    String s = "";
-    for (int v : corner) {
-      s = s + v;
+    String id = "";
+    for (int c : this.corner) {
+      id += String.format("%03d", c);
     }
-    return Double.parseDouble(s);
+    return Double.parseDouble(id);
   }
 }
