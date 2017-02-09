@@ -23,10 +23,17 @@
 
 package edu.gmu.stc.hadoop.index.kdtree;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import java.io.Serializable;
 import java.util.List;
 
-class KDNode<T> implements Serializable{
+import edu.gmu.stc.hadoop.raster.io.datastructure.ArrayFloatSerializer;
+
+public class KDNode<T> implements Serializable, KryoSerializable {
 
     // these are seen by KDTree
     protected HPoint k;
@@ -296,4 +303,21 @@ class KDNode<T> implements Serializable{
 	    hp_dst.coord[i] = hp_src.coord[i];
 	}
     }
+
+  @Override
+  public void write(Kryo kryo, Output output) {
+    kryo.writeObject(output, k);
+    kryo.writeClassAndObject(output, v);
+
+    kryo.writeClassAndObject(output, left);
+    kryo.writeClassAndObject(output, right);
+  }
+
+  @Override
+  public void read(Kryo kryo, Input input) {
+    k = kryo.readObject(input, HPoint.class);
+    v = (T) kryo.readClassAndObject(input);
+    left = (KDNode<T>) kryo.readClassAndObject(input);
+    right = (KDNode<T>) kryo.readClassAndObject(input);
+  }
 }

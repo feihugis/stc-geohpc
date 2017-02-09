@@ -2,6 +2,7 @@ package edu.gmu.stc.climatespark.io
 
 import com.esotericsoftware.kryo.Kryo
 import edu.gmu.stc.climatespark.io.datastructure.Cell
+import edu.gmu.stc.hadoop.index.kdtree.{KDNode, KDTree, HPoint}
 import edu.gmu.stc.hadoop.raster.DataChunk
 import edu.gmu.stc.hadoop.raster.io.datastructure.{ArraySerializer, ArrayShortSerializer, ArrayFloatSerializer}
 import org.apache.spark.serializer.KryoRegistrator
@@ -18,6 +19,10 @@ class ClimateSparkKryoRegistrator extends KryoRegistrator{
     kryo.register(classOf[ArraySerializer])
     kryo.register(classOf[scala.Tuple2[DataChunk, ArrayFloatSerializer]])
     kryo.register(classOf[Cell])
+    kryo.register(classOf[KDTree[ArrayFloatSerializer]])
+    kryo.register(classOf[HPoint])
+    kryo.register(classOf[KDNode[ArrayFloatSerializer]])
+
     //kryo.register(scala.Tuple2[].class)
     //kryo.register(classOf[scala.Tuple2[]])
     //kryo.register(classOf[Cell])

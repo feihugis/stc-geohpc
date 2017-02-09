@@ -23,4 +23,6 @@ public class DataChunkHosts implements Serializable{
   public void setHosts(String[] hosts) {
     this.hosts = hosts;
   }
+
+
 }

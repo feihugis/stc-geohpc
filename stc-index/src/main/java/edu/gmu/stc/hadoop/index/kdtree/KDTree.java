@@ -1,5 +1,10 @@
 package edu.gmu.stc.hadoop.index.kdtree;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoSerializable;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.LinkedList;
@@ -56,12 +61,12 @@ import java.util.Stack;
 * and
 *   <https:*projects.ardrone.org/attachments/278/ParrotCopyrightAndDisclaimer.txt>.
 */
-public class KDTree<T> implements Serializable{
+public class KDTree<T> implements Serializable, KryoSerializable {
     // number of milliseconds
     final long m_timeout;
     
     // K = number of dimensions
-    final private int m_K;
+    private int m_K;
     
     // root of KD-tree
     private KDNode<T> m_root;
@@ -251,7 +256,7 @@ public class KDTree<T> implements Serializable{
     * a given key.
     *
     * @param key key for KD-tree node
-    * @param d Euclidean distance
+    * @param dist Euclidean distance
     *
     * @return objects at nodes with distance of key, or null on failure
     *
@@ -269,7 +274,7 @@ public class KDTree<T> implements Serializable{
     * a given key.
     *
     * @param key key for KD-tree node
-    * @param d Hamming distance
+    * @param dist Hamming distance
     *
     * @return objects at nodes with distance of key, or null on failure
     *
@@ -411,6 +416,18 @@ public class KDTree<T> implements Serializable{
     }
 
 
+  @Override
+  public void write(Kryo kryo, Output output) {
+    output.writeInt(m_count);
+    output.writeInt(m_K);
+    kryo.writeClassAndObject(output, m_root);
+  }
 
+  @Override
+  public void read(Kryo kryo, Input input) {
+    this.m_count = input.readInt();
+    this.m_K = input.readInt();
+    this.m_root = (KDNode<T>) kryo.readClassAndObject(input);
+  }
 }
 

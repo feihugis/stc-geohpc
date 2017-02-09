@@ -84,14 +84,15 @@ class DataChunkSplitRDD(
         val dataChunkCorner = dataChunkCoords(i)
         val dataChunkByteLocation = nodeIndex.get(dataChunkCorner.getID)
         val corner = dataChunkCorner.getCorner
-        val filePath = dataChunkMeta.getFilePathPattern.replace("YEAR", corner(0).toString)
+        //val filePath = dataChunkMeta.getFilePathPattern.replace("YEAR", corner(0).toString)
+        val filePath = dataChunkMeta.getFilePath(corner(0).toInt)
 
         val shape = dataChunkMeta.getShape.slice(1, dataChunkMeta.getShape.size)
         val dims = dataChunkMeta.getDimensions.slice(1, dataChunkMeta.getDimensions.size)
 
         dataChunks(i) = new DataChunk(corner.slice(1, corner.size), shape, dims,
           dataChunkByteLocation.getFilePos, dataChunkByteLocation.getByteSize,
-          dataChunkMeta.getFilterMask, hosts, dataChunkMeta.getDataType, dataChunkMeta.getVarShortName, filePath)
+          dataChunkMeta.getFilterMask, hosts, dataChunkMeta.getDataType, dataChunkMeta.getVarShortName, filePath, corner(0))
       }
 
       results(indice) = new DataChunkInputSplit(dataChunks.toList.asJava)

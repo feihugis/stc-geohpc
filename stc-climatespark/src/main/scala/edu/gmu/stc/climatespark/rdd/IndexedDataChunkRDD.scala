@@ -1,28 +1,25 @@
 package edu.gmu.stc.climatespark.rdd
 
-import edu.gmu.stc.climatespark.rdd.indexedrdd.IndexedRDD
-import edu.gmu.stc.climatespark.rdd.indexedrdd.IndexedRDD._
+import edu.gmu.stc.climatespark.rdd.indexedrdd.IndexedRDDPartition
+import edu.gmu.stc.hadoop.index.kdtree.KDTree
+import edu.gmu.stc.hadoop.raster.{DataChunkCoord, DataChunkInputSplit, DataChunkReader, DataChunk}
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer
-import edu.gmu.stc.hadoop.raster.{DataChunkInputSplit, DataChunk, DataChunkReader}
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.mapred.InputSplit
-import org.apache.spark._
 import org.apache.spark.annotation.DeveloperApi
+import org.apache.spark.{TaskContext, Partition, SerializableWritable, SparkContext}
 import org.apache.spark.rdd.RDD
 
 import scala.collection.mutable.ArrayBuffer
-import scala.reflect.ClassTag
-import org.apache.spark.storage.StorageLevel
 
-
-
-
-class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
-                   oneToMorePartitionNumMapping: Array[(Int, Int)],
-                   newPartitionNum: Int,
-                   sc: SparkContext,
-                   @transient conf: Configuration)
-    extends RDD[(DataChunk, ArraySerializer)](sc, Nil){   //List(new OneToOneDependency(dataChunkSplitRDD))
+/**
+  * Created by Fei Hu on 2/1/17.
+  */
+class IndexedDataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
+                          oneToMorePartitionNumMapping: Array[(Int, Int)],
+                          newPartitionNum: Int,
+                          sc: SparkContext,
+                          @transient conf: Configuration)
+  extends RDD[KDTree[ArraySerializer]](sc, Nil){   //List(new OneToOneDependency(dataChunkSplitRDD))
 
   private val confBroadcast = sc.broadcast(new SerializableWritable(conf))
 
@@ -32,7 +29,7 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
   }
 
   @DeveloperApi
-  override def compute(split: Partition, context: TaskContext): Iterator[(DataChunk, ArraySerializer)] = {
+  override def compute(split: Partition, context: TaskContext): Iterator[KDTree[ArraySerializer]] = {
     val parentSplit = getParentPartition(split)
     val inputSplitSplitIndex = {
       if (parentSplit.index == 0) {
@@ -42,9 +39,12 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
       }
     }
 
-    val dataChunkSplits = dataChunkSplitRDD.iterator(parentSplit, context).slice(inputSplitSplitIndex, inputSplitSplitIndex+1)
+    val dataChunkSplits = dataChunkSplitRDD.iterator(parentSplit, context).slice(inputSplitSplitIndex, inputSplitSplitIndex+1).toArray
     val results = new ArrayBuffer[(DataChunk, ArraySerializer)]
     val configuration = dataChunkSplitRDD.getConf
+
+
+    val kdTree = new KDTree[ArraySerializer](4)
 
     for ( dataChunkSplit <- dataChunkSplits) {
       val recordReader = new DataChunkReader()
@@ -53,12 +53,27 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
         val key = recordReader.getCurrentKey
         val value = recordReader.getCurrentValue
         if (key != null) {
-          val r = (key, value)
-          results += r
+          val corner = new DataChunkCoord(key).getCornerAsDouble
+          kdTree.insert(corner, value)
         }
       }
     }
-    results.toIterator
+
+    Array(kdTree).toIterator
+  }
+
+  def range(lowk: Array[Double], uppk: Array[Double]): Array[Array[_ <: AnyRef]] = {
+   //this.map(kdTree => kdTree.range(lowk, uppk))
+   val results = context.runJob(this, (task: TaskContext, iter: Iterator[KDTree[ArraySerializer]]) => {
+      if (iter.hasNext) {
+        val kdTree = iter.next()
+        kdTree.range(lowk, uppk).toArray()
+      } else {
+        Array.empty
+      }
+    }, this.partitions.indices, allowLocal = true)
+
+    results
   }
 
   override protected def getPartitions: Array[Partition] = {
@@ -111,8 +126,3 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
     new DataChunkSplitPartition(split.asInstanceOf[DataChunkSplitPartition].dataChunkPartitions, parentIndex)
   }
 }
-
-
-
-
-
