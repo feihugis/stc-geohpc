@@ -30,6 +30,7 @@ object RuntimeMonitor {
       time = time + end - start
     }
 
+    println(time/repeatTime/1000)
     time/repeatTime/1000
   }
 }

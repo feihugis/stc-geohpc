@@ -17,7 +17,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
   def queryPointTimeSeries: RDD[Cell] = {
     self.flatMap(tuple => {
       val dataChunk = tuple._1
-      val time = dataChunk.getTime.toString
+      val time = dataChunk.getTime
       val shape =  dataChunk.getShape
       val corner = dataChunk.getCorner
       val varName = dataChunk.getVarShortName
@@ -31,8 +31,36 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
           val value = array.getShort(index)
           val y = 89.5F - (corner(0)+lat)*1.0F
           val x = -179.5F + (corner(1)+lon)*1.0F
-          val cell = Cell(varName, time, y, x, value)
+          val cell = Cell(varName, time, 0, y, x, value)
           cellList += cell
+        }
+      }
+      cellList.toList
+    })
+  }
+
+  def query3DPointTimeSeries: RDD[Cell] = {
+    self.filter(tuple => tuple._1 != null)
+      .flatMap(tuple => {
+      val dataChunk = tuple._1
+      val time = dataChunk.getTime
+      val shape =  dataChunk.getShape
+      val corner = dataChunk.getCorner
+      val varName = dataChunk.getVarShortName
+
+      val array = tuple._2.getArray
+      var cellList = ArrayBuffer.empty[Cell]
+
+      for (hour:Int <- 0 until shape(0)) {
+        for (lat:Int <- 0 until shape(1)){
+          for (lon:Int <- 0 until shape(2)){
+            val index = hour * shape(1) * shape(2) + lat * shape(2) + lon
+            val value = array.getShort(index)
+            val y = 89.5F - (corner(1)+lat)*1.0F
+            val x = -179.5F + (corner(2)+lon)*1.0F
+            val cell = Cell(varName, time, corner(0), y, x, value)
+            cellList += cell
+          }
         }
       }
       cellList.toList

@@ -115,6 +115,22 @@ object DataFormatFunctions {
 
   }
 
+  def buildBinaryTree(sortedArray: Array[DataChunkCorner],
+                      tartget: Array[DataChunkCorner],
+                      start: Int, end: Int,
+                      index: Int): Unit = {
+    if (start <= end && index < tartget.size) {
+      max = Math.max(max, index)
+      count = count + 1
+
+      val mid = (start + end) / 2
+      tartget(index) = sortedArray(mid)
+      buildBinaryTree(sortedArray, tartget, start, mid - 1, index * 2 + 1)
+      buildBinaryTree(sortedArray, tartget, mid + 1, end, index * 2 + 2)
+    }
+
+  }
+
   def csvToKDTreeFile(sc : SparkContext, config: Configuration, inputFile : String, outputFile: String) = {
     val dataChunkCoordRDD = DataFormatFunctions.csvToDataChunkCoordRDD(sc, inputFile)
     val coordArray = dataChunkCoordRDD.collect()

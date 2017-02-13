@@ -43,7 +43,6 @@ class IndexedDataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
     val results = new ArrayBuffer[(DataChunk, ArraySerializer)]
     val configuration = dataChunkSplitRDD.getConf
 
-
     val kdTree = new KDTree[ArraySerializer](4)
 
     for ( dataChunkSplit <- dataChunkSplits) {
@@ -67,7 +66,22 @@ class IndexedDataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
    val results = context.runJob(this, (task: TaskContext, iter: Iterator[KDTree[ArraySerializer]]) => {
       if (iter.hasNext) {
         val kdTree = iter.next()
+        //println(kdTree.toString)
+        //println("--------------------------------------------------------------------------------")
         kdTree.range(lowk, uppk).toArray()
+      } else {
+        Array.empty
+      }
+    }, this.partitions.indices, allowLocal = true)
+
+    results
+  }
+
+  def nearestEuclidean(point: Array[Double], dist: Double): Array[Array[_ <: AnyRef]] = {
+    val results = context.runJob(this, (task: TaskContext, iter: Iterator[KDTree[ArraySerializer]]) => {
+      if (iter.hasNext) {
+        val kdTree = iter.next()
+        kdTree.nearestEuclidean(point, dist).toArray()
       } else {
         Array.empty
       }

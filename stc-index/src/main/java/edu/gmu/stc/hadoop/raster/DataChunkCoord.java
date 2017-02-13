@@ -36,6 +36,36 @@ public class DataChunkCoord implements Serializable, Writable, KryoSerializable 
     this.hosts = hosts.getHosts();
   }
 
+  public boolean physicalEqual(DataChunkCoord dataChunkCoord) {
+    if (this.corner.length != dataChunkCoord.corner.length ||
+        this.hosts.length != dataChunkCoord.hosts.length) {
+      return false;
+    }
+
+    for (int i = 0; i < this.corner.length; i++) {
+      if (this.corner[i] != dataChunkCoord.corner[i]) return false;
+    }
+
+    for (int i = 0; i < this.hosts.length; i++) {
+      if (!this.hosts[i].equals(dataChunkCoord.hosts[i])) return false;
+    }
+
+    return true;
+  }
+
+  public boolean logicalEqual(DataChunkCoord dataChunkCoord) {
+    if (this.corner.length != dataChunkCoord.corner.length) {
+      return false;
+    }
+
+    for (int i = 0; i < this.corner.length; i++) {
+      if (this.corner[i] != dataChunkCoord.corner[i]) return false;
+    }
+
+    return true;
+  }
+
+
   @Override
   public void write(DataOutput out) throws IOException {
     out.writeInt(corner.length);

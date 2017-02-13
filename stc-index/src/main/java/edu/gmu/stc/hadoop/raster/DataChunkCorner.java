@@ -49,4 +49,15 @@ public class DataChunkCorner implements Serializable {
     }
     return Double.parseDouble(id);
   }
+
+  public double getEuclideanDist(DataChunkCorner dataChunkCorner) {
+    if (this.corner.length != dataChunkCorner.corner.length) return Double.MAX_VALUE;
+
+    double dist = 0.0;
+    for (int i = 0; i < this.corner.length; i++) {
+      dist = dist + (this.corner[i] - dataChunkCorner.corner[i]) * (this.corner[i] - dataChunkCorner.corner[i]);
+    }
+
+    return Math.sqrt(dist);
+  }
 }
