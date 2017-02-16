@@ -63,7 +63,19 @@ object HierarchyIndex {
 
 
     val start_point = Array(19860101, 0.0, 0.0, 0.0)
-    val end_point = Array(19881231, 24.0, 364.0, 576.0)
+    val end_point = Array(19901231, 24.0, 364.0, 576.0)
+
+    val dataChunkRDDs = qeueryDataChunkRDD(csc, dataChunkMeta, kdTree, start_point, end_point, true)
+    //701184
+
+    val dynamicDataChunkRDD = queryDynamicDataChunkRDD(csc, dataChunkMeta, kdTree, start_point, end_point, true, 1, 4)
+    RuntimeMonitor.show_multi_runtiming(dynamicDataChunkRDD.avgDaily.foreach(p => p), 5)
+
+    RuntimeMonitor.show_multi_runtiming(dataChunkRDDs.avgDaily.foreach(p => p), 5)
+
+
+
+
 
     val indexedDataChunkRDD = qeueryIndexedDataChunkRDD(csc, dataChunkMeta, kdTree, start_point, end_point, false)
 
@@ -229,12 +241,15 @@ object HierarchyIndex {
     RuntimeMonitor.show_multi_runtiming(dataChunkRDD.foreach(p => println(p)), 2)
 
 
+
+
     val years = Array(19860101, 19870101, 19880101, 19890101, 19900101, 19910101, 19920101, 19930101, 19940101, 19950101)
     for (year <- years) {
       val start_point = Array(19850101, 0.0, 254.0, 113.0)
       val end_point = Array(year, 24.0, 262.0, 124.0)
       val dataChunkRDD = qeueryDataChunkRDD(csc, dataChunkMeta, kdTree, start_point, end_point, true)
       RuntimeMonitor.show_multi_runtiming(dataChunkRDD.avgDaily.foreach(s => println(s)), 10)
+
     }
   }
 

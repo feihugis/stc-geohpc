@@ -21,7 +21,8 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
                    oneToMorePartitionNumMapping: Array[(Int, Int)],
                    newPartitionNum: Int,
                    sc: SparkContext,
-                   @transient conf: Configuration)
+                   @transient conf: Configuration,
+                   decreaseParallelismLevel: Int = 1)
     extends RDD[(DataChunk, ArraySerializer)](sc, Nil){   //List(new OneToOneDependency(dataChunkSplitRDD))
 
   private val confBroadcast = sc.broadcast(new SerializableWritable(conf))
@@ -42,7 +43,12 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
       }
     }
 
-    val dataChunkSplits = dataChunkSplitRDD.iterator(parentSplit, context).slice(inputSplitSplitIndex, inputSplitSplitIndex+1)
+    val splitSize = oneToMorePartitionNumMapping(parentSplit.index)._2
+
+    val dataChunkSplits = dataChunkSplitRDD.iterator(parentSplit, context)
+                            .slice(inputSplitSplitIndex,
+                                    math.min(inputSplitSplitIndex + decreaseParallelismLevel, splitSize))
+
     val results = new ArrayBuffer[(DataChunk, ArraySerializer)]
     val configuration = dataChunkSplitRDD.getConf
 
@@ -74,6 +80,7 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
 
     var startIndex = 0
     var endIndex = 0
+    var curPartition = 0
     for (i <- parentPartions.indices) {
       val dataChunkScheduler = parentPartions(i).asInstanceOf[DataChunkSplitPartition].dataChunkPartitions
       if (i == 0) {
@@ -82,8 +89,9 @@ class DataChunkRDD(dataChunkSplitRDD: DataChunkSplitRDD,
         startIndex = oneToMorePartitionNumMapping(i - 1)._2
       }
       endIndex = oneToMorePartitionNumMapping(i)._2
-      for (partitionIndex <- startIndex until endIndex) {
-        partitions(partitionIndex) = new DataChunkSplitPartition(dataChunkScheduler, partitionIndex)
+      for (partitionIndex <- startIndex until endIndex by decreaseParallelismLevel) {
+        partitions(curPartition) = new DataChunkSplitPartition(dataChunkScheduler, partitionIndex)
+        curPartition = curPartition + 1
       }
     }
 

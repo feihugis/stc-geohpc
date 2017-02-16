@@ -74,8 +74,8 @@ object IndexedRDDTest {
 
     //println(RuntimeMonitor.show_multi_runtiming(kdTree.range(Array(19860101, 0.0, 0.0, 0.0), Array(19870101, 24.0, 364.0, 576.0)).toArray, repeatTime))
 
-    val start_point = Array(19920101, 0.0, 0.0, 0.0)
-    val end_point = Array(19920102, 24.0, 364.0, 576.0)
+    val start_point = Array(19860101, 0.0, 0.0, 0.0)
+    val end_point = Array(19900102, 24.0, 364.0, 576.0)
 
     val results = kdTree.range(start_point, end_point)
 
@@ -88,6 +88,14 @@ object IndexedRDDTest {
 
     val dataChunkRDD = qeueryDataChunkRDD(sc, dataChunkMeta, kdTree, start_point, end_point, false)
     dataChunkRDD.cache()
+
+    val dynamicDataChunkRDD = queryDynamicDataChunkRDD(sc, dataChunkMeta,
+                                                       kdTree, start_point, end_point, false,
+                                                       1, 2)
+
+    dynamicDataChunkRDD.count()
+
+
 
     val indexedDataChunkRDD = qeueryIndexedDataChunkRDD(sc, dataChunkMeta, kdTree, start_point, end_point, false)
     indexedDataChunkRDD.cache()

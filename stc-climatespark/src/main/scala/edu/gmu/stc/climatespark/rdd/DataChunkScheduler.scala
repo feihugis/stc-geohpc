@@ -69,25 +69,10 @@ object DataChunkScheduler {
       val values = new Array[Array[DataChunkCorner]](group.length)
       for (i <- values.indices) {
         values(i) = group(i)._2(0)
-        /*values(i).sortBy(dataChunkCorner => dataChunkCorner.getID)
-        val size = values(i).size
-        val binaryBree = new Array[DataChunkCorner](size*2 + 1)
-        DataFormatFunctions.buildBinaryTree(values(i), binaryBree, 0, size - 1, 0)
-        values(i) = binaryBree.filter(dataChunkCorner => dataChunkCorner != null)*/
-
       }
       val key = group(0)._1
-      (key, values.toArray)
+      (key, values)
     }).toArray
-
-    /*scheduledDataChunks.foreach(tuple => {
-      val entrysize = tuple._2.length
-      var chunksize = 0
-      for (i <- tuple._2.indices) {
-        chunksize = chunksize + tuple._2(i).length
-      }
-      println(entrysize + " : " + chunksize)
-    })*/
 
     scheduledDataChunks
   }

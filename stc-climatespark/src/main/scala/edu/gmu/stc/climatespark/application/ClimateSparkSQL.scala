@@ -22,7 +22,10 @@ object ClimateSparkSQL {
 
     val variable = sqlContext.read.parquet("/parquet/preccu_merra2_1980_1996.parquet")
     variable.registerTempTable("merra")
-    sqlContext.sql("select * from merra where time >= 19860101 and time <= 19881231").registerTempTable("merra2")
+    sqlContext.sql("select * from merra where time >= 19860101 and time <= 19901231").registerTempTable("merra2")
+
+    RuntimeMonitor.show_multi_runtiming(
+      sqlContext.sql("select avg(value) from merra where time >= 19850101 and time <= 19851231 and lat <= 41.001 and lat >= 37.0077 and lon <= -102.040513 and lon >= -109.071 and hour >= 0 and hour <= 24 group by time").collect(), 1)
 
     sqlContext.cacheTable("merra2")
     //val sqlLang = "select avg(value) from merra2 where lat <= 91 and lon <= 288 and time >= 19860101 and time <= 19861231 and hour >= 0 and hour <=2 group by lat, lon"
