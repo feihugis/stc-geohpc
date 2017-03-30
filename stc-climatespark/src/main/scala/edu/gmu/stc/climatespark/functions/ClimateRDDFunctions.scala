@@ -23,7 +23,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val varName = dataChunk.getVarShortName
 
       val array = tuple._2.getArray
-      var cellList = ArrayBuffer.empty[Cell]
+      val cellList = ArrayBuffer.empty[Cell]
 
       for (lat:Int <- 0 until shape(0)){
         for (lon:Int <- 0 until shape(1)){

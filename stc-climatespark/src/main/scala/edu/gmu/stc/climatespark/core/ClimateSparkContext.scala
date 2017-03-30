@@ -1,11 +1,12 @@
 package edu.gmu.stc.climatespark.core
 
 import edu.gmu.stc.climatespark.io.ClimateSparkKryoRegistrator
-import edu.gmu.stc.climatespark.rdd.ClimateRDD
-import edu.gmu.stc.hadoop.raster.DataChunk
+import edu.gmu.stc.climatespark.rdd.{ClimateRDD, GenericFileRDD}
+import edu.gmu.stc.hadoop.raster.{DataChunk, DataChunkInputFormat}
 import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
+import org.apache.hadoop.io.Text
 import org.apache.hadoop.mapred.JobConf
 import org.apache.spark.deploy.SparkHadoopUtil
 import org.apache.spark.rdd.RDD
@@ -61,7 +62,13 @@ class ClimateSparkContext (@transient val sparkContext: SparkContext) {
 
     val jconf = new JobConf(this.hConf)
     SparkHadoopUtil.get.addCredentials(jconf)
-    new ClimateRDD(this.sparkContext, this.hConf);
+    new ClimateRDD(this.sparkContext, this.hConf)
+  }
+
+  def getGenericFileRDD: RDD[(Text, Text)] = {
+    val jconf = new JobConf(this.hConf)
+    SparkHadoopUtil.get.addCredentials(jconf)
+    new GenericFileRDD(this.sparkContext, this.hConf)
   }
 
   def getHadoopConfig = this.hConf

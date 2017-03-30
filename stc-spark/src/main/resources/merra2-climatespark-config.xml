@@ -62,6 +62,13 @@
         <value>.nc4</value>
     </property>
 
+    <property>
+        <name>index.vairalbes</name>
+        <value>PRECCU</value>
+        <description>it specifies the variables for the index. If it is blank, will build the index for all variables. If specifying some, build the index
+            for the specified variables. Multiple variables are separated by comma</description>
+    </property>
+
     <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
     <property>
         <name>query.variable.names</name>
