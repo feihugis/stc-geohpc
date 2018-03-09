@@ -12,7 +12,6 @@
         <module>stc-index</module>
         <module>stc-spark</module>
         <module>stc-mapreduce</module>
-        <module>stc-hive</module>
         <module>stc-datavisualization</module>
         <module>stc-climatespark</module>
     </modules>
