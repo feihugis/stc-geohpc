@@ -1,4 +1,4 @@
-package edu.gmu.stc.hadoop.verctor.dataformat.geojson;
+package edu.gmu.stc.hadoop.vector.geojson;
 
 /**
  * Created by Fei Hu on 2/21/16.

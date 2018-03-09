@@ -1,4 +1,4 @@
-package edu.gmu.stc.hadoop.verctor.dataformat.geojson;
+package edu.gmu.stc.hadoop.vector.geojson;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -20,8 +20,8 @@ import edu.gmu.stc.hadoop.vector.Point;
 import edu.gmu.stc.hadoop.vector.Polygon;
 import edu.gmu.stc.hadoop.vector.Rectangle;
 import edu.gmu.stc.hadoop.vector.extension.CountyFeature;
-import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyMultiPolygonJSON;
-import edu.gmu.stc.hadoop.verctor.dataformat.geojson.CountyPolygonJSON;
+import edu.gmu.stc.hadoop.vector.geojson.CountyMultiPolygonJSON;
+import edu.gmu.stc.hadoop.vector.geojson.CountyPolygonJSON;
 import scala.Tuple2;
 import ucar.ma2.Index2D;
 

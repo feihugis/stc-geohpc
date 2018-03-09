@@ -2,11 +2,8 @@ package edu.gmu.stc.climatespark.application
 
 import edu.gmu.stc.climatespark.core.ClimateSparkContext
 import edu.gmu.stc.climatespark.functions.ClimateRDDFunctions._
-import edu.gmu.stc.climatespark.io.datastructure.{MultiCell3, MultiCell}
-import edu.gmu.stc.hadoop.commons.ClimateHadoopConfigParameter
-import org.apache.hadoop.conf.Configuration
+import edu.gmu.stc.climatespark.io.datastructure.Cell5D
 import org.apache.spark.sql.SQLContext
-import org.apache.spark.sql.types._
 
 /**
   * Created by Fei Hu on 11/15/16.
@@ -16,18 +13,26 @@ import org.apache.spark.sql.types._
 object SptiotemporalQuery {
 
   def main(args: Array[String]) {
-    val configFile = "/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/merra2-climatespark-config.xml"      //"/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/mod08-climatespark-config.xml"
+    //val configFile = "/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/merra2-climatespark-config.xml"
+    val configFile = "/Users/feihu/Documents/GitHub/stc-geohpc/stc-spark/src/main/resources/mod08-climatespark-config.xml"
     val sc = new ClimateSparkContext(configFile, "local[6]", "test")
     val sqlContext = new SQLContext(sc.getSparkContext)
-    import sqlContext.implicits._
 
     val climateRDD_1 = sc.getClimateRDD
 
-    val collect = climateRDD_1.avgDaily.collect()
+    println(climateRDD_1.count())
 
-    collect.foreach(s => println(s))
+    val collect = climateRDD_1.queryPointTimeSeries
 
-    println(collect.length)
+    collect.foreach(cell => {
+      println(cell)
+    })
+
+    println(collect.count())
+
+    val weightedValue = climateRDD_1.calWeightedAreaDaily
+    weightedValue.foreach(s => println(s))
+    println(weightedValue.count())
 
     //val weightedAreaAvg = climateRDD_1.weightedAreaAvgDaily
 

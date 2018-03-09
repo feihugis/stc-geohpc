@@ -11,7 +11,7 @@
 
     <property>
         <name>db.databasename</name>
-        <value>m2t1nxint</value>
+        <value>mat1nxslv</value>
         <description> dabasename is the name of the data product</description>
     </property>
 
@@ -49,12 +49,12 @@
     <!--++++++++++++++++++++++ Spatiotemporal Index Configuration ++++++++++++++++++++++-->
     <property>
         <name>mapreduce.input.fileinputformat.inputdir</name>
-        <value>/Users/feihu/Documents/Data/M2T1NXINT/1980/01/</value>
+        <value>/Users/feihu/Documents/Data/MAT1NXSLV/</value>
     </property>
 
     <property>
         <name>index.filepath.prefix</name>
-        <value>/Users/feihu/Documents/Data/M2T1NXINT/1980/01/MERRA2_100.tavg1_2d_int_Nx.</value>
+        <value>/Users/feihu/Documents/Data/MAT1NXSLV/MERRA2_400.tavg1_2d_slv_Nx.</value>
     </property>
 
     <property>
@@ -64,7 +64,7 @@
 
     <property>
         <name>index.vairalbes</name>
-        <value>PRECCU</value>
+        <value>T2M,T10M</value>
         <description>it specifies the variables for the index. If it is blank, will build the index for all variables. If specifying some, build the index
             for the specified variables. Multiple variables are separated by comma</description>
     </property>
@@ -72,18 +72,18 @@
     <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
     <property>
         <name>query.variable.names</name>
-        <value>PRECCU</value>
+        <value>T2M,T10M</value>
         <description>it support multiple input variables, which are separated by comma</description>
     </property>
 
     <property>
         <name>query.time.start</name>
-        <value>19800101</value>
+        <value>20160216</value>
     </property>
 
     <property>
         <name>query.time.end</name>
-        <value>19800102</value>
+        <value>20160216</value>
     </property>
 
     <property>

@@ -9,37 +9,20 @@ import ucar.ma2.{ArrayShort, IndexIterator, MAMath}
 import scala.collection.mutable.ArrayBuffer
 
 import scala.math._
+
+import edu.gmu.stc.climatespark.io.datastructure.CellFactory._
 /**
   * Created by Fei Hu on 11/16/16.
   */
 class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Serializable{
 
-  def queryPointTimeSeries: RDD[Cell] = {
-    self.flatMap(tuple => {
-      val dataChunk = tuple._1
-      val time = dataChunk.getTime
-      val shape =  dataChunk.getShape
-      val corner = dataChunk.getCorner
-      val varName = dataChunk.getVarShortName
+  def queryPointTimeSeries: RDD[Cell] = self.filter(tuple => tuple._1 != null)
+                                            .flatMap(_.getCells)
 
-      val array = tuple._2.getArray
-      val cellList = ArrayBuffer.empty[Cell]
+  def calWeightedAreaDaily: RDD[String] = self.filter(tuple => tuple._1 != null)
+                                            .flatMap(_.calWeightedAreaAvgDaily)
 
-      for (lat:Int <- 0 until shape(0)){
-        for (lon:Int <- 0 until shape(1)){
-          val index = lat*shape(1)+lon
-          val value = array.getShort(index)
-          val y = 89.5F - (corner(0)+lat)*1.0F
-          val x = -179.5F + (corner(1)+lon)*1.0F
-          val cell = Cell(varName, time, 0, y, x, value)
-          cellList += cell
-        }
-      }
-      cellList.toList
-    })
-  }
-
-  def query3DPointTimeSeries: RDD[Cell] = {
+  def query3DPointTimeSeries: RDD[Cell3D] = {
     self.filter(tuple => tuple._1 != null)
       .flatMap(tuple => {
       val dataChunk = tuple._1
@@ -49,7 +32,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val varName = dataChunk.getVarShortName
 
       val array = tuple._2.getArray
-      var cellList = ArrayBuffer.empty[Cell]
+      var cellList = ArrayBuffer.empty[Cell3D]
 
       for (hour:Int <- 0 until shape(0)) {
         for (lat:Int <- 0 until shape(1)){
@@ -58,7 +41,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
             val value = array.getShort(index)
             val y = 89.5F - (corner(1)+lat)*1.0F
             val x = -179.5F + (corner(2)+lon)*1.0F
-            val cell = Cell(varName, time, corner(0), y, x, value)
+            val cell = Cell3D(time, y, x, value)
             cellList += cell
           }
         }
@@ -136,6 +119,7 @@ class ClimateRDDFunctions(self: RDD[(DataChunk, ArraySerializer)]) extends Seria
       val a = array1.getArray
       val b = array2.getArray
       val result = ucar.ma2.Array.factory(a.getElementType, a.getShape);
+
 
       val iterR = result.getIndexIterator
       val iterA = a.getIndexIterator

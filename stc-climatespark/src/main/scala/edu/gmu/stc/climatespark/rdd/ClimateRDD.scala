@@ -4,7 +4,7 @@ import edu.gmu.stc.hadoop.raster.io.datastructure.ArraySerializer
 import edu.gmu.stc.hadoop.raster.{DataChunk, DataChunkInputFormat}
 import org.apache.hadoop.mapreduce.InputFormat
 import org.apache.spark.SparkContext
-import org.apache.hadoop.conf.{Configurable, Configuration}
+import org.apache.hadoop.conf.Configuration
 import org.apache.spark.rdd.NewHadoopRDD
 
 /**

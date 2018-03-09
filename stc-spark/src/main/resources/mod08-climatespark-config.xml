@@ -76,7 +76,7 @@
 
     <property>
         <name>index.vairalbes</name>
-        <value></value>
+        <value>Aerosol_Optical_Depth_Small_Ocean_Standard_Deviation</value>
         <description>it specifies the variables for the index. If it is blank, will build the index for all variables. If specifying some, build the index
         for the specified variables. Multiple variables are separated by comma</description>
     </property>
@@ -84,7 +84,7 @@
     <!--++++++++++++++++++++++ Spatiotemporal Query Configuration ++++++++++++++++++++++-->
     <property>
         <name>query.variable.names</name>
-        <value>aerosol_optical_depth_land_ocean_mean</value>
+        <value>Aerosol_AE2_Ocean_JHisto_vs_Opt_Depth</value>
         <description>it support multiple input variables, which are separated by comma, e.g. Aerosol_Optical_Depth_Land_Ocean_Mean</description>
     </property>
 
@@ -105,13 +105,13 @@
 
     <property>
         <name>query.space.corner</name>
-        <value>33,0</value>
+        <value>0,0,0,0</value>
         <description>the dimensions of corner should be same with that of the variable; leaving it blank means no input corner</description>
     </property>
 
     <property>
         <name>query.space.shape</name>
-        <value>10,4</value>
+        <value>7,8,10,4</value>
         <description>the dimensions of shape should be same with that of the variable; leaving it blank means no input shape</description>
     </property>
 

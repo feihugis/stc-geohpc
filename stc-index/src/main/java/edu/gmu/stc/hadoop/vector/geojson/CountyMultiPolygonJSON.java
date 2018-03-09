@@ -1,4 +1,4 @@
-package edu.gmu.stc.hadoop.verctor.dataformat.geojson;
+package edu.gmu.stc.hadoop.vector.geojson;
 
 /**
  * Created by Fei Hu on 2/21/16.
@@ -79,7 +79,7 @@ public class CountyMultiPolygonJSON {
 
   public void setProperties(
       PropertyJSON properties) {
-    this.properties = properties;
+      this.properties = properties;
   }
 
   public MultiPolygonJSON getGeometry() {

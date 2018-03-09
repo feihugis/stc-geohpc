@@ -13,14 +13,15 @@ import org.apache.hadoop.io.Text
 import org.apache.spark.rdd.RDD
 import org.apache.hadoop.fs.{FileSystem, Path}
 import ucar.nc2.NetcdfFile
+
 import scala.collection.JavaConversions._
+import scala.util.matching.Regex
 
 
 /**
   * Created by Fei Hu on 3/29/17.
   */
 class NetCDFUtils (self: RDD[(Text, Text)]) extends Serializable{
-
 
   def getArray(varName: String): RDD[ArraySerializer] = {
     self.map(tuple => {
@@ -35,17 +36,33 @@ class NetCDFUtils (self: RDD[(Text, Text)]) extends Serializable{
     })
   }
 
-  def buildIndex(varName: String,
+  def getArray(varName: String, stringPattern: String): RDD[(Int, ArraySerializer)] = {
+    self.map { case(path, p) => {
+      val conf = new Configuration
+      val fs = FileSystem.get(conf)
+      val raf = new NcHdfsRaf(fs.getFileStatus(new Path(path.toString)), fs.getConf)
+      val netcdfFile = NetcdfFile.open(raf, path.toString)
+      val variable = netcdfFile.findVariable(varName)
+      val array = variable.read()
+      val date = stringPattern.r.findFirstIn(path.toString).getOrElse(-1).asInstanceOf[String].toInt
+      (date, ArraySerializer.factory(array))
+    }}
+  }
+
+  def buildIndex(varNames: Array[String],
                  filePath_prefix: String, filePath_suffix: String,
                  dbHost: String, dbPort: String, dbName: String,
-                 dbUser: String, dbPWD: String) = self.map(tuple => {
+                 dbUser: String, dbPWD: String): RDD[Int] = self.map(tuple => {
     val filePath = tuple._1.toString
     val dataChunkIndexBuilderImp: DataChunkIndexBuilderImp = new DataChunkIndexBuilderImp(filePath_prefix, filePath_suffix)
     val statement: Statement = new DBConnector(dbHost, dbPort, dbName, dbUser, dbPWD).GetConnStatement
-    val chunkList = new util.ArrayList[DataChunk]
 
-    chunkList.addAll(ChunkUtils.geneDataChunksByVar(filePath, varName))
-    dataChunkIndexBuilderImp.insertDataChunks(chunkList, varName, statement)
+    for (varName <- varNames) {
+      val chunkList = new util.ArrayList[DataChunk]
+      chunkList.addAll(ChunkUtils.geneDataChunksByVar(filePath, varName))
+      dataChunkIndexBuilderImp.insertDataChunks(chunkList, varName, statement)
+    }
+
     statement.getConnection.close()
     1
   })
@@ -65,5 +82,9 @@ object NetCDFUtils {
     val variable = netcdfFile.findVariable("mod08/Data_Fields/Aerosol_Optical_Depth_Small_Ocean_Standard_Deviation")
     val array = variable.read()
     ArraySerializer.factory(array)
+    val pattern = """\d\d\d\d\d\d\d""".r
+    val time = pattern.findFirstIn(path).getOrElse(-1).asInstanceOf[String].toInt
+    print(time)
+
   }
 }
