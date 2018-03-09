@@ -1,9 +1,10 @@
 target/
+*/target
 stc-index/target/
 stc-spark/target/
 stc-mapreduce/target/
 stc-hive/target/
-*/*.iml
+*.iml
 .DS_Store
 
 */.DS_Store
@@ -14,8 +15,8 @@ stc-hive/target/
 .idea/*
 out/*
 
-/Users/feihu/Desktop/
 
-Users/feihu/Desktop/mulcell.csv/.part-00000.crc
 
 *.crc
+
+*.csv
